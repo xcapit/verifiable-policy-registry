@@ -10,11 +10,10 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-from datetime import date
 from pathlib import Path
 
 from vpr import metrics, policy
-from vpr.hashing import to_hex
+from vpr.hashing import keccak256, to_hex
 
 
 def main() -> None:
@@ -32,7 +31,7 @@ def main() -> None:
     p = policy.load(a.policy)
     with open(a.events, encoding="utf-8") as f:
         events = [(r["school_id"], r["day"], r["category"]) for r in csv.DictReader(f) if r["day"] == a.day]
-    rows, suppressed = metrics.aggregate(events, a.k)
+    rows, _ = metrics.aggregate(events, a.k)
     if not rows:
         raise SystemExit(f"no cell reaches k={a.k} on {a.day}")
 
@@ -40,6 +39,11 @@ def main() -> None:
     first = rows[0]
     tampered = metrics.Row(first.school_id, first.day, first.category, first.count + 1)
 
+    appeal_doc = json.dumps(
+        {"format": "vpr-appeal/2", "scope": p.scope, "domain": "educational-site.example", "request": "unblock",
+         "reason": "Used in the science curriculum"},
+        sort_keys=True, separators=(",", ":"),
+    ).encode("utf-8")
     data = {
         "scope": p.scope,
         "scopeId": p.scope_id(),
@@ -47,21 +51,19 @@ def main() -> None:
         "policyUri": "ipfs://example-policy",
         "validDays": int(p.doc.get("valid_days", 90)),
         "reasonCode": int(p.doc.get("reason_code", 1)),
+        "appealDocumentHash": to_hex(keccak256(appeal_doc)),
         "day": a.day,
-        "dayNumber": (date.fromisoformat(a.day) - date(1970, 1, 1)).days,
+        "dayNumber": metrics.day_number(a.day),
         "k": a.k,
-        "suppressedCells": suppressed,
         "root": metrics.dataset_root(rows),
         "datasetUri": "ipfs://example-dataset",
         "row": first.__dict__,
-        "leaf": to_hex(first.leaf()),
         "proof": metrics.row_proof(rows, 0),
         "tamperedRow": tampered.__dict__,
-        "tamperedLeaf": to_hex(tampered.leaf()),
     }
     (out / "e2e.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
     print(f"policy  {p.scope}  contentHash {data['contentHash']}")
-    print(f"day     {a.day} (day {data['dayNumber']})  rows {len(rows)}  suppressed cells {suppressed}  k {a.k}")
+    print(f"day     {a.day} (day {data['dayNumber']})  published rows {len(rows)}  k {a.k}")
     print(f"root    {data['root']}")
 
 

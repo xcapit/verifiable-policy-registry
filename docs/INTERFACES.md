@@ -1,6 +1,6 @@
 # Interfaces
 
-*CC BY 4.0 · Format version 1 · Applies to the contracts in `contracts/src/` and the `vpr` tools 0.1.x*
+*CC BY 4.0 · Policy format 1, dataset format 2, appeal format 2 · Applies to the contracts in `contracts/src/` and the `vpr` tools 0.2.x*
 
 This document specifies every boundary between the components described in [ARCHITECTURE.md](ARCHITECTURE.md): what each side sends, in which format, and what the receiver must check. If two components are built by different teams, this is the contract between them. Anything marked **planned** is not implemented yet and links to its backlog item.
 
@@ -54,7 +54,7 @@ Producer: policy authors (operator drafts, governor signers approve). Consumers:
 | `threat_feeds` | list of `{provider, version}` | optional | Third-party feeds by reference, never copied |
 | `restricted_list_hash` | `0x` hex or `null` | optional | Commitment to a restricted list (see below) |
 
-Validation rules enforced by `vpr.policy.validate`: required keys present; domains valid; every block and exception has a non-empty reason; no domain is both blocked and excepted; `restricted_list_hash` well formed. The fields marked *recommended* or *optional* are checked by the JSON schema but not yet by `validate` ([VPR-007](BACKLOG.md)).
+Validation rules enforced by `vpr.policy.validate`, identical to the JSON schema: required keys present and no unknown keys; scope, version, profile, categories (unique), `valid_days`, `reason_code` and `threat_feeds` well formed; domains valid; every block and exception has exactly a domain and a non-empty reason; no domain is both blocked and excepted; `restricted_list_hash` well formed.
 
 **Canonical form and `contentHash`.**
 
@@ -72,22 +72,28 @@ Source: [`contracts/src/VerifiablePolicyRegistry.sol`](../contracts/src/Verifiab
 
 | Function | Caller | Effect | Reverts |
 | --- | --- | --- | --- |
-| `createScope(bytes32 scopeId, address governor, uint64 maxValidity)` | anyone | Creates a scope | `ScopeAlreadyExists`, `ZeroAddress`, `InvalidValidity` |
+| `createScope(bytes32 scopeId, address governor, uint64 maxValidity)` | the governor itself | Creates a scope | `ScopeAlreadyExists`, `ZeroAddress`, `NotGovernor`, `InvalidValidity` |
 | `setGovernor(bytes32 scopeId, address newGovernor)` | governor | Rotates the governor | `UnknownScope`, `NotGovernor`, `ZeroAddress` |
-| `publishPolicy(bytes32 scopeId, bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 validity, bytes32 resolvesAppeal) → uint256 version` | governor | Appends a version (1-based); optionally accepts an appeal | `UnknownScope`, `NotGovernor`, `EmptyContentHash`, `InvalidValidity`, `AppealNotOpen`, `AppealScopeMismatch` |
-| `fileAppeal(bytes32 scopeId, string uri) → bytes32 appealId` | anyone | Opens an appeal; `appealId = keccak256(abi.encode(scopeId, uri))` | `UnknownScope`, `AppealAlreadyExists` |
-| `rejectAppeal(bytes32 appealId)` | governor of the appeal's scope | Closes an appeal as rejected | `AppealNotOpen`, `NotGovernor` |
+| `setIssuer(bytes32 scopeId, address issuer, Role role)` | governor | Grants, changes or revokes (`Role.None`) the attestation role of an address | `UnknownScope`, `NotGovernor`, `ZeroAddress` |
+| `publishPolicy(bytes32 scopeId, bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 validity, bytes32 resolvesAppeal) → uint256 version` | governor | Appends a version (1-based); optionally accepts an appeal, recording `contentHash` as its resolution | `UnknownScope`, `NotGovernor`, `EmptyContentHash`, `InvalidValidity`, `AppealNotOpen`, `AppealScopeMismatch` |
+| `fileAppeal(bytes32 scopeId, bytes32 documentHash) → bytes32 appealId` | anyone | Opens an appeal for the hash of an appeal document (I9); a rejected document can be filed again in a new round | `UnknownScope`, `EmptyDocumentHash`, `AppealAlreadyExists` |
+| `rejectAppeal(bytes32 appealId, bytes32 reasonHash)` | governor of the appeal's scope | Closes an appeal as rejected, with the hash of a reasoned decision published off-chain | `AppealNotOpen`, `NotGovernor`, `EmptyReason` |
+| `appealIdOf(bytes32 scopeId, bytes32 documentHash, uint32 round) → bytes32` | pure | `keccak256(abi.encode(scopeId, documentHash, round))` | none |
 | `currentPolicy(bytes32 scopeId) → (uint256 version, PolicyVersion policy, bool inForce)` | view | Latest version; `inForce = block.timestamp < expiresAt` | none |
 | `getVersion(bytes32 scopeId, uint256 version) → PolicyVersion` | view | A specific version | panics on out-of-range |
 | `versionCount(bytes32 scopeId) → uint256` | view | Number of versions | none |
 | `scopes(bytes32) → (address governor, uint64 maxValidity, bool exists)` | view | Scope record | none |
-| `appeals(bytes32) → (bytes32 scopeId, uint8 status, uint64 filedAt, string uri)` | view | Appeal record; status `0 None, 1 Open, 2 Accepted, 3 Rejected` | none |
+| `issuerRole(bytes32 scopeId, address) → Role` | view | `0 None, 1 Operator, 2 Reviewer, 3 Auditor`; one role per address per scope | none |
+| `appeals(bytes32) → (bytes32 scopeId, uint8 status, uint32 round, uint64 filedAt, bytes32 documentHash, bytes32 resolutionHash)` | view | Appeal record; status `0 None, 1 Open, 2 Accepted, 3 Rejected` | none |
+| `appealRounds(bytes32 key) → uint32` | view | Latest round for `key = keccak256(abi.encode(scopeId, documentHash))` | none |
 
 `PolicyVersion = (bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 publishedAt, uint64 expiresAt, bytes32 resolvesAppeal)`.
 
-Events: `ScopeCreated(scopeId, governor, maxValidity)`, `GovernorChanged(scopeId, previousGovernor, newGovernor)`, `PolicyPublished(scopeId, version, contentHash, restrictedListHash, uri, reasonCode, expiresAt, resolvesAppeal)`, `AppealFiled(appealId, scopeId, uri)`, `AppealResolved(appealId, accepted)`. Indexed fields: `scopeId`, `version`, `governor` addresses, `appealId`.
+Events: `ScopeCreated(scopeId, governor, maxValidity)`, `GovernorChanged(scopeId, previousGovernor, newGovernor)`, `IssuerSet(scopeId, issuer, role)`, `PolicyPublished(scopeId, version, contentHash, restrictedListHash, uri, reasonCode, expiresAt, resolvesAppeal)`, `AppealFiled(appealId, scopeId, documentHash, round)`, `AppealResolved(appealId, accepted, resolutionHash)`.
 
-Invariants: versions are append-only; every version expires; an appeal moves only `Open → Accepted` or `Open → Rejected`.
+Invariants: versions are append-only; every version expires; an appeal moves only `Open → Accepted` or `Open → Rejected`; a document has at most one open or accepted round; no caller-supplied free text is stored through appeals (the policy `uri` is written by the governor only).
+
+**Scope discovery.** Scope names are not authenticated by the contract: anyone who controls an address can create a scope under any unused name with itself as governor. Verifiers therefore never trust a scope by its name. They pin, from a deployment manifest published by the partners (planned, VPR-049), the chain id, the registry and anchor addresses, the scope id and the expected governor, and they alert on `GovernorChanged` and on changes to the Safe's owners or threshold.
 
 ## I3 · Registry → sync daemon (planned, [VPR-015](BACKLOG.md))
 
@@ -120,30 +126,30 @@ CSV with header `school_id,day,category`, one row per blocked query. These three
 
 ## I6 · Public dataset (aggregator → public)
 
-Produced by `vpr aggregate`. Format described by [`schemas/dataset.schema.json`](../schemas/dataset.schema.json).
+Produced by `vpr aggregate`. Format `vpr-dataset/2`, described by [`schemas/dataset.schema.json`](../schemas/dataset.schema.json).
 
-- CSV with header `school_id,day,category,count`, rows sorted by `(school_id, day, category, count)`, `\n` line endings, UTF-8.
-- Rows with `count < k` are suppressed (default k = 10). The JSON summary reports `k`, `suppressed_cells`, `root` and `rows`.
-- No field may contain `|`.
-- Leaf: `keccak256(utf8("<school_id>|<day>|<category>|<count>"))`, count in decimal without padding.
-- Tree: leaves in row order; parent = `keccak256(min(a,b) ‖ max(a,b))`; an odd node is promoted unchanged. An empty dataset has no root and is not anchored.
-- Anyone can check a dataset with `vpr verify-root dataset.csv <root>`.
+- A release covers exactly one UTC day. CSV with header `school_id,day,category,count`, rows sorted by `(school_id, day, category, count)`, `\n` line endings, UTF-8. Cells `(school_id, day, category)` are unique.
+- Rows with `count < k` are suppressed (default k = 10). The JSON summary reports `format`, `k`, `root` and `rows`. The number of suppressed cells is not published.
+- Leaf: `keccak256(0x00 ‖ day:uint32 ‖ count:uint256 ‖ len(school_id):uint16 ‖ school_id ‖ len(category):uint16 ‖ category)`, big-endian, where `day` is the on-chain day number. Length prefixes make the encoding unambiguous, and the day binds a row to one anchored date.
+- Internal node: `keccak256(0x01 ‖ min(a,b) ‖ max(a,b))`; leaves in row order; an odd node is promoted unchanged. Leaves and nodes are domain-separated as in RFC 9162. An empty release has no root and is not anchored.
+- Anyone can check a release with `vpr verify-root dataset.csv <root>`, or a single row on-chain with `MetricsAnchor.verifyRow`.
 
 ## I7 · `MetricsAnchor` ABI
 
-Source: [`contracts/src/MetricsAnchor.sol`](../contracts/src/MetricsAnchor.sol).
+Source: [`contracts/src/MetricsAnchor.sol`](../contracts/src/MetricsAnchor.sol). Constructed with the address of the policy registry.
 
 | Function | Caller | Effect | Reverts |
 | --- | --- | --- | --- |
-| `configure(bytes32 scopeId, address admin, address publisher)` | anyone, once per scope | Sets admin (expected: governor Safe) and publisher (operator) | `AlreadyConfigured`, `ZeroAddress` |
-| `setPublisher(bytes32 scopeId, address publisher)` | admin | Rotates the publisher | `NotAdmin`, `ZeroAddress` |
+| `setPublisher(bytes32 scopeId, address publisher)` | the scope's current governor in the registry | Appoints or rotates the publisher (operator) | `UnknownScope`, `NotGovernor`, `ZeroAddress` |
 | `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)` | publisher | Write-once root for a day | `NotPublisher`, `EmptyRoot`, `DayAlreadyCommitted` |
 | `getCommitment(bytes32 scopeId, uint32 day) → (bytes32 root, string datasetUri, uint64 committedAt)` | view | Stored commitment | none |
-| `verifyLeaf(bytes32 scopeId, uint32 day, bytes32 leaf, bytes32[] proof) → bool` | view | Checks a row against the anchored root | none |
+| `leafHash(uint32 day, string schoolId, string category, uint256 count) → bytes32` | pure | Leaf of a row (I6) | `FieldTooLong` |
+| `verifyRow(bytes32 scopeId, uint32 day, string schoolId, string category, uint256 count, bytes32[] proof) → bool` | view | Computes the leaf from the row and the anchored day, then checks the proof | `FieldTooLong` |
+| `registry() → address`, `publisher(bytes32) → address` | view | Configuration | none |
 
-Events: `PublisherSet(scopeId, admin, publisher)`, `RootCommitted(scopeId, day, root, datasetUri)`.
+Events: `PublisherSet(scopeId, governor, publisher)`, `RootCommitted(scopeId, day, root, datasetUri)`.
 
-Known gap: `configure` is open to the first caller of each scope, so someone could claim a scope before its operator does. Until this is fixed ([VPR-009](BACKLOG.md)), deployment scripts must configure the anchor scope in the same batch that creates it in the registry ([VPR-010](BACKLOG.md)), and verifiers must check that the anchor admin equals the registry governor.
+There is no first-caller configuration: the governor recorded in the registry is the only party that can appoint a publisher, and a governor rotation in the registry immediately transfers that power. The anchor accepts rows, not raw leaves, so an internal node cannot be presented as a row.
 
 ## I8 · EAS attestations
 
@@ -157,13 +163,13 @@ Definitions: [`schemas/eas-schemas.json`](../schemas/eas-schemas.json) (CC0). Re
 
 All schemas are revocable. For `VPR.IndependentTest.v1`, the booleans are the public summary; `reportHash` commits to the full report, which is shared with the governor signers and not published, since a per-school account of bypass attempts can be useful to an attacker. Verifiers must check that the attester address belongs to the expected role for the scope, and that `validUntil` has not passed. A school counts as protected only with a valid, unrevoked `VPR.IndependentTest.v1` for the policy version in force.
 
-## I9 · Appeal document (planned, [VPR-017](BACKLOG.md))
+## I9 · Appeal document (format 2; relayer planned, [VPR-017](BACKLOG.md))
 
-The `uri` passed to `fileAppeal` points to a small public JSON document:
+An appeal is a small JSON document, canonicalised like a policy document (sorted keys, no whitespace, UTF-8). The contract stores only `documentHash = keccak256(canonical document)`:
 
 ```json
 {
-  "format": "vpr-appeal/1",
+  "format": "vpr-appeal/2",
   "scope": "giga:XX:primary",
   "domain": "educational-site.example",
   "request": "unblock",
@@ -171,7 +177,9 @@ The `uri` passed to `fileAppeal` points to a small public JSON document:
 }
 ```
 
-Allowed `request` values: `unblock`, `block`. The document must not contain names, emails, school staff details or anything about a student. The block page relayer enforces this and rate-limits submissions. Because the appeal id derives from `(scopeId, uri)`, the same document cannot be filed twice.
+Rules enforced by the relayer before it files the hash: exactly these five keys; `request` is `unblock` or `block`; `domain` is a valid domain name; `reason` is at most 280 characters; no names, emails, school staff details or anything about a student. The relayer publishes accepted documents off-chain, keyed by their hash, and can withhold or take down a document that breaks these rules without affecting the on-chain record. Anyone can also file a hash directly; since only a hash reaches the chain, a direct filing cannot place free text on-chain, and an appeal whose document is never published is treated as unsubstantiated.
+
+The governor answers each appeal with a reasoned decision. A rejection records the hash of the published reasoning; an acceptance records the content hash of the policy version that resolves it. A rejected document can be filed again, which opens a new round.
 
 ## I10 · Command-line interface
 
@@ -180,8 +188,9 @@ Installed with `pip install -e tools/`. Exit code `0` on success, non-zero on va
 | Command | Input | Output |
 | --- | --- | --- |
 | `vpr policy-hash <policy>` | Policy document (I1) | `scope`, `scopeId`, `version`, `contentHash` |
-| `vpr compile-rpz <policy> [--feeds-dir DIR] [--restricted FILE] [--block-page HOST] [--out FILE]` | Policy, feeds (`<category>.txt`, one domain per line, `#` comments), optional restricted list | RPZ zone (I4) |
-| `vpr aggregate <events.csv> [--k N] [--out-csv FILE]` | Block events (I5) | JSON summary on stdout, dataset CSV (I6) |
+| `vpr compile-rpz <policy> [--feeds-dir DIR] [--restricted FILE] [--block-page HOST] [--out FILE]` | Policy, feeds (`<category>.txt`, one domain per line, `#` comments), optional restricted list | RPZ zone (I4). Fails closed: a category without a feed, or a restricted list whose hash differs from the policy's, is an error |
+| `vpr aggregate <events.csv> [--day YYYY-MM-DD] [--k N] [--out-csv FILE]` | Block events (I5); `--day` is required when they span several days | JSON summary on stdout, dataset CSV (I6) |
+| `vpr restricted-hash <list>` | Restricted list, one domain per line | Its commitment (I1); the list itself is never published |
 | `vpr verify-root <dataset.csv> <root>` | Dataset (I6) and expected root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
 
 ## Versioning of these interfaces
