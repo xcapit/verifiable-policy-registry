@@ -12,6 +12,9 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-004 | DPIA template `docs/DPIA.md` aligned with UNICEF Policy on Personal Data Protection | Sections for data inventory, necessity, risks, mitigations; reviewed by Giga |
 | VPR-005 | Finalise `docs/PRIVACY_STATEMENT.md` (RFC 8932 RPS) | Placeholders resolved; `vpr` command prints its keccak256 |
 | VPR-006 | Filtering profiles: `policies/profiles/{primary,secondary,teachers}.yaml` mapped to ITU COP categories | Each validates with `vpr policy-hash`; mapping table in `docs/PROFILES.md` |
+| VPR-007 | Validate policy documents against `schemas/policy.schema.json` in `vpr.policy.validate` (`valid_days`, `reason_code`, `profile`, `threat_feeds`, unknown keys) | Invalid example documents fail with a clear message; the shipped example passes; schema and code agree on every field |
+| VPR-008 | `vpr restricted-hash <file>` command printing the restricted list commitment | Output equals `policy.restricted_list_hash()`; documented in `docs/INTERFACES.md` |
+| VPR-009 | Restrict `MetricsAnchor.configure` so only the registry governor of a scope (or a factory) can configure it | A third party cannot claim a scope; tests cover the front-running case; INTERFACES updated |
 
 ## M2 · Registry and attestations
 
@@ -37,7 +40,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-022 | NIST SP 800-81r3 compliance matrix `docs/compliance/nist-800-81r3.md` | Each applicable recommendation mapped to config or control, with evidence |
 | VPR-023 | UK Safer Internet Centre self-certification checklist | Completed and published in `docs/compliance/` |
 | VPR-024 | Security analysis with MIESC + external audit preparation | Findings triaged; no open high-severity issues |
-| VPR-025 | DPG application package | All 9 DPG Standard indicators evidenced with links |
+| VPR-025 | DPG application package | Every item in the *Still to do* list of `docs/DPG.md` closed; all 9 DPG Standard indicators evidenced with links; application submitted by the authorised representative |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
 ## M4 · Research
@@ -53,3 +56,5 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-040 | Add `slither`/MIESC and `ruff` to CI | CI fails on high-severity findings and lint errors |
 | VPR-041 | Gas report for typical operations | Table in `docs/ARCHITECTURE.md` |
 | VPR-042 | Fuzz/invariant tests for the registry (Foundry or Echidna) | Invariants from VPR-001 hold under fuzzing |
+| VPR-043 | REUSE compliance: SPDX headers on every file, `REUSE.toml` for files without headers | `reuse lint` passes in CI |
+| VPR-044 | Docs site (MkDocs or similar) published from `docs/` | Site builds in CI and is linked from the README |

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/xcapit/verifiable-policy-registry/schemas/dataset.schema.json",
+  "title": "VPR daily aggregate dataset (JSON summary)",
+  "description": "Output of `vpr aggregate`. The CSV form has the columns school_id,day,category,count with the same rules. License: CC0-1.0. See docs/INTERFACES.md#i6--public-dataset-aggregator--public.",
+  "type": "object",
+  "required": ["k", "suppressed_cells", "root", "rows"],
+  "additionalProperties": false,
+  "properties": {
+    "k": { "type": "integer", "minimum": 2 },
+    "suppressed_cells": { "type": "integer", "minimum": 0 },
+    "root": {
+      "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^0x[0-9a-f]{64}$" }],
+      "description": "Merkle root of the rows; null when every cell was suppressed"
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["school_id", "day", "category", "count"],
+        "additionalProperties": false,
+        "properties": {
+          "school_id": { "type": "string", "pattern": "^[^|]+$" },
+          "day": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "category": { "type": "string", "pattern": "^[^|]+$" },
+          "count": { "type": "integer", "minimum": 2 }
+        }
+      }
+    }
+  }
+}

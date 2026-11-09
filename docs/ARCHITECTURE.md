@@ -2,6 +2,8 @@
 
 *CC BY 4.0*
 
+The exact formats exchanged between these components (documents, events, datasets, ABIs, attestations) are specified in [INTERFACES.md](INTERFACES.md). The reasons behind the main choices are in the [decision records](adr).
+
 ## Components
 
 | Component | Where | Responsibility | Status in this repo |
@@ -59,6 +61,8 @@ sequenceDiagram
 | Individual queries, IPs, devices | Not stored | Nobody |
 
 ## Contract interfaces (summary)
+
+Full specification, including events, errors and invariants: [INTERFACES.md](INTERFACES.md#i2--verifiablepolicyregistry-abi).
 
 `VerifiablePolicyRegistry`
 
