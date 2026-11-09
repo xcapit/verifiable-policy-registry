@@ -19,7 +19,7 @@ A content filter for children can harm the people it is meant to protect. It can
 
 ## 9a · Data privacy and security
 
-The software does not collect, store or distribute personally identifiable information. Privacy is enforced by what is collected, not by what is deleted later:
+The resolver necessarily processes personal data transiently: it sees client IP addresses and queried names in memory in order to answer each query. The design does not retain, export or publish that data, and privacy is enforced by what leaves the resolver process, not by what is deleted later:
 
 - the resolver answers queries in memory and does not log them;
 - the only data that leaves the resolver is a count per school, day and category;

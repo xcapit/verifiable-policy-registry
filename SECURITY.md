@@ -33,4 +33,4 @@ Out of scope: third-party services (Safe, EAS, OP Mainnet, Unbound) unless the p
 
 ## Data we hold
 
-The project does not collect personal data by design ([privacy statement](docs/PRIVACY_STATEMENT.md)). If you find personal data anywhere in this repository, its history or a published dataset, report it as a vulnerability.
+The resolver processes client addresses and queried names transiently to answer queries, but nothing identifying is retained, exported or published by design ([privacy statement](docs/PRIVACY_STATEMENT.md)). If you find personal data anywhere in this repository, its history or a published dataset, report it as a vulnerability.
