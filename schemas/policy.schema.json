@@ -4,7 +4,14 @@
   "title": "VPR policy document",
   "description": "Public filtering policy for one scope (format version 1). License: CC0-1.0. See docs/INTERFACES.md#i1--policy-document.",
   "type": "object",
-  "required": ["scope", "version", "profile", "categories", "local_blocks", "exceptions"],
+  "required": [
+    "scope",
+    "version",
+    "profile",
+    "categories",
+    "local_blocks",
+    "exceptions"
+  ],
   "additionalProperties": false,
   "properties": {
     "scope": {
@@ -12,44 +19,113 @@
       "pattern": "^[a-z0-9-]+:[A-Z]{2}:[a-z0-9-]+$",
       "description": "<programme>:<ISO 3166-1 alpha-2>:<profile>, e.g. giga:AR:primary"
     },
-    "version": { "type": "integer", "minimum": 1 },
-    "profile": { "enum": ["primary", "secondary", "teachers"] },
-    "valid_days": { "type": "integer", "minimum": 1, "description": "Must not exceed the scope maxValidity on-chain" },
-    "reason_code": { "type": "integer", "enum": [1, 2, 3, 4, 5, 6], "description": "See docs/GOVERNANCE.md#reason-codes" },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "profile": {
+      "enum": [
+        "primary",
+        "secondary",
+        "teachers"
+      ]
+    },
+    "valid_days": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Must not exceed the scope maxValidity on-chain"
+    },
+    "reason_code": {
+      "type": "integer",
+      "enum": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "description": "See docs/GOVERNANCE.md#reason-codes"
+    },
     "categories": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_-]+$"
+      },
       "uniqueItems": true
     },
     "threat_feeds": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["provider", "version"],
+        "required": [
+          "provider",
+          "version"
+        ],
         "additionalProperties": false,
         "properties": {
-          "provider": { "type": "string", "minLength": 1 },
-          "version": { "type": "string", "minLength": 1 }
+          "provider": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
     "restricted_list_hash": {
-      "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^0x[0-9a-f]{64}$" }]
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{64}$"
+        }
+      ]
     },
-    "local_blocks": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
-    "exceptions": { "type": "array", "items": { "$ref": "#/$defs/entry" } }
+    "local_blocks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    },
+    "feed_hashes": {
+      "type": "object",
+      "description": "keccak256 of each category feed (sorted unique normalised domains joined by newlines); keys must equal `categories`",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^0x[0-9a-f]{64}$"
+      }
+    }
   },
   "$defs": {
     "entry": {
       "type": "object",
-      "required": ["domain", "reason"],
+      "required": [
+        "domain",
+        "reason"
+      ],
       "additionalProperties": false,
       "properties": {
         "domain": {
           "type": "string",
           "pattern": "^(?=.{1,253}$)(?!-)([a-z0-9-]{1,63}(?<!-)\\.)+[a-z]{2,63}$"
         },
-        "reason": { "type": "string", "minLength": 1, "pattern": "\\S" }
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
       }
     }
   }

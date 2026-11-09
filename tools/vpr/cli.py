@@ -35,7 +35,10 @@ def _out(a, obj: dict, text: str) -> None:
 
 def cmd_policy_hash(a):
     p = policy.load(a.policy)
-    obj = {"scope": p.scope, "scopeId": p.scope_id(), "version": p.doc["version"], "contentHash": p.content_hash()}
+    obj = {"scope": p.scope, "version": p.doc["version"], "contentHash": p.content_hash()}
+    if a.governor:
+        obj["governor"] = a.governor
+        obj["scopeId"] = p.scope_id(a.governor)
     _out(a, obj, "\n".join(f"{k + ':':<13} {v}" for k, v in obj.items()))
     return EXIT_OK
 
@@ -136,7 +139,33 @@ def cmd_verify_row(a):
 
 
 def cmd_restricted_hash(a):
-    print(policy.restricted_list_hash(policy.load_feed(a.list)))
+    print(policy.list_hash(policy.load_feed(a.list)))
+    return EXIT_OK
+
+
+def cmd_zone_hash(a):
+    print(policy.zone_hash(Path(a.zone).read_text(encoding="utf-8")))
+    return EXIT_OK
+
+
+def cmd_check_onchain(a):
+    """Compare a policy document with the values of its on-chain version (VPR-060)."""
+    p = policy.load(a.policy)
+    checks = {
+        "contentHash": (p.content_hash(), a.content_hash.lower() if a.content_hash else None),
+        "version": (p.doc["version"], a.version),
+        "validitySeconds": (int(p.doc["valid_days"]) * 86400 if "valid_days" in p.doc else None, a.validity),
+        "reasonCode": (p.doc.get("reason_code"), a.reason_code),
+    }
+    results = {k: {"document": d, "onchain": o, "match": o is None or d == o} for k, (d, o) in checks.items()}
+    ok = all(r["match"] for r in results.values())
+    _out(a, {"match": ok, "checks": results}, "\n".join(f"{k:<16} {'ok' if r['match'] else 'MISMATCH'}  document={r['document']} onchain={r['onchain']}" for k, r in results.items()))
+    return EXIT_OK if ok else EXIT_MISMATCH
+
+
+def cmd_appeal_hash(a):
+    doc = json.loads(Path(a.document).read_text(encoding="utf-8"))
+    print(toolkit.appeal_document_hash(doc))
     return EXIT_OK
 
 
@@ -144,8 +173,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="vpr", description="Verifiable Policy Registry tools (toolkit API v1)")
     sub = ap.add_subparsers(required=True)
 
-    s = sub.add_parser("policy-hash", help="validate a policy and print its on-chain identifiers")
+    s = sub.add_parser("policy-hash", help="validate a policy and print its content hash (and scope id, given the governor)")
     s.add_argument("policy")
+    s.add_argument("--governor", help="governor address; the on-chain scope id is keccak256(abi.encode(governor, scope))")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_policy_hash)
 
@@ -172,9 +202,28 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--out-csv")
     s.set_defaults(func=cmd_aggregate)
 
-    s = sub.add_parser("restricted-hash", help="print the commitment of a restricted list file (never publish the list)")
-    s.add_argument("list")
-    s.set_defaults(func=cmd_restricted_hash)
+    for name, help_text in (("restricted-hash", "print the commitment of a restricted list file (never publish the list)"),
+                            ("list-hash", "print the commitment of a domain list (feed_hashes, restricted_list_hash)")):
+        s = sub.add_parser(name, help=help_text)
+        s.add_argument("list")
+        s.set_defaults(func=cmd_restricted_hash)
+
+    s = sub.add_parser("zone-hash", help="print keccak256 of a compiled zone (resolverConfigHash in the deployment attestation)")
+    s.add_argument("zone")
+    s.set_defaults(func=cmd_zone_hash)
+
+    s = sub.add_parser("check-onchain", help="compare a policy document with the values of its on-chain version")
+    s.add_argument("policy")
+    s.add_argument("--content-hash")
+    s.add_argument("--version", type=int)
+    s.add_argument("--validity", type=int, help="validity in seconds passed to publishPolicy")
+    s.add_argument("--reason-code", type=int)
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_check_onchain)
+
+    s = sub.add_parser("appeal-hash", help="validate an appeal document (vpr-appeal/3) and print the hash to file")
+    s.add_argument("document")
+    s.set_defaults(func=cmd_appeal_hash)
 
     s = sub.add_parser("verify-root", help="recompute a published release's root")
     s.add_argument("dataset")

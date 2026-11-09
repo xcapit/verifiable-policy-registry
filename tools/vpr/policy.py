@@ -17,7 +17,7 @@ from pathlib import Path
 
 import yaml
 
-from .hashing import keccak256, to_hex
+from .hashing import keccak256, scope_id, to_hex
 
 DOMAIN_RE = re.compile(r"^(?=.{1,253}$)(?!-)([a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,63}$")
 
@@ -32,7 +32,7 @@ REASON_CODES = {
 }
 
 REQUIRED_KEYS = {"scope", "version", "profile", "categories", "local_blocks", "exceptions"}
-OPTIONAL_KEYS = {"valid_days", "reason_code", "threat_feeds", "restricted_list_hash"}
+OPTIONAL_KEYS = {"valid_days", "reason_code", "threat_feeds", "restricted_list_hash", "feed_hashes"}
 PROFILES = {"primary", "secondary", "teachers"}
 SCOPE_RE = re.compile(r"[a-z0-9-]+:[A-Z]{2}:[a-z0-9-]+")  # used with fullmatch
 CATEGORY_RE = re.compile(r"[a-z0-9_-]{1,64}")  # used with fullmatch
@@ -57,9 +57,9 @@ class Policy:
     def content_hash(self) -> str:
         return to_hex(keccak256(self.canonical_json()))
 
-    def scope_id(self) -> str:
-        """bytes32 scope id used on-chain: keccak256 of the scope string."""
-        return to_hex(keccak256(self.scope.encode("utf-8")))
+    def scope_id(self, governor: str) -> str:
+        """bytes32 scope id used on-chain: keccak256(abi.encode(governor, scope)) (VerifiablePolicyRegistry.scopeIdOf)."""
+        return scope_id(governor, self.scope)
 
 
 def _check_domain(d: str, where: str) -> str:
@@ -121,6 +121,12 @@ def validate(doc: dict) -> Policy:
     overlap = blocked & allowed
     if overlap:
         raise PolicyError(f"domains both blocked and excepted: {sorted(overlap)}")
+    fh = doc.get("feed_hashes")
+    if fh is not None:
+        if not isinstance(fh, dict) or set(fh) != set(cats):
+            raise PolicyError("feed_hashes must map every category, and only those, to a feed hash")
+        if not all(isinstance(v, str) and re.fullmatch(r"0x[0-9a-f]{64}", v) for v in fh.values()):
+            raise PolicyError("feed hashes must be 0x-prefixed 32-byte hex strings")
     rlh = doc.get("restricted_list_hash")
     if rlh is not None and not re.fullmatch(r"0x[0-9a-f]{64}", str(rlh)):
         raise PolicyError("restricted_list_hash must be a 0x-prefixed 32-byte hex string")
@@ -188,6 +194,11 @@ def compile_rpz(
         raise PolicyError(f"no feed, or an empty feed, for categories {missing}: refusing to compile a zone without promised protection")
     if block_page is not None:
         block_page = _check_domain(block_page, "block_page")
+    declared_feeds = policy.doc.get("feed_hashes")
+    if declared_feeds:
+        for cat in policy.doc["categories"]:
+            if cat in feeds and list_hash(feeds[cat]) != declared_feeds[cat]:
+                raise PolicyError(f"feed for category {cat!r} does not match the hash declared in the policy")
     declared = policy.doc.get("restricted_list_hash")
     if declared and restricted is None:
         raise PolicyError("the policy declares a restricted list but none was supplied")
@@ -240,9 +251,27 @@ def compile_rpz(
     return "\n".join(lines) + "\n"
 
 
+def list_hash(domains: list[str]) -> str:
+    """Commitment to a domain list: keccak256 of the sorted, unique, normalised domains joined by newlines.
+    Used for restricted lists and for category feeds (feed_hashes)."""
+    return restricted_list_hash(domains)
+
+
+def zone_hash(zone: str) -> str:
+    """keccak256 of a compiled zone's bytes; the value a deployment attestation records as resolverConfigHash."""
+    return to_hex(keccak256(zone.encode("utf-8")))
+
+
 def restricted_list_hash(domains: list[str]) -> str:
-    """Commitment to a restricted list: keccak256 of the sorted, newline-joined domains."""
-    norm = sorted({_check_domain(d, "restricted") for d in domains})
+    """Commitment to a restricted list: keccak256 of the sorted, newline-joined domains.
+    Errors give the position only, never the entry."""
+    norm_set = set()
+    for i, d in enumerate(domains, start=1):
+        dn = d.strip().lower().removesuffix(".") if isinstance(d, str) else ""
+        if not DOMAIN_RE.fullmatch(dn):
+            raise PolicyError(f"invalid entry {i} in the list")
+        norm_set.add(dn)
+    norm = sorted(norm_set)
     return to_hex(keccak256("\n".join(norm).encode("utf-8")))
 
 

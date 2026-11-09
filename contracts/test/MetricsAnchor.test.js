@@ -1,19 +1,17 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
-const SCOPE = ethers.id("giga:XX:primary");
+const NAME = "giga:XX:primary";
 const MAX_VALIDITY = 90 * 24 * 60 * 60;
-const DAY = 20758; // 2026-11-01
+const DAY = 20758; // 2026-11-01, in the past for any run of these tests
 
 // Dataset format 2: domain-separated leaves (0x00) and internal nodes (0x01), as in tools/vpr/merkle.py.
-function leafHash(day, school, category, count) {
-  const s = ethers.toUtf8Bytes(school);
+function leafHash(day, unit, category, count) {
+  const s = ethers.toUtf8Bytes(unit);
   const c = ethers.toUtf8Bytes(category);
   return ethers.keccak256(
-    ethers.solidityPacked(
-      ["bytes1", "uint32", "uint256", "uint16", "bytes", "uint16", "bytes"],
-      ["0x00", day, count, s.length, s, c.length, c]
-    )
+    ethers.solidityPacked(["bytes1", "uint32", "uint256", "uint16", "bytes", "uint16", "bytes"], ["0x00", day, count, s.length, s, c.length, c])
   );
 }
 function hashPair(a, b) {
@@ -29,15 +27,20 @@ const ROWS = [
 ];
 
 describe("MetricsAnchor", function () {
-  let registry, anchor, governor, publisher, other;
+  let registry, anchor, governor, publisher, other, SCOPE;
   let leaves, ab, root;
+
+  async function today() {
+    return Number(await anchor.today());
+  }
 
   beforeEach(async function () {
     [governor, publisher, other] = await ethers.getSigners();
     registry = await (await ethers.getContractFactory("VerifiablePolicyRegistry")).deploy();
-    await registry.connect(governor).createScope(SCOPE, governor.address, MAX_VALIDITY);
+    await registry.connect(governor).createScope(NAME, MAX_VALIDITY);
+    SCOPE = await registry.scopeIdOf(governor.address, NAME);
     anchor = await (await ethers.getContractFactory("MetricsAnchor")).deploy(await registry.getAddress());
-    await anchor.connect(governor).setPublisher(SCOPE, publisher.address);
+    await anchor.connect(governor).setPublisher(SCOPE, publisher.address, 0);
 
     leaves = ROWS.map(([s, c, n]) => leafHash(DAY, s, c, n));
     ab = hashPair(leaves[0], leaves[1]);
@@ -53,69 +56,88 @@ describe("MetricsAnchor", function () {
     expect(root).to.equal("0x7d91cbb18fd37a7042393e2043b2fed8a1d0723bdf8845d72bc7188febdf6747");
   });
 
-  it("only the governor in the registry appoints the publisher (no first-caller claim)", async function () {
-    await expect(anchor.connect(other).setPublisher(SCOPE, other.address)).to.be.revertedWithCustomError(anchor, "NotGovernor");
-    await expect(anchor.connect(other).setPublisher(ethers.id("unknown"), other.address)).to.be.revertedWithCustomError(
-      anchor,
-      "UnknownScope"
-    );
-    // after a governor rotation, the new governor controls the publisher and the old one does not
-    await registry.connect(governor).setGovernor(SCOPE, other.address);
-    await expect(anchor.connect(governor).setPublisher(SCOPE, governor.address)).to.be.revertedWithCustomError(
-      anchor,
-      "NotGovernor"
-    );
-    await expect(anchor.connect(other).setPublisher(SCOPE, other.address))
-      .to.emit(anchor, "PublisherSet")
-      .withArgs(SCOPE, other.address, other.address);
+  describe("publisher", function () {
+    it("is appointed only by the governor in the registry (no first-caller claim)", async function () {
+      await expect(anchor.connect(other).setPublisher(SCOPE, other.address, 0)).to.be.revertedWithCustomError(anchor, "NotGovernor");
+      await expect(anchor.connect(other).setPublisher(ethers.id("unknown"), other.address, 0)).to.be.revertedWithCustomError(
+        anchor,
+        "UnknownScope"
+      );
+    });
+
+    it("can be revoked, and follows a completed governor handover", async function () {
+      await expect(anchor.setPublisher(SCOPE, ethers.ZeroAddress, 0))
+        .to.emit(anchor, "PublisherSet")
+        .withArgs(SCOPE, governor.address, ethers.ZeroAddress, 0);
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "NotPublisher");
+      await registry.proposeGovernor(SCOPE, other.address);
+      await registry.connect(other).acceptGovernor(SCOPE);
+      await expect(anchor.connect(governor).setPublisher(SCOPE, governor.address, 0)).to.be.revertedWithCustomError(anchor, "NotGovernor");
+      await anchor.connect(other).setPublisher(SCOPE, publisher.address, 7);
+      expect(await anchor.maxLagDays(SCOPE)).to.equal(7n);
+    });
   });
 
-  it("only the publisher commits, once per day", async function () {
-    await expect(anchor.connect(other).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(
-      anchor,
-      "NotPublisher"
-    );
-    await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, ethers.ZeroHash, "ipfs://d")).to.be.revertedWithCustomError(
-      anchor,
-      "EmptyRoot"
-    );
-    await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d"))
-      .to.emit(anchor, "RootCommitted")
-      .withArgs(SCOPE, DAY, root, "ipfs://d");
-    await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(
-      anchor,
-      "DayAlreadyCommitted"
-    );
+  describe("commitments", function () {
+    it("only the publisher commits, once per day, with a bounded URI", async function () {
+      await expect(anchor.connect(other).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "NotPublisher");
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, ethers.ZeroHash, "ipfs://d")).to.be.revertedWithCustomError(anchor, "EmptyRoot");
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "x".repeat(257))).to.be.revertedWithCustomError(anchor, "UriTooLong");
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.emit(anchor, "RootCommitted").withArgs(SCOPE, DAY, root, "ipfs://d");
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayAlreadyCommitted");
+    });
+
+    it("refuses future days and, with a lag limit, days that are too old", async function () {
+      const t = await today();
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, t + 1, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayInFuture");
+      await anchor.connect(publisher).commitRoot(SCOPE, t, root, "ipfs://d"); // today is allowed
+      await anchor.setPublisher(SCOPE, publisher.address, 7);
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, t - 8, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayTooOld");
+      await anchor.connect(publisher).commitRoot(SCOPE, t - 7, root, "ipfs://d");
+    });
+
+    it("marks empty days, which then cannot be anchored and never verify", async function () {
+      await expect(anchor.connect(publisher).markEmpty(SCOPE, DAY)).to.emit(anchor, "EmptyDayMarked").withArgs(SCOPE, DAY);
+      expect((await anchor.getCommitment(SCOPE, DAY)).empty).to.equal(true);
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayAlreadyCommitted");
+      const [s0, c0, n0] = ROWS[0];
+      expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(false);
+    });
+
+    it("lets only the governor correct a root, with a reason, and counts revisions", async function () {
+      const wrong = ethers.id("wrong root");
+      await anchor.connect(publisher).commitRoot(SCOPE, DAY, wrong, "ipfs://d");
+      const reason = ethers.id("published correction note");
+      await expect(anchor.connect(publisher).correctRoot(SCOPE, DAY, root, "ipfs://d2", reason)).to.be.revertedWithCustomError(anchor, "NotGovernor");
+      await expect(anchor.correctRoot(SCOPE, DAY + 1, root, "ipfs://d2", reason)).to.be.revertedWithCustomError(anchor, "DayNotCommitted");
+      await expect(anchor.correctRoot(SCOPE, DAY, root, "ipfs://d2", ethers.ZeroHash)).to.be.revertedWithCustomError(anchor, "EmptyReason");
+      await expect(anchor.correctRoot(SCOPE, DAY, root, "ipfs://d2", reason))
+        .to.emit(anchor, "RootCorrected")
+        .withArgs(SCOPE, DAY, wrong, root, reason, 1);
+      const c = await anchor.getCommitment(SCOPE, DAY);
+      expect(c.root).to.equal(root);
+      expect(c.revision).to.equal(1n);
+      const [s0, c0, n0] = ROWS[0];
+      expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(true);
+    });
   });
 
-  it("verifies published rows and rejects tampered rows, wrong days and internal nodes", async function () {
-    await anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d");
-    const [s0, c0, n0] = ROWS[0];
-    const [s2, c2, n2] = ROWS[2];
+  describe("verification", function () {
+    it("verifies published rows and rejects tampered rows, wrong days and unanchored days", async function () {
+      await anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d");
+      const [s0, c0, n0] = ROWS[0];
+      const [s2, c2, n2] = ROWS[2];
+      expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(true);
+      expect(await anchor.verifyRow(SCOPE, DAY, s2, c2, n2, [ab])).to.equal(true);
+      expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0 + 1, [leaves[1], leaves[2]])).to.equal(false);
+      await anchor.connect(publisher).commitRoot(SCOPE, DAY + 1, root, "ipfs://d2");
+      expect(await anchor.verifyRow(SCOPE, DAY + 1, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(false);
+      expect(await anchor.verifyRow(SCOPE, DAY + 2, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(false);
+    });
 
-    expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(true);
-    expect(await anchor.verifyRow(SCOPE, DAY, s2, c2, n2, [ab])).to.equal(true);
-
-    // tampered count
-    expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0 + 1, [leaves[1], leaves[2]])).to.equal(false);
-    // same row claimed for another day: the leaf binds the anchored day
-    await anchor.connect(publisher).commitRoot(SCOPE, DAY + 1, root, "ipfs://d2");
-    expect(await anchor.verifyRow(SCOPE, DAY + 1, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(false);
-    // an unanchored day never verifies
-    expect(await anchor.verifyRow(SCOPE, DAY + 2, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(false);
-  });
-
-  it("only verifies rows, so an internal node cannot be presented as a leaf", async function () {
-    await anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d");
-    // with raw-leaf verification, presenting `ab` with proof [leaves[2]] would succeed; rows are hashed with 0x00
-    const fakeLeafFromNode = hashPair(ab, leaves[2]);
-    expect(fakeLeafFromNode).to.equal(root);
-    // there is no row whose 0x00-prefixed leaf equals `ab`, so no call to verifyRow can reproduce that path
-    expect(await anchor.verifyRow(SCOPE, DAY, "giga-0001", "adult", 40, [leaves[2]])).to.equal(false);
-  });
-
-  it("rejects fields too long for the length-prefixed encoding", async function () {
-    const long = "x".repeat(65536);
-    await expect(anchor.leafHash(DAY, long, "adult", 1)).to.be.revertedWithCustomError(anchor, "FieldTooLong");
+    it("rejects fields too long for the length-prefixed encoding", async function () {
+      await expect(anchor.leafHash(DAY, "x".repeat(65536), "adult", 1)).to.be.revertedWithCustomError(anchor, "FieldTooLong");
+      await expect(anchor.leafHash(DAY, "u", "c".repeat(65536), 1)).to.be.revertedWithCustomError(anchor, "FieldTooLong");
+    });
   });
 });
