@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+- README badge and ZK paragraph aligned with white paper v0.4 and the two-phase plan.
+- White paper §11: replay-relevant public inputs bound in the statement; circuit audit placed in phase 2.
+
 ## [0.2.0] - 2026-11-09
 
 Hardened contracts and data formats, an end-to-end demo, the team, and a two-phase pilot plan, following external review. Contracts are still not audited. This release breaks compatibility with 0.1.0: the `MetricsAnchor` constructor and publisher model, `verifyRow` in place of `verifyLeaf`, dataset format 2 and appeal format 2.
@@ -29,7 +33,7 @@ Hardened contracts and data formats, an end-to-end demo, the team, and a two-pha
 - DPG self-assessment re-checked against DPG Standard v1.1.6, with evidence-based status words; indicators 7 and 9 marked as gaps.
 - Appeal storage redesign tracked as VPR-048; white paper reference to VPR-027 fixed.
 - White paper v0.4: zero-knowledge proofs of aggregation described as planned for M4; the event-log commitment must be hiding; canary events as a partial check on log completeness.
-- Roadmap: M1 renamed *Design and sign-off*, without the funding application; M4 acceptance window aligned with prover integration (from week 14); fallback acceptance if the circuit audit slips.
+- Roadmap: M1 renamed *Design and sign-off*, without the funding application; M4 acceptance window aligned with prover integration (from week 14).
 - Backlog: canary events (VPR-038); Spanish and Portuguese block page and appeal form (VPR-017).
 - ADR-0007 retitled to describe small-cell suppression.
 

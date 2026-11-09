@@ -1,6 +1,6 @@
 # Verifiable Policy Registry
 
-[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.3-informational.svg)](docs/WHITEPAPER.md)
+[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.4-informational.svg)](docs/WHITEPAPER.md)
 
 **Accountable, privacy-preserving content filtering for school connectivity.**
 
@@ -28,7 +28,7 @@ The system is built around seven properties, stated formally in the [white paper
 | Attested enforcement | A school counts as protected only with a valid attestation from the independent reviewer | Reviewer |
 | Aggregate integrity | Published impact figures cannot be changed after anchoring, contain only counts at or above a suppression threshold, and, from milestone M4 (testnet, phase 1), come with a zero-knowledge proof that they aggregate the committed event log under the policy in force | Cryptography; ZK proof planned (M4); completeness of the log rests on the reviewer |
 
-What the ledger cannot prove is that a resolver behaves as declared at runtime. It is covered by independent black-box testing and audit. In addition, the pilot plans [zero-knowledge proofs of aggregation](docs/WHITEPAPER.md#11-closing-the-enforcementaccountability-gap): by the end of the pilot, every daily release is to carry a proof, verified on-chain, that it is the correct k-suppressed aggregation of a committed event log under the policy in force.
+What the ledger cannot prove is that a resolver behaves as declared at runtime. It is covered by independent black-box testing and audit. In addition, the pilot plans [zero-knowledge proofs of aggregation](docs/WHITEPAPER.md#11-closing-the-enforcementaccountability-gap): from week 14 of phase 1, every alpha release is to carry a proof, verified on OP Sepolia, that it is the correct k-suppressed aggregation of a committed event log under the policy in force. The circuit audit and the mainnet verifier belong to phase 2.
 
 ## Documentation
 
