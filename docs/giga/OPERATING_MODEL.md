@@ -1,6 +1,6 @@
 # Operating model
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.3 preparation*
+*CC BY 4.0 · Proposal package for a school pilot · v0.3.0*
 
 Proposed allocation of work during a pilot, together with the decisions required for maintenance, funding and handover. Every holder below is provisional; no institution has accepted a role (see [OPEN_QUESTIONS_FOR_GIGA.md](OPEN_QUESTIONS_FOR_GIGA.md)).
 

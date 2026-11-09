@@ -4,7 +4,7 @@
 
 ## 1. Existing work, not part of a future request
 
-The following exist in the [v0.2.0 release](https://github.com/xcapit/verifiable-policy-registry/releases/tag/v0.2.0) plus the unreleased v0.3 branch (the toolkit API, `vpr evaluate`, the public-service example and the evidence-producing demonstrator are v0.3 additions; see CHANGELOG *Unreleased*). They are offered as the starting point, not as deliverables of a grant:
+The following exist in the [v0.2.0 release](https://github.com/xcapit/verifiable-policy-registry/releases/tag/v0.2.0) and the [v0.3.0 release](https://github.com/xcapit/verifiable-policy-registry/releases/tag/v0.3.0) (the toolkit API, `vpr evaluate`, the public-service example and the evidence-producing demonstrator are v0.3 additions; see CHANGELOG 0.3.0). They are offered as the starting point, not as deliverables of a grant:
 
 | Component | Evidence | Status |
 | --- | --- | --- |
