@@ -1,6 +1,6 @@
 # Localisation and accessibility
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.3.0*
+*CC BY 4.0 · Proposal package for a school pilot · v0.4.0*
 
 What people at schools and ministries will read and use, in which languages, and how it is made accessible. **No translation exists yet.** Repository documentation is in English; everything below in other languages is Planned.
 
