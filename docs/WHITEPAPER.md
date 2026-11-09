@@ -13,7 +13,7 @@ Correspondence: dpg@xcapit.com
 
 Programmes that connect schools to the internet must protect children from malware, phishing and harmful content, and in practice they do so with network-level content filtering. The same mechanism is among the most common instruments of internet censorship. Its legitimacy therefore depends on properties that today's filters do not provide: the public cannot learn what is blocked, who decided it, for how long, or whether the infrastructure records children's browsing. We present the *Verifiable Policy Registry* (VPR), a system that separates the **enforcement plane** of filtering, a conventional protective DNS resolver operated in-country, from an **accountability plane** built on a public blockchain. In the accountability plane, every policy version is committed to by hash, authorised by a threshold of independent institutions, bounded in time and open to appeal. The correct deployment of a policy is attested by a party other than the operator. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle commitment that anyone can recompute.
 
-We state the security properties the system offers, separate those that hold cryptographically from those that rest on institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We narrow that gap with zero-knowledge proofs that bind the published figures to a committed event log and to the policy in force, specified here and scheduled for implementation in the pilot, and identify trusted execution as further work. The first deployment targets a pilot in 20 to 50 schools connected by UNICEF Giga in Latin America. The design is generic to any bounded network with an accountable governor.
+We state the security properties the system offers, separate those that hold cryptographically from those that rest on institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We narrow that gap with zero-knowledge proofs that bind the published figures to a committed event log and to the policy in force, specified here and scheduled as a reference implementation on testnet in the first phase of the pilot, and identify trusted execution as further work. The first deployment targets UNICEF Giga schools in Latin America: a controlled alpha in a few schools, followed, if its gates are met, by a cohort of 20 to 50. The design is generic to any bounded network with an accountable governor.
 
 ---
 
@@ -260,18 +260,18 @@ The proposed network is OP Mainnet, where EAS is deployed and transaction costs 
 
 ## 9. Evaluation plan
 
-The pilot lasts four months: one month of design and sign-off, followed by three months of build, deployment and measurement (see the roadmap [4]). It will be evaluated against the following indicators, to be agreed with Giga.
+The pilot has two phases (see the roadmap [4]). Phase 1 lasts four months: one month of design and sign-off, then three months to build a testnet reference implementation, run an alpha in two to five schools, audit and deploy the registry, and implement the zero-knowledge aggregation on testnet. Phase 2, which starts only if the phase 1 gates are met, scales to a cohort of 20 to 50 schools and takes the verifier to mainnet after its own audit. The indicators below, to be agreed with Giga, apply to each phase with the targets shown.
 
 | Indicator | Target |
 | --- | --- |
-| Schools protected and holding a valid independent test attestation | 20–50 |
+| Schools protected and holding a valid independent test attestation | Phase 1: at least 2 of 2–5 alpha schools; phase 2: 20–50 |
 | Policy changes authorised by the multisignature and published with their reason | 100% |
 | Personal data on-chain or in published datasets | None, confirmed by the external audit |
 | Reports of wrongly blocked sites answered | Within 5 working days |
 | Attested schools passing the periodic bypass test | All |
 | Resolver availability | 99.9% |
 | Published roots recomputed by a party outside the project | At least one |
-| Digital Public Good registration | Approved |
+| Digital Public Good registration | Application submitted with signed evidence for indicators 7–9 (phase 1); approval is an outcome, not a deliverable |
 
 ---
 
@@ -283,7 +283,7 @@ DNS filtering operates on domain names. IWF entries that are individual URLs on 
 
 ## 11. Closing the enforcement–accountability gap
 
-The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. The pilot closes the middle link with zero-knowledge proofs of aggregation, planned as a milestone of their own (M4) and not yet implemented in the proof of concept. Trusted execution and verifiable differential privacy remain further work.
+The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. The pilot closes the middle link with zero-knowledge proofs of aggregation. They are planned as a reference implementation on testnet in phase 1 (milestone M4), with the circuit audit and mainnet verifier in phase 2, and are not yet implemented in the proof of concept. Trusted execution and verifiable differential privacy remain further work.
 
 <p align="center"><img src="figures/fig7-gap.svg" alt="Enforcement-accountability gap link by link" width="100%"></p>
 

@@ -2,7 +2,7 @@
 
 *CC BY 4.0 · Checked against the [DPG Standard](https://github.com/DPGAlliance/DPG-Standard) v1.1.6 (tag `v1.1.6`, the current version according to the DPGA repository) · Last review: 2026-11-09. The application itself is made through the DPGA's live questionnaire, which takes precedence over this page.*
 
-We intend to submit the Verifiable Policy Registry to the [Digital Public Goods Alliance](https://digitalpublicgoods.net/) at milestone M2 ([ROADMAP](ROADMAP.md)). This page maps each indicator to the evidence in this repository, so reviewers and contributors can see what is done and what is missing. It is tracked as [VPR-025](BACKLOG.md).
+We intend to submit the Verifiable Policy Registry to the [Digital Public Goods Alliance](https://digitalpublicgoods.net/) during milestone M3 of phase 1, once the evidence for indicators 7–9 is signed ([ROADMAP](ROADMAP.md)). This page maps each indicator to the evidence in this repository, so reviewers and contributors can see what is done and what is missing. It is tracked as [VPR-025](BACKLOG.md).
 
 | # | Indicator | Status | Evidence |
 | --- | --- | --- | --- |

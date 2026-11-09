@@ -18,7 +18,7 @@ The exact formats exchanged between these components (documents, events, dataset
 | Aggregator (`vpr.metrics`) | Operator / anyone | k-suppression, dataset, Merkle root and proofs | Implemented + tests |
 | Block page | Web | Explains the block; links to appeal | Pending (BACKLOG) |
 | ZK aggregation prover | Next to the aggregator | Proves that each daily release is the k-suppressed aggregation of the committed event log under the policy in force | Planned (ROADMAP M4) |
-| ZK verifier | Ethereum L2 | Verifies the daily proof before a root is accepted | Planned (ROADMAP M4) |
+| ZK verifier | Ethereum L2 | Verifies the daily proof before a root is accepted | Planned (ROADMAP M4 on testnet; mainnet in phase 2) |
 | Dashboard | Web | Public view of policies, attestations and metrics | Pending (BACKLOG) |
 
 ## Data flow
@@ -89,7 +89,7 @@ Merkle scheme (dataset format 2): sorted pairs, leaves `keccak256(0x00 ‖ day �
 
 ```mermaid
 flowchart TB
-  subgraph schools["20–50 Giga schools"]
+  subgraph schools["Giga schools: alpha 2–5, cohort 20–50"]
     R1[School router] --- R2[School router]
   end
   ISP[Connectivity provider] --> RES

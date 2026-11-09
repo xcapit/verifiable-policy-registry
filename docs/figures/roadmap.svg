@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 673" width="960" height="673" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
-<rect width="960" height="673" fill="#ffffff"/>
-<text x="16" y="32" font-size="17" font-weight="600" fill="#0f172a">Pilot roadmap · one month of design and sign-off, three months of work</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 698" width="960" height="698" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<rect width="960" height="698" fill="#ffffff"/>
+<text x="12" y="32" font-size="17" font-weight="600" fill="#0f172a">Phase 1 · one month of design and sign-off, three months of work, three gates</text>
 <rect x="230" y="50" width="176" height="22" fill="#fef3c7"/>
 <text x="318" y="66" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">Month 1 · design and sign-off</text>
 <rect x="406" y="50" width="176" height="22" fill="#f1f5f9"/>
@@ -43,52 +43,53 @@
 <text x="824.0" y="88" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle">w14</text>
 <text x="868.0" y="88" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle">w15</text>
 <text x="912.0" y="88" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle">w16</text>
-<text x="16" y="120" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M1 Design and sign-off</text>
+<text x="12" y="120" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M1 Design and sign-off</text>
 <rect x="232" y="104" width="40" height="22" rx="4" fill="#fffbeb" stroke="#d97706"/>
-<text x="278" y="119" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">kick-off · work plan · data inventory</text>
+<text x="278" y="119" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">kick-off · data inventory</text>
 <rect x="276" y="132" width="40" height="22" rx="4" fill="#fffbeb" stroke="#d97706"/>
-<text x="322" y="147" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">threat model · Safe · charter · schools</text>
+<text x="322" y="147" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">threat model · charter · Safe</text>
 <rect x="320" y="160" width="40" height="22" rx="4" fill="#fffbeb" stroke="#d97706"/>
-<text x="366" y="175" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">contract, EAS and ZK specs · profiles</text>
+<text x="366" y="175" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">contract, EAS and ZK specs</text>
 <rect x="364" y="188" width="40" height="22" rx="4" fill="#fffbeb" stroke="#d97706"/>
-<text x="410" y="203" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">DPIA · sign-off · auditor booked</text>
-<text x="16" y="242" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M2 Registry and attestations</text>
+<text x="410" y="203" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">DPIA · sign-off · auditor</text>
+<text x="12" y="242" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M2 Testnet reference + alpha</text>
 <rect x="408" y="226" width="84" height="22" rx="4" fill="#eff6ff" stroke="#2563eb"/>
 <text x="498" y="241" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">contracts on OP Sepolia</text>
 <rect x="452" y="254" width="128" height="22" rx="4" fill="#eff6ff" stroke="#2563eb"/>
-<text x="586" y="269" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">resolver · sync · exporter</text>
+<text x="586" y="269" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">resolver · sync · relayer</text>
 <rect x="540" y="282" width="128" height="22" rx="4" fill="#eff6ff" stroke="#2563eb"/>
-<text x="674" y="297" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">20–50 schools attested</text>
-<text x="16" y="336" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M3 Metrics and audit</text>
-<rect x="540" y="320" width="392" height="22" rx="4" fill="#ecfdf5" stroke="#059669"/>
-<text x="546" y="335" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">daily metrics and anchoring</text>
+<text x="546" y="297" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">alpha in 2–5 schools</text>
+<text x="12" y="336" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M3 Metrics, audit, mainnet</text>
+<rect x="584" y="320" width="348" height="22" rx="4" fill="#ecfdf5" stroke="#059669"/>
+<text x="590" y="335" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">daily releases and anchoring</text>
 <rect x="628" y="348" width="172" height="22" rx="4" fill="#ecfdf5" stroke="#059669"/>
-<text x="634" y="363" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">public dashboard</text>
+<text x="634" y="363" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">dashboard</text>
 <rect x="760" y="376" width="128" height="22" rx="4" fill="#ecfdf5" stroke="#059669"/>
-<text x="766" y="391" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">external audit</text>
+<text x="766" y="391" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">audit of registry</text>
 <rect x="892" y="404" width="40" height="22" rx="4" fill="#ecfdf5" stroke="#059669"/>
 <text x="886" y="419" font-size="11" font-weight="400" fill="#0f172a" text-anchor="end">mainnet</text>
-<text x="16" y="458" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M4 ZK proofs of aggregation</text>
+<text x="12" y="458" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M4 ZK reference implementation</text>
 <rect x="408" y="442" width="128" height="22" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
 <text x="542" y="457" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">proving system · oracle</text>
 <rect x="540" y="470" width="172" height="22" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
-<text x="546" y="485" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">circuit · tests · benchmarks</text>
+<text x="546" y="485" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">circuit · negative tests</text>
 <rect x="628" y="498" width="128" height="22" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
-<text x="634" y="513" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">on-chain verifier</text>
-<rect x="716" y="526" width="128" height="22" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
-<text x="722" y="541" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">prover in daily job</text>
+<text x="634" y="513" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">benchmarks</text>
+<rect x="672" y="526" width="172" height="22" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
+<text x="678" y="541" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">testnet verifier</text>
 <rect x="804" y="554" width="128" height="22" rx="4" fill="#f5f3ff" stroke="#7c3aed"/>
-<text x="810" y="569" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">proofs live</text>
+<text x="810" y="569" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">proofs for alpha</text>
 <text x="762" y="586" font-size="10" font-weight="400" fill="#dc2626" text-anchor="start">freeze</text>
 <line x1="230" y1="618" x2="934" y2="618" stroke="#334155"/>
-<text x="16" y="622" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">Milestones</text>
-<polygon points="406,611 413,618 406,625 399,618" fill="#0f172a"/>
-<text x="406" y="642" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">end of week 4</text>
-<text x="406" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">design, DPIA and ZK spec signed off</text>
-<polygon points="670,611 677,618 670,625 663,618" fill="#0f172a"/>
-<text x="670" y="642" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">end of week 10</text>
-<text x="670" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">schools attested · DPG submitted</text>
-<polygon points="934,611 941,618 934,625 927,618" fill="#0f172a"/>
-<text x="934" y="642" font-size="11" font-weight="600" fill="#0f172a" text-anchor="end">end of week 16</text>
-<text x="934" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="end">audit public · OP Mainnet</text>
+<text x="12" y="622" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">Gates</text>
+<polygon points="406,610 414,618 406,626 398,618" fill="#0f172a"/>
+<text x="406" y="642" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">Gate A · end of week 4</text>
+<text x="406" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">specs, DPIA, charter signed</text>
+<polygon points="670,610 678,618 670,626 662,618" fill="#0f172a"/>
+<text x="670" y="642" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">Gate B · end of week 10</text>
+<text x="670" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">alpha attested on testnet</text>
+<polygon points="934,610 942,618 934,626 926,618" fill="#0f172a"/>
+<text x="934" y="642" font-size="11" font-weight="600" fill="#0f172a" text-anchor="end">Gate C · end of week 16</text>
+<text x="934" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="end">audited registry on mainnet</text>
+<text x="12" y="682" font-size="11" font-weight="400" fill="#475569" text-anchor="start">Phase 2 (gated, funded separately): 20–50 school cohort · circuit audit and ZK verifier on mainnet · impact report over a school term</text>
 </svg>

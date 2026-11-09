@@ -8,7 +8,7 @@ Connecting a school to the internet means protecting its children from malware, 
 
 The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. No personal data, and no caller-supplied free text, is written on-chain: appeals are recorded as hashes of documents validated off-chain.
 
-The first deployment is a proposed pilot with **UNICEF Giga** in 20 to 50 connected schools in Latin America. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
+The first deployment is a proposed pilot with **UNICEF Giga** in Latin America: a controlled alpha in two to five schools, then, if its gates are met, a cohort of 20 to 50 ([roadmap](docs/ROADMAP.md)). The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
 
 > **Status: research prototype.** The contracts and off-chain tools are implemented and tested, but they are not audited and not deployed on any production network. See the [roadmap](docs/ROADMAP.md) and the [security policy](SECURITY.md).
 
@@ -26,7 +26,7 @@ The system is built around seven properties, stated formally in the [white paper
 | Bounded duration | Every version expires (pilot: at most 90 days) unless it is signed again | Contract |
 | Contestability | Anyone can appeal; acceptance or rejection is recorded on-chain | Contract + governor |
 | Attested enforcement | A school counts as protected only with a valid attestation from the independent reviewer | Reviewer |
-| Aggregate integrity | Published impact figures cannot be changed after anchoring, contain only counts at or above a suppression threshold, and, from milestone M4 of the pilot, come with a zero-knowledge proof that they aggregate the committed event log under the policy in force | Cryptography; ZK proof planned (M4); completeness of the log rests on the reviewer |
+| Aggregate integrity | Published impact figures cannot be changed after anchoring, contain only counts at or above a suppression threshold, and, from milestone M4 (testnet, phase 1), come with a zero-knowledge proof that they aggregate the committed event log under the policy in force | Cryptography; ZK proof planned (M4); completeness of the log rests on the reviewer |
 
 What the ledger cannot prove is that a resolver behaves as declared at runtime. It is covered by independent black-box testing and audit. In addition, the pilot plans [zero-knowledge proofs of aggregation](docs/WHITEPAPER.md#11-closing-the-enforcementaccountability-gap): by the end of the pilot, every daily release is to carry a proof, verified on-chain, that it is the correct k-suppressed aggregation of a committed event log under the policy in force.
 
@@ -99,7 +99,7 @@ The pilot targets school networks, but the components are generic and released f
 | Policy registry pattern (`VerifiablePolicyRegistry`) | Implemented, not audited | Versioned commitments with a stated reason, mandatory expiry bounded per scope, on-chain appeals and a governor that can be any Safe |
 | `MetricsAnchor` | Implemented, not audited | Write-once daily Merkle roots per scope, publisher appointed by the governor, and on-chain verification of a single row with domain-separated hashing |
 | `vpr` tools | Implemented | Canonical hashing of policy documents, RPZ compilation, aggregation with small-cell suppression and Merkle proofs |
-| ZK aggregation verifier and `vpr verify-proof` | Planned (M4) | On-chain check that a published table is the correct suppressed aggregation of a committed private log |
+| ZK aggregation verifier and `vpr verify-proof` | Planned (M4, testnet; mainnet in phase 2) | On-chain check that a published table is the correct suppressed aggregation of a committed private log |
 
 The design applies to any bounded network with an accountable governor: libraries, public Wi-Fi, health centres or NGO networks. It is not meant for ISP-wide or national blocking ([ADR-0006](docs/adr/0006-scope-school-networks-only.md)).
 

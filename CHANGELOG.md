@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Deployment conditions (satellite links, provider configuration, unreachable resolver) and integration with Giga Maps identifiers and Giga Meter, in the architecture and the white paper; Giga Maps identifiers as `school_id` (VPR-047).
 
 ### Changed
+- Roadmap re-scoped into two phases. Phase 1 (four months): design and sign-off, testnet reference implementation with an alpha in 2–5 schools, audited registry on mainnet, and a ZK aggregation reference implementation on testnet, with gates A–C. Phase 2 (gated): 20–50 school cohort, circuit audit and mainnet verifier, impact over a school term.
 - **Breaking (contracts).** `MetricsAnchor` takes the registry address; its publisher is appointed by the scope's governor (`setPublisher`), replacing first-caller `configure` (VPR-009). `verifyLeaf` is replaced by `verifyRow`, which computes the leaf from the row and the anchored day.
 - **Breaking (dataset format 2).** Domain-separated leaves (0x00) and nodes (0x01), length-prefixed fields and the on-chain day in each leaf (VPR-027); releases cover one day with unique cells; the number of suppressed cells is no longer published; `vpr aggregate` takes `--day`.
 - **Breaking (appeals, format 2).** `fileAppeal` stores only the hash of a validated appeal document; `rejectAppeal` requires the hash of a reasoned decision; a rejected document can be resubmitted in a new round (VPR-048).

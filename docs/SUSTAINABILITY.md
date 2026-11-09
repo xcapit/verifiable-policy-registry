@@ -57,4 +57,4 @@ At the end of the pilot, the operator taking over receives:
 - [ ] Reviewer day rate and hours per school (M1, week 2).
 - [ ] Gas per operation measured on OP Sepolia (M2, week 5).
 - [ ] Proving cost per scope per day (M4, VPR-036).
-- [ ] Agreement with Giga and the ministry on the post-pilot operator (before week 16).
+- [ ] Agreement with Giga and the ministry on the post-pilot operator (before the end of phase 1).
