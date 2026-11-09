@@ -56,6 +56,7 @@ sequenceDiagram
 | Full policy document (categories, local blocks, exceptions with reasons) | Off-chain (`uri`) | Public |
 | Restricted list (for example IWF) | Operator only | Commitment hash public; contents never published |
 | Deployment / test / conformance attestations | EAS | Public |
+| Full independent test report | Shared with governor signers | Hash public (`reportHash`); contents not published, since they can reveal exploitable weaknesses of a school network |
 | Daily aggregate dataset | Off-chain (`datasetUri`) | Public |
 | Daily dataset root | On-chain | Public |
 | Individual queries, IPs, devices | Not stored | Nobody |
