@@ -2,6 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 const Role = { Operator: 1, Reviewer: 2, Auditor: 3 };
+const Kind = { Deployment: 0, IndependentTest: 1, Conformance: 2 };
 const coder = ethers.AbiCoder.defaultAbiCoder();
 
 // Encodings of the three EAS schemas in schemas/eas-schemas.json.
@@ -45,13 +46,13 @@ describe("IssuerRoleResolver", function () {
     await registry.setIssuer(SCOPE, auditor.address, Role.Auditor);
   });
 
-  async function resolver(role, slot) {
+  async function resolver(kind) {
     const F = await ethers.getContractFactory("IssuerRoleResolver");
-    return F.deploy(eas.address, await registry.getAddress(), role, slot);
+    return F.deploy(eas.address, await registry.getAddress(), kind);
   }
 
   it("accepts a test attestation only from the reviewer of that scope", async function () {
-    const r = await resolver(Role.Reviewer, 1);
+    const r = await resolver(Kind.IndependentTest);
     expect(await r.connect(eas).attest.staticCall(attestation(reviewer.address, testData(SCOPE)))).to.equal(true);
     // the operator cannot certify its own deployment as tested
     expect(await r.connect(eas).attest.staticCall(attestation(operator.address, testData(SCOPE)))).to.equal(false);
@@ -61,44 +62,70 @@ describe("IssuerRoleResolver", function () {
   });
 
   it("checks the role at issuance time", async function () {
-    const r = await resolver(Role.Reviewer, 1);
+    const r = await resolver(Kind.IndependentTest);
     await registry.setIssuer(SCOPE, reviewer.address, 0);
     expect(await r.connect(eas).attest.staticCall(attestation(reviewer.address, testData(SCOPE)))).to.equal(false);
   });
 
   it("reads the scope from the right slot for each schema", async function () {
-    const dep = await resolver(Role.Operator, 1);
+    const dep = await resolver(Kind.Deployment);
     expect(await dep.connect(eas).attest.staticCall(attestation(operator.address, deploymentData(SCOPE)))).to.equal(true);
-    const conf = await resolver(Role.Auditor, 0);
+    const conf = await resolver(Kind.Conformance);
     expect(await conf.connect(eas).attest.staticCall(attestation(auditor.address, conformanceData(SCOPE)))).to.equal(true);
     expect(await conf.scopeOf(conformanceData(SCOPE))).to.equal(SCOPE);
     expect(await dep.scopeOf(deploymentData(SCOPE))).to.equal(SCOPE);
+    // the schema kind fixes the role: a reviewer cannot issue a deployment attestation
+    expect(await dep.connect(eas).attest.staticCall(attestation(reviewer.address, deploymentData(SCOPE)))).to.equal(false);
+    expect(await dep.requiredRole()).to.equal(BigInt(Role.Operator));
+    expect(await conf.requiredRole()).to.equal(BigInt(Role.Auditor));
+    expect(await dep.version()).to.equal("1.0.0");
+  });
+
+  it("refuses a truncated head or a non-canonical string offset", async function () {
+    const r = await resolver(Kind.IndependentTest);
+    const good = testData(SCOPE);
+    // the head is 10 words; cut inside it
+    await expect(r.scopeOf(ethers.dataSlice(good, 0, 9 * 32))).to.be.revertedWithCustomError(r, "MalformedAttestation");
+    // the first string must start right after the head (0x140)
+    const shifted = ethers.concat([ethers.zeroPadValue(ethers.toBeHex(0x160), 32), ethers.dataSlice(good, 32), ethers.ZeroHash]);
+    await expect(r.scopeOf(shifted)).to.be.revertedWithCustomError(r, "MalformedAttestation");
+    const conf = await resolver(Kind.Conformance);
+    await expect(conf.scopeOf(testData(SCOPE))).to.be.revertedWithCustomError(conf, "MalformedAttestation");
+    await expect(conf.scopeOf(ethers.dataSlice(conformanceData(SCOPE), 0, 64))).to.be.revertedWithCustomError(conf, "MalformedAttestation");
   });
 
   it("only accepts calls from EAS, without value, and rejects malformed data", async function () {
-    const r = await resolver(Role.Reviewer, 1);
+    const r = await resolver(Kind.IndependentTest);
     await expect(r.connect(stranger).attest(attestation(reviewer.address, testData(SCOPE)))).to.be.revertedWithCustomError(r, "NotEAS");
     await expect(r.connect(eas).attest(attestation(reviewer.address, testData(SCOPE)), { value: 1 })).to.be.revertedWithCustomError(
       r,
-      "InsufficientValue"
+      "NotPayable"
     );
     await expect(r.connect(eas).attest.staticCall(attestation(reviewer.address, "0x1234"))).to.be.revertedWithCustomError(r, "MalformedAttestation");
     expect(await r.isPayable()).to.equal(false);
     expect(await r.connect(eas).revoke.staticCall(attestation(reviewer.address, testData(SCOPE)))).to.equal(true);
+    const a = attestation(reviewer.address, testData(SCOPE));
+    await expect(r.connect(stranger).revoke(a)).to.be.revertedWithCustomError(r, "NotEAS");
+    await expect(r.connect(stranger).multiAttest([a], [0])).to.be.revertedWithCustomError(r, "NotEAS");
+    await expect(r.connect(stranger).multiRevoke([a], [0])).to.be.revertedWithCustomError(r, "NotEAS");
+    expect(await r.connect(eas).multiRevoke.staticCall([a], [0])).to.equal(true);
   });
 
   it("checks every attestation in a batch", async function () {
-    const r = await resolver(Role.Reviewer, 1);
+    const r = await resolver(Kind.IndependentTest);
     const good = attestation(reviewer.address, testData(SCOPE));
     const bad = attestation(operator.address, testData(SCOPE));
     expect(await r.connect(eas).multiAttest.staticCall([good, good], [0, 0])).to.equal(true);
     expect(await r.connect(eas).multiAttest.staticCall([good, bad], [0, 0])).to.equal(false);
+    await expect(r.connect(eas).multiAttest.staticCall([good, good], [0])).to.be.revertedWithCustomError(r, "LengthMismatch");
+    await expect(r.connect(eas).multiAttest.staticCall([good], [1])).to.be.revertedWithCustomError(r, "NotPayable");
   });
 
   it("refuses an invalid configuration", async function () {
     const F = await ethers.getContractFactory("IssuerRoleResolver");
-    await expect(F.deploy(eas.address, await registry.getAddress(), 0, 1)).to.be.revertedWithCustomError(F, "InvalidConfiguration");
-    await expect(F.deploy(eas.address, await registry.getAddress(), 2, 2)).to.be.revertedWithCustomError(F, "InvalidConfiguration");
-    await expect(F.deploy(ethers.ZeroAddress, await registry.getAddress(), 2, 1)).to.be.revertedWithCustomError(F, "ZeroAddress");
+    await expect(F.deploy(ethers.ZeroAddress, await registry.getAddress(), Kind.Deployment)).to.be.revertedWithCustomError(F, "ZeroAddress");
+    await expect(F.deploy(eas.address, ethers.ZeroAddress, Kind.Deployment)).to.be.revertedWithCustomError(F, "ZeroAddress");
+    // an out-of-range schema kind is rejected by the ABI decoder
+    await expect(F.deploy(eas.address, await registry.getAddress(), 3)).to.be.reverted;
   });
 });

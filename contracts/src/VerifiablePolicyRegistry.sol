@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.24;
+pragma solidity =0.8.24;
 
 /// @title Verifiable Policy Registry
 /// @notice Public, versioned, time-limited and contestable registry of content-filtering policies.
@@ -11,12 +11,19 @@ pragma solidity ^0.8.24;
 ///      Scope ids are derived on-chain from the creating governor and a scope name
 ///      (`scopeIdOf(governor, name)`), so a canonical name cannot be front-run by another address. Verifiers
 ///      still pin the chain id, this contract's address and the expected governor from a deployment manifest.
+///      The id binds the creating governor: after a handover it no longer equals scopeIdOf(currentGovernor, name),
+///      and the new governor could create a second scope with the same name under a different id. Verifiers
+///      therefore pin the scope id itself, never recompute it from the current governor.
+///      Separation of roles is enforced per address: the governor never holds an issuer role, including after a
+///      handover. One institution controlling several addresses is a governance matter, not a contract check.
 contract VerifiablePolicyRegistry {
     /// @notice Upper bound on any scope's maximum validity, so that "every version expires" cannot be
     ///         emptied of meaning by an arbitrarily large value.
     uint64 public constant MAX_VALIDITY_CAP = 365 days;
     /// @notice Upper bound on the length of a policy URI written on-chain.
     uint256 public constant MAX_URI_LENGTH = 256;
+    /// @notice Upper bound on the length of a scope name.
+    uint256 public constant MAX_NAME_LENGTH = 128;
     uint16 public constant REASON_APPEAL_ACCEPTED = 3;
     uint16 public constant MAX_REASON_CODE = 6;
 
@@ -95,6 +102,8 @@ contract VerifiablePolicyRegistry {
     error InvalidValidity();
     error ZeroAddress();
     error EmptyName();
+    error NameTooLong();
+    error UnknownVersion();
     error EmptyContentHash();
     error EmptyDocumentHash();
     error EmptyReason();
@@ -121,6 +130,7 @@ contract VerifiablePolicyRegistry {
     ///         address cannot occupy the same id first.
     function createScope(string calldata name, uint64 maxValidity) external returns (bytes32 scopeId) {
         if (bytes(name).length == 0) revert EmptyName();
+        if (bytes(name).length > MAX_NAME_LENGTH) revert NameTooLong();
         if (maxValidity == 0 || maxValidity > MAX_VALIDITY_CAP) revert InvalidValidity();
         scopeId = scopeIdOf(msg.sender, name);
         if (scopes[scopeId].exists) revert ScopeAlreadyExists();
@@ -129,8 +139,10 @@ contract VerifiablePolicyRegistry {
         emit ScopeCreated(scopeId, msg.sender, name, maxValidity);
     }
 
-    /// @notice First step of a governor handover. Proposing address(0) cancels a pending proposal.
+    /// @notice First step of a governor handover. Proposing address(0) cancels a pending proposal. An address that
+    ///         holds an issuer role in the scope cannot be proposed; its role must be revoked first.
     function proposeGovernor(bytes32 scopeId, address newGovernor) external onlyGovernor(scopeId) {
+        if (issuerRole[scopeId][newGovernor] != Role.None) revert GovernorCannotHoldRole();
         pendingGovernor[scopeId] = newGovernor;
         emit GovernorProposed(scopeId, msg.sender, newGovernor);
     }
@@ -140,6 +152,7 @@ contract VerifiablePolicyRegistry {
         if (!scopes[scopeId].exists) revert UnknownScope();
         address pending = pendingGovernor[scopeId];
         if (pending == address(0) || msg.sender != pending) revert NotPendingGovernor();
+        if (issuerRole[scopeId][pending] != Role.None) revert GovernorCannotHoldRole();
         address previous = scopes[scopeId].governor;
         scopes[scopeId].governor = pending;
         delete pendingGovernor[scopeId];
@@ -149,7 +162,9 @@ contract VerifiablePolicyRegistry {
     /// @notice Grant, change or revoke (Role.None) the attestation role of an address in a scope.
     function setIssuer(bytes32 scopeId, address issuer, Role role) external onlyGovernor(scopeId) {
         if (issuer == address(0)) revert ZeroAddress();
-        if (issuer == msg.sender) revert GovernorCannotHoldRole();
+        if (issuer == msg.sender || (role != Role.None && issuer == pendingGovernor[scopeId])) {
+            revert GovernorCannotHoldRole();
+        }
         issuerRole[scopeId][issuer] = role;
         emit IssuerSet(scopeId, issuer, role);
     }
@@ -208,7 +223,9 @@ contract VerifiablePolicyRegistry {
     /// @notice File an appeal against a block. Open to anyone; only the hash of the appeal document is stored.
     ///         Appeal documents carry a random nonce (format vpr-appeal/3), so a document cannot be guessed and
     ///         pre-filed by someone else. A document can be filed again after a rejection (new round); rounds
-    ///         are not an escalation count.
+    ///         are not an escalation count. Anyone, including a third party, can re-file a rejected document or
+    ///         file the same document first (the appeal exists either way); the filer is not recorded, so as not
+    ///         to link appellants to appeals. Spam is limited off-chain by the relayer (VPR-017).
     function fileAppeal(bytes32 scopeId, bytes32 documentHash) external returns (bytes32 appealId) {
         if (!scopes[scopeId].exists) revert UnknownScope();
         if (documentHash == bytes32(0)) revert EmptyDocumentHash();
@@ -250,6 +267,7 @@ contract VerifiablePolicyRegistry {
 
     /// @notice Read a specific version (1-based).
     function getVersion(bytes32 scopeId, uint256 version) external view returns (PolicyVersion memory) {
+        if (version == 0 || version > _versions[scopeId].length) revert UnknownVersion();
         return _versions[scopeId][version - 1];
     }
 

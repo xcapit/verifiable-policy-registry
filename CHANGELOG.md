@@ -18,6 +18,12 @@ Pre-audit hardening (closes VPR-060, VPR-065 to VPR-069; the resolver part of VP
 - **Breaking.** `MetricsAnchor.setPublisher(scopeId, publisher, maxLagDays)`: publishers can be revoked; future days are refused and back-filling can be limited; `markEmpty` declares days with nothing publishable; `correctRoot` lets the governor correct a root with a reason hash and a revision count.
 - Appeal documents move to format 3 (`nonce`), so they cannot be guessed and pre-filed.
 
+Changes after the independent contract review of this hardening:
+- **Breaking.** `MetricsAnchor` anchors only days that have ended (`DayNotClosed` replaces `DayInFuture`). The lag is explicit: `maxLagDays` is at least 1 for an appointed publisher, `NO_LAG_LIMIT` disables the bound, and 0 is used only to revoke (`InvalidLag`). A key-compromised publisher can no longer back-fill history by default.
+- **Breaking.** `correctRoot` can turn a root back into an empty day (`newRoot` 0) and refuses no-op corrections (`NoChange`); `RootCorrected` now carries the new `datasetUri`.
+- **Breaking.** `IssuerRoleResolver(eas, registry, SchemaKind)`: the schema kind fixes the role and the ABI layout; the head of `data` and the first string offset are checked; `version()` added; `NotPayable` and `LengthMismatch` errors.
+- The governor cannot hold an issuer role across a handover: an issuer cannot be proposed, the pending governor cannot be given a role, and `acceptGovernor` re-checks. Scope names are capped at 128 bytes; `getVersion` reverts `UnknownVersion`; pragmas pinned to `=0.8.24`.
+
 
 ## [0.3.0] - 2026-11-09
 

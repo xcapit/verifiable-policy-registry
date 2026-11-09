@@ -54,6 +54,8 @@ describe("VerifiablePolicyRegistry", function () {
       await expect(registry.createScope("x", 0)).to.be.revertedWithCustomError(registry, "InvalidValidity");
       await expect(registry.createScope("x", 366 * DAY)).to.be.revertedWithCustomError(registry, "InvalidValidity");
       await expect(registry.createScope("", DAY)).to.be.revertedWithCustomError(registry, "EmptyName");
+      await expect(registry.createScope("n".repeat(129), DAY)).to.be.revertedWithCustomError(registry, "NameTooLong");
+      await registry.createScope("n".repeat(128), DAY);
       await registry.createScope("x", 365 * DAY);
     });
 
@@ -77,6 +79,28 @@ describe("VerifiablePolicyRegistry", function () {
       await registry.proposeGovernor(SCOPE, newGovernor.address);
       await registry.proposeGovernor(SCOPE, ethers.ZeroAddress);
       await expect(registry.connect(newGovernor).acceptGovernor(SCOPE)).to.be.revertedWithCustomError(registry, "NotPendingGovernor");
+    });
+
+    it("never lets an issuer become governor, nor the pending governor become an issuer", async function () {
+      await registry.setIssuer(SCOPE, reviewer.address, Role.Reviewer);
+      await expect(registry.proposeGovernor(SCOPE, reviewer.address)).to.be.revertedWithCustomError(registry, "GovernorCannotHoldRole");
+      await registry.proposeGovernor(SCOPE, newGovernor.address);
+      await expect(registry.setIssuer(SCOPE, newGovernor.address, Role.Reviewer)).to.be.revertedWithCustomError(
+        registry,
+        "GovernorCannotHoldRole"
+      );
+      // once its role is revoked, a former issuer can be proposed and accept
+      await registry.proposeGovernor(SCOPE, ethers.ZeroAddress);
+      await registry.setIssuer(SCOPE, operator.address, Role.Operator);
+      await registry.setIssuer(SCOPE, operator.address, Role.None);
+      await registry.proposeGovernor(SCOPE, operator.address);
+      await registry.connect(operator).acceptGovernor(SCOPE);
+      expect((await registry.scopes(SCOPE)).governor).to.equal(operator.address);
+    });
+
+    it("refuses a handover for an unknown scope", async function () {
+      await expect(registry.proposeGovernor(ethers.id("nope"), other.address)).to.be.revertedWithCustomError(registry, "UnknownScope");
+      await expect(registry.acceptGovernor(ethers.id("nope"))).to.be.revertedWithCustomError(registry, "UnknownScope");
     });
   });
 
@@ -131,6 +155,17 @@ describe("VerifiablePolicyRegistry", function () {
     it("caps the length of the policy URI", async function () {
       await expect(publish(governor, SCOPE, ethers.id("v"), { uri: "x".repeat(257) })).to.be.revertedWithCustomError(registry, "UriTooLong");
       await publish(governor, SCOPE, ethers.id("v"), { uri: "x".repeat(256) });
+    });
+
+    it("reverts cleanly for a version that does not exist", async function () {
+      await expect(registry.getVersion(SCOPE, 0)).to.be.revertedWithCustomError(registry, "UnknownVersion");
+      await expect(registry.getVersion(SCOPE, 1)).to.be.revertedWithCustomError(registry, "UnknownVersion");
+      await publish(governor, SCOPE, ethers.id("v1"));
+      expect((await registry.getVersion(SCOPE, 1)).contentHash).to.equal(ethers.id("v1"));
+    });
+
+    it("accepts the boundary values of validity and reason codes", async function () {
+      await publish(governor, SCOPE, ethers.id("v1"), { validity: MAX_VALIDITY, reason: 6 });
     });
 
     it("reports a policy as no longer in force after it expires", async function () {

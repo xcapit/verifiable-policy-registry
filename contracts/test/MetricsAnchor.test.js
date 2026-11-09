@@ -5,6 +5,7 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers");
 const NAME = "giga:XX:primary";
 const MAX_VALIDITY = 90 * 24 * 60 * 60;
 const DAY = 20758; // 2026-11-01, in the past for any run of these tests
+const NO_LAG_LIMIT = 2 ** 32 - 1;
 
 // Dataset format 2: domain-separated leaves (0x00) and internal nodes (0x01), as in tools/vpr/merkle.py.
 function leafHash(day, unit, category, count) {
@@ -40,7 +41,7 @@ describe("MetricsAnchor", function () {
     await registry.connect(governor).createScope(NAME, MAX_VALIDITY);
     SCOPE = await registry.scopeIdOf(governor.address, NAME);
     anchor = await (await ethers.getContractFactory("MetricsAnchor")).deploy(await registry.getAddress());
-    await anchor.connect(governor).setPublisher(SCOPE, publisher.address, 0);
+    await anchor.connect(governor).setPublisher(SCOPE, publisher.address, NO_LAG_LIMIT);
 
     leaves = ROWS.map(([s, c, n]) => leafHash(DAY, s, c, n));
     ab = hashPair(leaves[0], leaves[1]);
@@ -58,8 +59,8 @@ describe("MetricsAnchor", function () {
 
   describe("publisher", function () {
     it("is appointed only by the governor in the registry (no first-caller claim)", async function () {
-      await expect(anchor.connect(other).setPublisher(SCOPE, other.address, 0)).to.be.revertedWithCustomError(anchor, "NotGovernor");
-      await expect(anchor.connect(other).setPublisher(ethers.id("unknown"), other.address, 0)).to.be.revertedWithCustomError(
+      await expect(anchor.connect(other).setPublisher(SCOPE, other.address, 1)).to.be.revertedWithCustomError(anchor, "NotGovernor");
+      await expect(anchor.connect(other).setPublisher(ethers.id("unknown"), other.address, 1)).to.be.revertedWithCustomError(
         anchor,
         "UnknownScope"
       );
@@ -72,9 +73,27 @@ describe("MetricsAnchor", function () {
       await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "NotPublisher");
       await registry.proposeGovernor(SCOPE, other.address);
       await registry.connect(other).acceptGovernor(SCOPE);
-      await expect(anchor.connect(governor).setPublisher(SCOPE, governor.address, 0)).to.be.revertedWithCustomError(anchor, "NotGovernor");
+      await expect(anchor.connect(governor).setPublisher(SCOPE, governor.address, 1)).to.be.revertedWithCustomError(anchor, "NotGovernor");
       await anchor.connect(other).setPublisher(SCOPE, publisher.address, 7);
       expect(await anchor.maxLagDays(SCOPE)).to.equal(7n);
+    });
+
+    it("requires an explicit lag: at least one day for a publisher, zero only to revoke", async function () {
+      await expect(anchor.setPublisher(SCOPE, publisher.address, 0)).to.be.revertedWithCustomError(anchor, "InvalidLag");
+      await expect(anchor.setPublisher(SCOPE, ethers.ZeroAddress, 1)).to.be.revertedWithCustomError(anchor, "InvalidLag");
+    });
+
+    it("keeps the old publisher after a governor handover until the new governor replaces it", async function () {
+      await registry.proposeGovernor(SCOPE, other.address);
+      await registry.connect(other).acceptGovernor(SCOPE);
+      await anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d");
+      await anchor.connect(other).setPublisher(SCOPE, ethers.ZeroAddress, 0);
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY + 1, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "NotPublisher");
+      // the previous governor can no longer correct the scope's roots
+      await expect(anchor.connect(governor).correctRoot(SCOPE, DAY, ethers.id("x"), "ipfs://d2", ethers.id("r"))).to.be.revertedWithCustomError(
+        anchor,
+        "NotGovernor"
+      );
     });
   });
 
@@ -83,17 +102,25 @@ describe("MetricsAnchor", function () {
       await expect(anchor.connect(other).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "NotPublisher");
       await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, ethers.ZeroHash, "ipfs://d")).to.be.revertedWithCustomError(anchor, "EmptyRoot");
       await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "x".repeat(257))).to.be.revertedWithCustomError(anchor, "UriTooLong");
+      await anchor.connect(publisher).commitRoot(SCOPE, DAY - 1, root, "x".repeat(256));
       await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.emit(anchor, "RootCommitted").withArgs(SCOPE, DAY, root, "ipfs://d");
       await expect(anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayAlreadyCommitted");
     });
 
-    it("refuses future days and, with a lag limit, days that are too old", async function () {
+    it("anchors only days that have ended, within the lag limit", async function () {
       const t = await today();
-      await expect(anchor.connect(publisher).commitRoot(SCOPE, t + 1, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayInFuture");
-      await anchor.connect(publisher).commitRoot(SCOPE, t, root, "ipfs://d"); // today is allowed
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, t + 1, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayNotClosed");
+      // the current UTC day is still accumulating
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, t, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayNotClosed");
+      await expect(anchor.connect(publisher).markEmpty(SCOPE, t)).to.be.revertedWithCustomError(anchor, "DayNotClosed");
       await anchor.setPublisher(SCOPE, publisher.address, 7);
       await expect(anchor.connect(publisher).commitRoot(SCOPE, t - 8, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayTooOld");
-      await anchor.connect(publisher).commitRoot(SCOPE, t - 7, root, "ipfs://d");
+      await expect(anchor.connect(publisher).markEmpty(SCOPE, t - 8)).to.be.revertedWithCustomError(anchor, "DayTooOld");
+      await anchor.connect(publisher).commitRoot(SCOPE, t - 7, root, "ipfs://d"); // day + lag == today
+      // lag 1: yesterday only
+      await anchor.setPublisher(SCOPE, publisher.address, 1);
+      await expect(anchor.connect(publisher).commitRoot(SCOPE, t - 2, root, "ipfs://d")).to.be.revertedWithCustomError(anchor, "DayTooOld");
+      await anchor.connect(publisher).commitRoot(SCOPE, t - 1, root, "ipfs://d");
     });
 
     it("marks empty days, which then cannot be anchored and never verify", async function () {
@@ -111,14 +138,33 @@ describe("MetricsAnchor", function () {
       await expect(anchor.connect(publisher).correctRoot(SCOPE, DAY, root, "ipfs://d2", reason)).to.be.revertedWithCustomError(anchor, "NotGovernor");
       await expect(anchor.correctRoot(SCOPE, DAY + 1, root, "ipfs://d2", reason)).to.be.revertedWithCustomError(anchor, "DayNotCommitted");
       await expect(anchor.correctRoot(SCOPE, DAY, root, "ipfs://d2", ethers.ZeroHash)).to.be.revertedWithCustomError(anchor, "EmptyReason");
+      await expect(anchor.correctRoot(SCOPE, DAY, wrong, "ipfs://d2", reason)).to.be.revertedWithCustomError(anchor, "NoChange");
       await expect(anchor.correctRoot(SCOPE, DAY, root, "ipfs://d2", reason))
         .to.emit(anchor, "RootCorrected")
-        .withArgs(SCOPE, DAY, wrong, root, reason, 1);
+        .withArgs(SCOPE, DAY, wrong, root, "ipfs://d2", reason, 1);
       const c = await anchor.getCommitment(SCOPE, DAY);
       expect(c.root).to.equal(root);
       expect(c.revision).to.equal(1n);
       const [s0, c0, n0] = ROWS[0];
       expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(true);
+    });
+
+    it("corrects an empty day into a root and a root back into an empty day", async function () {
+      const [s0, c0, n0] = ROWS[0];
+      const reason = ethers.id("note");
+      await anchor.connect(publisher).markEmpty(SCOPE, DAY);
+      await expect(anchor.correctRoot(SCOPE, DAY, ethers.ZeroHash, "", reason)).to.be.revertedWithCustomError(anchor, "NoChange");
+      // previousRoot 0 in the event means the day was empty
+      await expect(anchor.correctRoot(SCOPE, DAY, root, "ipfs://d", reason))
+        .to.emit(anchor, "RootCorrected")
+        .withArgs(SCOPE, DAY, ethers.ZeroHash, root, "ipfs://d", reason, 1);
+      expect((await anchor.getCommitment(SCOPE, DAY)).empty).to.equal(false);
+      expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(true);
+      await anchor.correctRoot(SCOPE, DAY, ethers.ZeroHash, "", reason);
+      const c = await anchor.getCommitment(SCOPE, DAY);
+      expect(c.empty).to.equal(true);
+      expect(c.revision).to.equal(2n);
+      expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(false);
     });
   });
 

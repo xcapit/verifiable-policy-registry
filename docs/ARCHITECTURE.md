@@ -84,7 +84,7 @@ Full specification, including events, errors and invariants: [INTERFACES.md](INT
 
 - `setPublisher(bytes32 scopeId, address publisher, uint32 maxLagDays)`: the scope's governor in the registry only; `address(0)` revokes
 - `markEmpty(bytes32 scopeId, uint32 day)`: publisher; `correctRoot(…, reasonHash)`: governor
-- `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)`: publisher only, once per day, never a future day
+- `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)`: publisher only, once per day, only after the UTC day has ended and within the scope's back-fill limit
 - `verifyRow(bytes32 scopeId, uint32 day, string schoolId, string category, uint256 count, bytes32[] proof) returns (bool)`
 
 Merkle scheme (dataset format 2): sorted pairs, leaves `keccak256(0x00 ‖ day ‖ count ‖ len ‖ school ‖ len ‖ category)` and nodes `keccak256(0x01 ‖ min ‖ max)`. Implemented identically in `tools/vpr/merkle.py` and `tools/vpr/metrics.py`, and tested against the same vector in both languages.

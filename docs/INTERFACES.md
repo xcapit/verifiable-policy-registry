@@ -72,16 +72,16 @@ Source: [`contracts/src/VerifiablePolicyRegistry.sol`](../contracts/src/Verifiab
 
 | Function | Caller | Effect | Reverts |
 | --- | --- | --- | --- |
-| `createScope(string name, uint64 maxValidity) → bytes32 scopeId` | anyone; becomes the governor | Creates the scope `scopeIdOf(msg.sender, name)`; `0 < maxValidity ≤ 365 days` | `EmptyName`, `InvalidValidity`, `ScopeAlreadyExists` |
+| `createScope(string name, uint64 maxValidity) → bytes32 scopeId` | anyone; becomes the governor | Creates the scope `scopeIdOf(msg.sender, name)`; name ≤ 128 bytes; `0 < maxValidity ≤ 365 days` | `EmptyName`, `NameTooLong`, `InvalidValidity`, `ScopeAlreadyExists` |
 | `scopeIdOf(address governor, string name) → bytes32` | pure | `keccak256(abi.encode(governor, name))` | none |
-| `proposeGovernor(bytes32 scopeId, address newGovernor)` | governor | Starts a handover; `address(0)` cancels | `UnknownScope`, `NotGovernor` |
-| `acceptGovernor(bytes32 scopeId)` | the proposed governor | Completes the handover | `UnknownScope`, `NotPendingGovernor` |
-| `setIssuer(bytes32 scopeId, address issuer, Role role)` | governor | Grants, changes or revokes (`Role.None`) an attestation role; the governor cannot hold one | `UnknownScope`, `NotGovernor`, `ZeroAddress`, `GovernorCannotHoldRole` |
+| `proposeGovernor(bytes32 scopeId, address newGovernor)` | governor | Starts a handover; `address(0)` cancels; an address holding an issuer role cannot be proposed | `UnknownScope`, `NotGovernor`, `GovernorCannotHoldRole` |
+| `acceptGovernor(bytes32 scopeId)` | the proposed governor | Completes the handover; refused if the proposed address holds an issuer role | `UnknownScope`, `NotPendingGovernor`, `GovernorCannotHoldRole` |
+| `setIssuer(bytes32 scopeId, address issuer, Role role)` | governor | Grants, changes or revokes (`Role.None`) an attestation role; neither the governor nor the pending governor can hold one | `UnknownScope`, `NotGovernor`, `ZeroAddress`, `GovernorCannotHoldRole` |
 | `publishPolicy(bytes32 scopeId, bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 validity, bytes32 resolvesAppeal) → uint256 version` | governor | Appends a version (1-based); `reasonCode` in 1..6, and 3 if and only if `resolvesAppeal` is set; `uri` ≤ 256 bytes | `UnknownScope`, `NotGovernor`, `EmptyContentHash`, `InvalidValidity`, `UriTooLong`, `InvalidReasonCode`, `AppealNotOpen`, `AppealScopeMismatch` |
 | `fileAppeal(bytes32 scopeId, bytes32 documentHash) → bytes32 appealId` | anyone | Opens an appeal for the hash of an appeal document (I9); a rejected document can be filed again in a new round | `UnknownScope`, `EmptyDocumentHash`, `AppealAlreadyExists` |
 | `rejectAppeal(bytes32 appealId, bytes32 reasonHash)` | governor of the appeal's scope | Closes an appeal as rejected with the hash of a reasoned decision | `AppealNotOpen`, `NotGovernor`, `EmptyReason` |
 | `appealIdOf(bytes32 scopeId, bytes32 documentHash, uint32 round) → bytes32` | pure | `keccak256(abi.encode(scopeId, documentHash, round))` | none |
-| `currentPolicy`, `getVersion`, `versionCount`, `scopes`, `scopeName`, `pendingGovernor`, `issuerRole`, `appeals`, `appealRounds` | view | State | `getVersion` panics out of range |
+| `currentPolicy`, `getVersion`, `versionCount`, `scopes`, `scopeName`, `pendingGovernor`, `issuerRole`, `appeals`, `appealRounds` | view | State | `getVersion` reverts `UnknownVersion` for 0 or out of range |
 
 Events: `ScopeCreated(scopeId, governor, name, maxValidity)`, `GovernorProposed(scopeId, currentGovernor, proposedGovernor)`, `GovernorChanged(scopeId, previousGovernor, newGovernor)`, `IssuerSet(scopeId, issuer, role)`, `PolicyPublished(…)`, `AppealFiled(appealId, scopeId, documentHash, round)`, `AppealResolved(appealId, accepted, resolutionHash)`.
 
@@ -134,18 +134,18 @@ Source: [`contracts/src/MetricsAnchor.sol`](../contracts/src/MetricsAnchor.sol).
 
 | Function | Caller | Effect | Reverts |
 | --- | --- | --- | --- |
-| `setPublisher(bytes32 scopeId, address publisher, uint32 maxLagDays)` | the scope's current governor in the registry | Appoints, rotates or revokes (`address(0)`) the publisher, and sets the back-fill limit in days (0 = none) | `UnknownScope`, `NotGovernor` |
-| `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)` | publisher | Root for a day: once, not in the future, not older than the limit; `datasetUri` ≤ 256 bytes | `NotPublisher`, `DayInFuture`, `DayTooOld`, `DayAlreadyCommitted`, `EmptyRoot`, `UriTooLong` |
+| `setPublisher(bytes32 scopeId, address publisher, uint32 maxLagDays)` | the scope's current governor in the registry | Appoints, rotates or revokes (`address(0)` with `maxLagDays` 0) the publisher, and sets the back-fill limit: at least 1 (yesterday only), or `NO_LAG_LIMIT` (2³²−1) for no bound | `UnknownScope`, `NotGovernor`, `InvalidLag` |
+| `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)` | publisher | Root for a day: once, only after the UTC day has ended (`day < today()`), and `day + maxLagDays ≥ today()`; `datasetUri` ≤ 256 bytes | `NotPublisher`, `DayNotClosed`, `DayTooOld`, `DayAlreadyCommitted`, `EmptyRoot`, `UriTooLong` |
 | `markEmpty(bytes32 scopeId, uint32 day)` | publisher | Declares a day with no publishable cell | as `commitRoot` |
-| `correctRoot(bytes32 scopeId, uint32 day, bytes32 newRoot, string datasetUri, bytes32 reasonHash)` | governor | Replaces an anchored root, increments `revision`, keeps the previous root in the event | `NotGovernor`, `DayNotCommitted`, `EmptyRoot`, `EmptyReason`, `UriTooLong` |
+| `correctRoot(bytes32 scopeId, uint32 day, bytes32 newRoot, string datasetUri, bytes32 reasonHash)` | governor | Replaces the root of an anchored or empty day, increments `revision`, keeps the previous root in the event; `newRoot` 0 turns the day into an empty day | `NotGovernor`, `DayNotCommitted`, `NoChange`, `EmptyReason`, `UriTooLong` |
 | `getCommitment(bytes32 scopeId, uint32 day) → (root, datasetUri, committedAt, revision, empty)` | view | Stored commitment | none |
 | `leafHash(uint32 day, string unitId, string category, uint256 count) → bytes32` | pure | Leaf of a row (I6) | `FieldTooLong` |
 | `verifyRow(bytes32 scopeId, uint32 day, string unitId, string category, uint256 count, bytes32[] proof) → bool` | view | Checks a row against the current root of the day | `FieldTooLong` |
 | `today() → uint32` | view | Current UTC day number | none |
 
-Events: `PublisherSet(scopeId, governor, publisher, maxLagDays)`, `RootCommitted(scopeId, day, root, datasetUri)`, `EmptyDayMarked(scopeId, day)`, `RootCorrected(scopeId, day, previousRoot, newRoot, reasonHash, revision)`.
+Events: `PublisherSet(scopeId, governor, publisher, maxLagDays)`, `RootCommitted(scopeId, day, root, datasetUri)`, `EmptyDayMarked(scopeId, day)`, `RootCorrected(scopeId, day, previousRoot, newRoot, datasetUri, reasonHash, revision)`. An anchored root is never 0, so a root of 0 in `RootCorrected` always means an empty day.
 
-A governor handover does not revoke the publisher; the new governor should confirm or replace it. Verifiers read `revision` and the `RootCorrected` events, and compare `committedAt` with `day`.
+A governor handover does not revoke the publisher; the new governor should confirm or replace it. Verifiers read `revision` and the `RootCorrected` events, and compare `committedAt` with `day`. The leaf does not bind the scope id: roots are stored per scope, and a row is verified only against the root of the scope it is checked for (decision recorded before the audit, so the leaf encoding and test vectors stay frozen).
 
 ## I8 · EAS attestations
 
@@ -157,7 +157,7 @@ Definitions: [`schemas/eas-schemas.json`](../schemas/eas-schemas.json) (CC0). Re
 | `VPR.IndependentTest.v1` | independent reviewer | `string schoolId, bytes32 scopeId, uint256 policyVersion, bool categoriesBlocked, bool exceptionsReachable, bool dnssecValidated, bool bypassResisted, bytes32 reportHash, uint64 testedAt, uint64 validUntil` |
 | `VPR.Conformance.v1` | auditor | `bytes32 scopeId, string framework, string frameworkVersion, bytes32 reportHash, uint64 assessedAt, uint64 validUntil` |
 
-All schemas are revocable. Each schema is registered with an `IssuerRoleResolver` ([`contracts/src/IssuerRoleResolver.sol`](../contracts/src/IssuerRoleResolver.sol)) that accepts an attestation only if the attester holds the schema's role in the registry for the scope carried in the attestation, at issuance time (Deployment → Operator, IndependentTest → Reviewer, Conformance → Auditor). Registration of the schemas on a public network is Planned (M2). For `VPR.IndependentTest.v1`, the booleans are the public summary; `reportHash` commits to the full report, which is shared with the governor signers and not published, since a per-school account of bypass attempts can be useful to an attacker. Verifiers must check that the attester address belongs to the expected role for the scope, and that `validUntil` has not passed. A school counts as protected only with a valid, unrevoked `VPR.IndependentTest.v1` for the policy version in force.
+All schemas are revocable. Each schema is registered with its own `IssuerRoleResolver` ([`contracts/src/IssuerRoleResolver.sol`](../contracts/src/IssuerRoleResolver.sol)), constructed with `(eas, registry, SchemaKind)`. The kind fixes the role and the encoding (Deployment → Operator, IndependentTest → Reviewer, Conformance → Auditor), so a resolver cannot be deployed with a mismatched role or slot. It accepts an attestation only if the attester holds that role in the registry for the scope carried in the attestation, at issuance time. It reads the scope id from the ABI head (slot 1 for Deployment and IndependentTest, slot 0 for Conformance), after checking that the head is complete and that the first string offset is canonical; it does not decode the tail, so verifiers decode `data` strictly and treat a decoding failure as no attestation. The role is checked at issuance only: an attestation stays valid on EAS after the attester's role is withdrawn, so verifiers compare the attestation time with the `IssuerSet` history. `policyVersion` is not checked on-chain. Registration of the schemas on a public network is Planned (M2). For `VPR.IndependentTest.v1`, the booleans are the public summary; `reportHash` commits to the full report, which is shared with the governor signers and not published, since a per-school account of bypass attempts can be useful to an attacker. Verifiers must check that the attester address belongs to the expected role for the scope, and that `validUntil` has not passed. A school counts as protected only with a valid, unrevoked `VPR.IndependentTest.v1` for the policy version in force.
 
 ## I9 · Appeal document (format 3; relayer planned, [VPR-017](BACKLOG.md))
 

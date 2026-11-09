@@ -97,9 +97,11 @@ async function main() {
   );
   await send("setIssuer", registry.connect(governor).setIssuer(d.scopeId, operator.address, Role.Operator));
   await registry.connect(governor).setIssuer(d.scopeId, reviewer.address, Role.Reviewer);
-  await send("setPublisher", anchor.connect(governor).setPublisher(d.scopeId, operator.address, 0));
+  // the demonstrator anchors fixed historical synthetic data, so it disables the back-fill bound
+  const NO_LAG_LIMIT = await anchor.NO_LAG_LIMIT();
+  await send("setPublisher", anchor.connect(governor).setPublisher(d.scopeId, operator.address, NO_LAG_LIMIT));
   console.log(`2. governor created ${d.scope}, registered operator and reviewer roles, appointed the publisher`);
-  check(await reverts(anchor.connect(stranger).setPublisher(d.scopeId, stranger.address, 0), "NotGovernor"), "a stranger cannot claim the scope's publisher (NotGovernor)");
+  check(await reverts(anchor.connect(stranger).setPublisher(d.scopeId, stranger.address, 1), "NotGovernor"), "a stranger cannot claim the scope's publisher (NotGovernor)");
 
   await send(
     "publishPolicy",
@@ -112,7 +114,7 @@ async function main() {
   check(current.contentHash !== d.tamperedDocumentHash, "a modified policy document does not match the on-chain contentHash");
   manifestBase.policy = { scope: d.scope, scopeId: d.scopeId, governor: governor.address, version: d.policyVersion, contentHash: d.contentHash, zoneHash: d.zoneHash };
 
-  const resolver = await (await ethers.getContractFactory("IssuerRoleResolver")).deploy(stranger.address, await registry.getAddress(), Role.Reviewer, 1);
+  const resolver = await (await ethers.getContractFactory("IssuerRoleResolver")).deploy(stranger.address, await registry.getAddress(), 1 /* SchemaKind.IndependentTest */);
   const testData = ethers.AbiCoder.defaultAbiCoder().encode(
     ["string", "bytes32", "uint256", "bool", "bool", "bool", "bool", "bytes32", "uint64", "uint64"],
     ["giga-0001", d.scopeId, 1, true, true, true, true, ethers.id("report"), 1, 2]
@@ -148,8 +150,11 @@ async function main() {
   await anchor.connect(operator).commitRoot(d.scopeId, otherDay, ethers.id("unrelated root"), d.datasetUri);
   check(!(await anchor.verifyRow(d.scopeId, otherDay, r.school_id, r.category, r.count, d.proof)), "the published row does not verify against a different anchored root");
   gas.verifyRow_estimate = Number(await anchor.verifyRow.estimateGas(d.scopeId, d.dayNumber, r.school_id, r.category, r.count, d.proof));
-  const futureDay = Number(await anchor.today()) + 1;
-  check(await reverts(anchor.connect(operator).commitRoot(d.scopeId, futureDay, d.root, d.datasetUri), "DayInFuture"), "a future day cannot be anchored (DayInFuture)");
+  const currentDay = Number(await anchor.today());
+  check(
+    await reverts(anchor.connect(operator).commitRoot(d.scopeId, currentDay, d.root, d.datasetUri), "DayNotClosed"),
+    "the current UTC day, still accumulating, cannot be anchored (DayNotClosed)"
+  );
   await send("markEmpty", anchor.connect(operator).markEmpty(d.scopeId, d.dayNumber - 1));
   check((await anchor.getCommitment(d.scopeId, d.dayNumber - 1)).empty, "a day with nothing publishable is marked empty, so the gap is not ambiguous");
   await send("correctRoot", anchor.connect(governor).correctRoot(d.scopeId, otherDay, d.root, d.datasetUri, ethers.id("correction note")));
@@ -160,7 +165,7 @@ async function main() {
     const s = d.service;
     await registry.connect(governor).createScope(s.scope, 90n * DAY);
     s.scopeId = await registry.scopeIdOf(governor.address, s.scope);
-    await anchor.connect(governor).setPublisher(s.scopeId, operator.address, 0);
+    await anchor.connect(governor).setPublisher(s.scopeId, operator.address, NO_LAG_LIMIT);
     await anchor.connect(operator).commitRoot(s.scopeId, s.dayNumber, s.root, "ipfs://example-service-dataset");
     check(
       await anchor.verifyRow(s.scopeId, s.dayNumber, s.row.unit_id, s.row.category, s.row.count, s.proof),
