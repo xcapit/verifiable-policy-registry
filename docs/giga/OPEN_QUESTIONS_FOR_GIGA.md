@@ -1,6 +1,6 @@
 # Open questions for Giga and implementing partners
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.3 preparation*
+*CC BY 4.0 · Proposal package for a school pilot · v0.3.0*
 
 Decisions that only Giga, a ministry, a connectivity provider or another partner can take. None of them is assumed answered anywhere in this repository. Each is validated directly with the partner and recorded, with its source, before the stage that depends on it.
 

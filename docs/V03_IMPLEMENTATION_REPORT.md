@@ -1,6 +1,6 @@
 # v0.3 implementation report
 
-*CC BY 4.0 · Branch `feat/v0.3-esp-giga-readiness`, based on `v0.2.0` (`7e5b8e2`). Last substantive commit before this report: `de5e039`. CI evidence: run [42644820168](https://github.com/xcapit/verifiable-policy-registry/actions/runs/42644820168) on `de5e039` (contracts, tools, e2e and links all passing). v0.3 is a **release candidate, not released**: no version bump, no tag, and the pull request is left unmerged.*
+*CC BY 4.0 · Released as v0.3.0 (pre-release) on 2026-11-09 after the second review (§14); the text below describes the state at review time. Branch `feat/v0.3-esp-giga-readiness`, based on `v0.2.0` (`7e5b8e2`). Last substantive commit before this report: `de5e039`. CI evidence: run [42644820168](https://github.com/xcapit/verifiable-policy-registry/actions/runs/42644820168) on `de5e039` (contracts, tools, e2e and links all passing). v0.3 is a **release candidate, not released**: no version bump, no tag, and the pull request is left unmerged.*
 
 ## 1. Recommendation
 

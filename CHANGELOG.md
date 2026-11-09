@@ -4,7 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-v0.3 preparation (release candidate, not released). Evidence-driven readiness for external review.
+## [0.3.0] - 2026-11-09
+
+Evidence-driven readiness for external review, with a second security and privacy review. Research prototype: contracts not audited, ZK proof of aggregation designed but not implemented, no public deployment.
 
 ### Added
 - Baseline and gap analysis, claims-and-evidence ledger, reviewer guide mapped to the 14 review questions.
@@ -19,8 +21,17 @@ v0.3 preparation (release candidate, not released). Evidence-driven readiness fo
 - A release-validation error message could echo suppressed cells; it no longer contains values.
 - Malformed YAML policies crashed the CLI with a traceback; they now fail with exit code 2.
 - The tools package could not be installed in editable mode once a second top-level directory existed.
+- An exception in a policy could cancel a restricted-list entry; compilation now refuses it without naming the entry. Empty feeds and invalid block pages are refused; zones are deterministic and written 0600.
+- Event input now enforces the privacy boundary on content: units and categories must be identifiers, so domains and IP addresses cannot reach a release; rows, dates and counts are parsed strictly.
+- Restricted-list entries no longer appear in error messages; duplicate YAML keys are rejected.
+- Zone evaluation fails closed on records it does not understand and handles TTL, class, case, NODATA and drop.
+- CLI: unexpected errors exit 2 without a traceback; `verify-row` without `--root` reports `anchored: false`; `verify-root --k` checks the threshold.
+- The reference Unbound fragment did not load; it now passes `unbound-checkconf` with deployment files substituted.
+- The demonstrator's wrong-root check could never fail; negative checks now assert exact custom errors.
 
 ### Changed
+- ZK specification (Designed): the event count *m* stays private, *k* is read from the registry, the scope is bound in each event leaf.
+- Threat model T38–T48 and backlog VPR-061 to VPR-069 from the second review; contract-level hardening is scheduled before the M3 audit freeze.
 - README status box separating implemented, demonstrated, designed, audit and deployment status; tagline no longer says "privacy-preserving" without qualification. White paper v0.5 defers to the evidence documents.
 
 ## [0.2.0] - 2026-11-09
@@ -77,6 +88,7 @@ First public release: a proof of concept and the documentation needed for extern
 - Code of conduct, security policy, project governance, maintainers, support, contribution guide with DCO, issue and pull request templates.
 - Licence texts (AGPL-3.0-only, CC0-1.0, CC-BY-4.0), NOTICE, CITATION.cff and publiccode.yml.
 
-[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/xcapit/verifiable-policy-registry/releases/tag/v0.1.0
