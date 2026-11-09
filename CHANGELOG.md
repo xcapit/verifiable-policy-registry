@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-09
+
+Hardened contracts and data formats, an end-to-end demo, the team, and a two-phase pilot plan, following external review. Contracts are still not audited. This release breaks compatibility with 0.1.0: the `MetricsAnchor` constructor and publisher model, `verifyRow` in place of `verifyLeaf`, dataset format 2 and appeal format 2.
+
 ### Added
 - Issuer roles on-chain: `setIssuer` and `issuerRole`, one role per address per scope.
 - `vpr restricted-hash` command and runtime validation of the full policy schema (VPR-007, VPR-008).
@@ -54,5 +58,6 @@ First public release: a proof of concept and the documentation needed for extern
 - Code of conduct, security policy, project governance, maintainers, support, contribution guide with DCO, issue and pull request templates.
 - Licence texts (AGPL-3.0-only, CC0-1.0, CC-BY-4.0), NOTICE, CITATION.cff and publiccode.yml.
 
-[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/xcapit/verifiable-policy-registry/releases/tag/v0.1.0
