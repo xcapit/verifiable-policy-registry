@@ -18,6 +18,8 @@ Pre-audit hardening (closes VPR-060, VPR-065 to VPR-069; the resolver part of VP
 - **Breaking.** `MetricsAnchor.setPublisher(scopeId, publisher, maxLagDays)`: publishers can be revoked; future days are refused and back-filling can be limited; `markEmpty` declares days with nothing publishable; `correctRoot` lets the governor correct a root with a reason hash and a revision count.
 - Appeal documents move to format 3 (`nonce`), so they cannot be guessed and pre-filed.
 
+White paper version 0.6: wording aligned with the hardened contracts (scope identifiers, issuer-role enforcement, anchoring window and governor corrections, appeal format 3), stale figure labels corrected (leaf encoding, `verifyRow`), eleven new figures added and the roadmap figure reused, so that every main section has one (19 in total).
+
 Changes after a further internal review of this hardening:
 - **Breaking.** `MetricsAnchor` anchors only days that have ended (`DayNotClosed` replaces `DayInFuture`). The lag is explicit: `maxLagDays` is at least 1 for an appointed publisher, `NO_LAG_LIMIT` disables the bound, and 0 is used only to revoke (`InvalidLag`). A key-compromised publisher can no longer back-fill history by default.
 - **Breaking.** `correctRoot` can turn a root back into an empty day (`newRoot` 0) and refuses no-op corrections (`NoChange`); `RootCorrected` now carries the new `datasetUri`.

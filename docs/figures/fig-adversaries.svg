@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" width="960" height="500" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<rect width="960" height="500" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">Adversaries, the mechanism that answers each, and the kind of guarantee</text>
+<g font-size="12">
+<text x="40" y="62" font-weight="600" fill="#475569">ADVERSARY</text>
+<text x="330" y="62" font-weight="600" fill="#475569">MAIN MECHANISM</text>
+<text x="760" y="62" font-weight="600" fill="#475569">OUTCOME</text>
+<line x1="40" y1="70" x2="920" y2="70" stroke="#cbd5e1"/>
+
+<text x="40" y="94" font-weight="600" fill="#0f172a">A1 · one signer alone</text><text x="330" y="94" fill="#0f172a">m-of-n Safe as governor (P3)</text>
+<rect x="760" y="80" width="160" height="22" rx="11" fill="#059669"/><text x="840" y="95" font-weight="600" fill="#fff" text-anchor="middle">prevented</text>
+
+<text x="40" y="134" font-weight="600" fill="#0f172a">A2 · colluding majority</text><text x="330" y="134" fill="#0f172a">public version and reason, expiry, appeal, permanent record</text>
+<rect x="760" y="120" width="160" height="22" rx="11" fill="#2563eb"/><text x="840" y="135" font-weight="600" fill="#fff" text-anchor="middle">visible, temporary</text>
+
+<text x="40" y="174" font-weight="600" fill="#0f172a">A3 · dishonest operator</text><text x="330" y="166" fill="#0f172a">reviewer tests; RFC 8932 and audit; anchored roots;</text><text x="330" y="182" fill="#64748b">ZK proof of aggregation (designed, M4)</text>
+<rect x="760" y="160" width="160" height="22" rx="11" fill="#d97706"/><text x="840" y="175" font-weight="600" fill="#fff" text-anchor="middle">detected by others</text>
+
+<text x="40" y="214" font-weight="600" fill="#0f172a">A4 · split-view resolver</text><text x="330" y="214" fill="#0f172a">tests from inside, indistinguishable, unannounced</text>
+<rect x="760" y="200" width="160" height="22" rx="11" fill="#d97706"/><text x="840" y="215" font-weight="600" fill="#fff" text-anchor="middle">rests on reviewer</text>
+
+<text x="40" y="254" font-weight="600" fill="#0f172a">A5 · attacker on signer keys</text><text x="330" y="254" fill="#0f172a">threshold, hardware or passkey custody, two-step handover</text>
+<rect x="760" y="240" width="160" height="22" rx="11" fill="#059669"/><text x="840" y="255" font-weight="600" fill="#fff" text-anchor="middle">prevented below m</text>
+
+<text x="40" y="294" font-weight="600" fill="#0f172a">A6 · re-identification</text><text x="330" y="294" fill="#0f172a">minimisation at the source, k-suppression (limits in §5.2)</text>
+<rect x="760" y="280" width="160" height="22" rx="11" fill="#64748b"/><text x="840" y="295" font-weight="600" fill="#fff" text-anchor="middle">reduced, not removed</text>
+
+<text x="40" y="334" font-weight="600" fill="#0f172a">A7 · user bypass</text><text x="330" y="334" fill="#0f172a">provider blocks external DNS and DoH; bypass tested and reported</text>
+<rect x="760" y="320" width="160" height="22" rx="11" fill="#64748b"/><text x="840" y="335" font-weight="600" fill="#fff" text-anchor="middle">reduced, reported</text>
+
+<text x="40" y="374" font-weight="600" fill="#0f172a">A8 · appeal spammer</text><text x="330" y="374" fill="#0f172a">gas cost; no re-filing while open; relayer rate limit (planned)</text>
+<rect x="760" y="360" width="160" height="22" rx="11" fill="#64748b"/><text x="840" y="375" font-weight="600" fill="#fff" text-anchor="middle">bounded</text>
+
+<text x="40" y="414" font-weight="600" fill="#0f172a">A9 · the ledger itself</text><text x="330" y="414" fill="#0f172a">filtering independent of liveness; forced inclusion via L1</text>
+<rect x="760" y="400" width="160" height="22" rx="11" fill="#2563eb"/><text x="840" y="415" font-weight="600" fill="#fff" text-anchor="middle">filtering unaffected</text>
+
+<text x="40" y="454" font-weight="600" fill="#0f172a">A10 · withholding documents</text><text x="330" y="446" fill="#0f172a">substitution fails the hash; withholding answered</text><text x="330" y="462" fill="#0f172a">by mirrors on independent hosts</text>
+<rect x="760" y="440" width="160" height="22" rx="11" fill="#2563eb"/><text x="840" y="455" font-weight="600" fill="#fff" text-anchor="middle">substitution detected</text>
+</g>
+<g stroke="#f1f5f9"><line x1="40" y1="112" x2="920" y2="112"/><line x1="40" y1="152" x2="920" y2="152"/><line x1="40" y1="192" x2="920" y2="192"/><line x1="40" y1="232" x2="920" y2="232"/><line x1="40" y1="272" x2="920" y2="272"/><line x1="40" y1="312" x2="920" y2="312"/><line x1="40" y1="352" x2="920" y2="352"/><line x1="40" y1="392" x2="920" y2="392"/><line x1="40" y1="432" x2="920" y2="432"/></g>
+<text x="40" y="490" font-size="11" fill="#475569">Green: prevented under §3.2. Blue: not prevented, but public or without effect on filtering. Amber: rests on a named party. Grey: reduced within stated limits.</text>
+</svg>
