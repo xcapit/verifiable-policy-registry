@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 673" width="960" height="673" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
 <rect width="960" height="673" fill="#ffffff"/>
-<text x="16" y="32" font-size="17" font-weight="600" fill="#0f172a">Pilot roadmap · one month of application and design, three months of work</text>
+<text x="16" y="32" font-size="17" font-weight="600" fill="#0f172a">Pilot roadmap · one month of design and sign-off, three months of work</text>
 <rect x="230" y="50" width="176" height="22" fill="#fef3c7"/>
-<text x="318" y="66" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">Month 1 · application and design</text>
+<text x="318" y="66" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">Month 1 · design and sign-off</text>
 <rect x="406" y="50" width="176" height="22" fill="#f1f5f9"/>
 <text x="494" y="66" font-size="11" font-weight="600" fill="#0f172a" text-anchor="middle">Month 2</text>
 <rect x="582" y="50" width="176" height="22" fill="#e2e8f0"/>
@@ -43,9 +43,9 @@
 <text x="824.0" y="88" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle">w14</text>
 <text x="868.0" y="88" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle">w15</text>
 <text x="912.0" y="88" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle">w16</text>
-<text x="16" y="120" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M1 Application and design</text>
+<text x="16" y="120" font-size="11" font-weight="600" fill="#0f172a" text-anchor="start">M1 Design and sign-off</text>
 <rect x="232" y="104" width="40" height="22" rx="4" fill="#fffbeb" stroke="#d97706"/>
-<text x="278" y="119" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">kick-off · application · data inventory</text>
+<text x="278" y="119" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">kick-off · work plan · data inventory</text>
 <rect x="276" y="132" width="40" height="22" rx="4" fill="#fffbeb" stroke="#d97706"/>
 <text x="322" y="147" font-size="11" font-weight="400" fill="#0f172a" text-anchor="start">threat model · Safe · charter · schools</text>
 <rect x="320" y="160" width="40" height="22" rx="4" fill="#fffbeb" stroke="#d97706"/>
@@ -90,5 +90,5 @@
 <text x="670" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">schools attested · DPG submitted</text>
 <polygon points="934,611 941,618 934,625 927,618" fill="#0f172a"/>
 <text x="934" y="642" font-size="11" font-weight="600" fill="#0f172a" text-anchor="end">end of week 16</text>
-<text x="934" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="end">audit public · proofs live on mainnet</text>
+<text x="934" y="657" font-size="11" font-weight="400" fill="#475569" text-anchor="end">audit public · OP Mainnet</text>
 </svg>

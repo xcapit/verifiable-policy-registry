@@ -1,4 +1,4 @@
-# ADR-0007: k-anonymous metrics (k = 10) with a daily Merkle root
+# ADR-0007: Threshold-suppressed metrics (k = 10) with a daily Merkle root
 
 - Status: Accepted
 - Date: 2026-11-09

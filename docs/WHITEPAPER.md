@@ -3,7 +3,7 @@
 **Fernando Boiero** · Xcapit (CryptoLab S.A.S.), Córdoba, Argentina
 Correspondence: dpg@xcapit.com
 
-*White paper · Version 0.3 (draft for review) · November 2026 · Licensed under CC BY 4.0*
+*White paper · Version 0.4 (draft for review) · November 2026 · Licensed under CC BY 4.0*
 
 > **Status.** This document describes a design and a proof-of-concept implementation. The smart contracts have not been audited and are not deployed on any production network. Claims about security and privacy are stated together with the assumptions under which they hold.
 
@@ -13,7 +13,7 @@ Correspondence: dpg@xcapit.com
 
 Programmes that connect schools to the internet must protect children from malware, phishing and harmful content, and in practice they do so with network-level content filtering. The same mechanism is among the most common instruments of internet censorship. Its legitimacy therefore depends on properties that today's filters do not provide: the public cannot learn what is blocked, who decided it, for how long, or whether the infrastructure records children's browsing. We present the *Verifiable Policy Registry* (VPR), a system that separates the **enforcement plane** of filtering, a conventional protective DNS resolver operated in-country, from an **accountability plane** built on a public blockchain. In the accountability plane, every policy version is committed to by hash, authorised by a threshold of independent institutions, bounded in time and open to appeal. The correct deployment of a policy is attested by a party other than the operator. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle commitment that anyone can recompute.
 
-We state the security properties the system offers, separate those that hold cryptographically from those that rest on institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We narrow that gap with zero-knowledge proofs that bind the published figures to a committed event log and to the policy in force, implemented as part of the pilot, and identify trusted execution as further work. The first deployment targets a pilot in 20 to 50 schools connected by UNICEF Giga in Latin America. The design is generic to any bounded network with an accountable governor.
+We state the security properties the system offers, separate those that hold cryptographically from those that rest on institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We narrow that gap with zero-knowledge proofs that bind the published figures to a committed event log and to the policy in force, specified here and scheduled for implementation in the pilot, and identify trusted execution as further work. The first deployment targets a pilot in 20 to 50 schools connected by UNICEF Giga in Latin America. The design is generic to any bounded network with an accountable governor.
 
 ---
 
@@ -260,7 +260,7 @@ The proposed network is OP Mainnet, where EAS is deployed and transaction costs 
 
 ## 9. Evaluation plan
 
-The pilot lasts four months: one month of application and initial design, followed by three months of build, deployment and measurement (see the roadmap [4]). It will be evaluated against the following indicators, to be agreed with Giga.
+The pilot lasts four months: one month of design and sign-off, followed by three months of build, deployment and measurement (see the roadmap [4]). It will be evaluated against the following indicators, to be agreed with Giga.
 
 | Indicator | Target |
 | --- | --- |
@@ -283,7 +283,7 @@ DNS filtering operates on domain names. IWF entries that are individual URLs on 
 
 ## 11. Closing the enforcement–accountability gap
 
-The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. The pilot closes the middle link with zero-knowledge proofs of aggregation, which are implemented, audited and deployed as a milestone of their own (M4). Trusted execution and verifiable differential privacy remain further work.
+The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. The pilot closes the middle link with zero-knowledge proofs of aggregation, planned as a milestone of their own (M4) and not yet implemented in the proof of concept. Trusted execution and verifiable differential privacy remain further work.
 
 <p align="center"><img src="figures/fig7-gap.svg" alt="Enforcement-accountability gap link by link" width="100%"></p>
 
@@ -291,15 +291,15 @@ The weakest link in the design is the step between the resolver's behaviour and 
 
 ### 11.1 Statement
 
-For a scope *s* and a day *d*, let *L* = ⟨*e*₁, …, *e*ₘ⟩ be the event log, where each *e*ⱼ = (*school*ⱼ, *d*, *category*ⱼ), and let *C*_L be a binding commitment to *L*, anchored together with the daily root. Let Cat(*h*) be the set of categories of the policy in force, whose document hashes to *h*. Let Agg_k(*L*) be the table of counts per (*school*, *d*, *category*) with every cell below *k* removed, and let MR(·) be the Merkle root of §5.3. The operator proves knowledge of a witness *L* for the relation
+For a scope *s* and a day *d*, let *L* = ⟨*e*₁, …, *e*ₘ⟩ be the event log, where each *e*ⱼ = (*school*ⱼ, *d*, *category*ⱼ), and let *C*_L = Commit(*L*; ρ) be a binding and hiding commitment to *L* under fresh randomness ρ, anchored together with the daily root. Hiding is required, not incidental: the counts in a day are small integers and the unsuppressed cells are public, so an unsalted hash of *L* would let anyone recover the suppressed cells by enumeration. Let Cat(*h*) be the set of categories of the policy in force, whose document hashes to *h*. Let Agg_k(*L*) be the table of counts per (*school*, *d*, *category*) with every cell below *k* removed, and let MR(·) be the Merkle root of §5.3. The operator proves knowledge of a witness (*L*, ρ) for the relation
 
-  R(*h*, Cat, *k*, *C*_L, *root*; *L*) ⟺ Commit(*L*) = *C*_L ∧ ∀*j*: *category*ⱼ ∈ Cat ∧ MR(Agg_k(*L*)) = *root*.
+  R(*h*, Cat, *k*, *C*_L, *root*; *L*, ρ) ⟺ Commit(*L*; ρ) = *C*_L ∧ ∀*j*: *category*ⱼ ∈ Cat ∧ MR(Agg_k(*L*)) = *root*.
 
 The public inputs are the policy hash *h*, its category set Cat, the threshold *k*, the log commitment *C*_L and the daily root. The binding between Cat and *h* is checked either in the circuit or by any verifier holding the public document; the specification (VPR-033) fixes which, based on proving cost. The proof is zero-knowledge in *L*, so the counts of suppressed cells stay hidden. As a side effect, the number of suppressed cells no longer needs to be published (§5.2).
 
 ### 11.2 What the proof guarantees, and implementation
 
-Given a valid proof, the published figures are exactly the suppressed aggregation of a log the operator committed to, and no event in that log falls outside the policy in force. The operator can no longer adjust the figures after the fact, or report blocks in categories the governor never approved. The proof does not establish that *L* is complete or that its events occurred. That property belongs to the first link of Figure 7 and still rests on the reviewer's measurements and on audit.
+Given a valid proof, the published figures are exactly the suppressed aggregation of a log the operator committed to, and no event in that log falls outside the policy in force. The operator can no longer adjust the figures after the fact, or report blocks in categories the governor never approved. The proof does not establish that *L* is complete or that its events occurred. That property belongs to the first link of Figure 7 and still rests on the reviewer's measurements and on audit. A partial tie is available at low cost: the independent reviewer issues test queries from known schools on undisclosed days, records them as canary events, and after each release asks the operator for a proof that every canary is included in *L*. An operator who drops or rewrites events cannot tell canaries from real traffic, so omission is detected with a probability that grows with the number of canaries (VPR-038).
 
 Two implementation routes are evaluated in the first month: a general-purpose zero-knowledge virtual machine running a reference implementation of R, or a dedicated circuit for counting, threshold comparison and membership. zkVM proofs are usually wrapped into a succinct proof such as Groth16 [25] or PLONK [26] for verification on the EVM. A dedicated circuit is cheaper to prove but must implement keccak-256, which is expensive in arithmetic circuits. One option is to commit to *L* with a SNARK-friendly hash such as Poseidon [27] and keep keccak-256 only for the public Merkle root. The anchoring contract accepts a daily root only together with a proof that verifies on-chain. The circuit and the verifier fall within the scope of the external audit. If proving a full day exceeds the daily budget on commodity hardware, the fallback is one proof per school, aggregated off-chain.
 

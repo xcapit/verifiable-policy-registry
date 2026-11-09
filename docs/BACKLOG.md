@@ -2,9 +2,9 @@
 
 Issue-ready tasks after the proof of concept. Each has acceptance criteria so it can be implemented spec-first. IDs are stable; reference them in commits (`VPR-012: ...`).
 
-## M1 · Application and initial design (weeks 1–4)
+## M1 · Design and sign-off (weeks 1–4)
 
-See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--application-and-initial-design--weeks-14--10). VPR-033 (ZK specification) is also delivered in this milestone.
+See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--weeks-14--10). VPR-033 (ZK specification) is also delivered in this milestone.
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -29,7 +29,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--application-and-initial
 | VPR-014 | Policy publisher: `vpr publish` uploads the canonical document (IPFS or HTTPS) and prints the Safe transaction data | Fetched document hashes to the on-chain `contentHash` |
 | VPR-015 | Resolver sync daemon: watches `PolicyPublished`, fetches and verifies the document, recompiles RPZ, reloads Unbound | Refuses documents whose hash mismatches; logs only version numbers; integration test with a local chain |
 | VPR-016 | Metrics exporter for Unbound RPZ hits → `(school_id, day, category)` | No IPs or qnames leave the process (unit test asserts emitted fields); school_id derived from source network mapping |
-| VPR-017 | Block page with appeal form that calls `fileAppeal` through a relayer | Appeal text limited to domain + reason; no personal data fields; rate-limited |
+| VPR-017 | Block page with appeal form that calls `fileAppeal` through a relayer | Appeal text limited to domain + reason; no personal data fields; rate-limited; block page and form available in Spanish and Portuguese, with strings in a translation file |
 | VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
@@ -52,12 +52,12 @@ Statement to prove for each daily release: the published table is the k-suppress
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
-| VPR-033 | ZK specification (`docs/specs/zk-aggregation.md`), produced in M1: statement, public and private inputs, event-log commitment, proving-system evaluation (zkVM vs. dedicated circuit) | Reviewed in the M1 design review; chosen system justified with estimated proving cost |
+| VPR-033 | ZK specification (`docs/specs/zk-aggregation.md`), produced in M1: statement, public and private inputs, hiding event-log commitment, proving-system evaluation (zkVM vs. dedicated circuit) | Reviewed in the M1 design review; chosen system justified with estimated proving cost |
 | VPR-034 | Reference implementation of the statement in Python, used as the test oracle | Accepts valid (log, release) pairs and rejects altered counts, wrong suppression and out-of-policy categories |
 | VPR-030 | Circuit or zkVM program for counting, k-suppression and category membership | Matches the oracle on randomised tests, including edge cases (empty day, all cells suppressed, k boundary) |
 | VPR-036 | Benchmarks on commodity hardware | Proving time, memory and on-chain verification gas for 50 schools × 1 day; documented in the spec; per-school fallback decided before the freeze |
 | VPR-035 | On-chain verifier and an anchoring function that accepts a daily root only with a valid proof | Tests for valid proof, altered root, wrong policy hash and replay; INTERFACES and ARCHITECTURE updated; frozen at end of week 12 |
-| VPR-037 | Prover in the daily job; proofs published with each release; `vpr verify-proof` | Every release in the last four weeks of the pilot has a proof accepted on-chain; an outside party verifies one with the CLI |
+| VPR-037 | Prover in the daily job; proofs published with each release; `vpr verify-proof` | Every release from week 14 has a proof accepted on-chain; an outside party verifies one with the CLI |
 
 ## Future work
 
@@ -65,6 +65,7 @@ Statement to prove for each daily release: the published table is the k-suppress
 | --- | --- | --- |
 | VPR-031 | Verifiable differential privacy for overlapping releases (noise from committed public randomness or proven sampling) | Write-up with privacy budget, utility on synthetic data and verification cost |
 | VPR-032 | TEE remote attestation (TDX, SEV-SNP or Nitro) for resolver and exporter, to bind the event log to a measured binary | Prototype binding a measured binary and the zone hash to an attestation; threat analysis of the TEE trust assumptions |
+| VPR-038 | Canary events: reviewer test queries recorded as canaries and proven included in the committed log after release | Reviewer kit generates canaries without telling the operator the day; inclusion proof or explicit failure for every canary; detection probability against omission documented in the spec |
 
 ## Hygiene
 

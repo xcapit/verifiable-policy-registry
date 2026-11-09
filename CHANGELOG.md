@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+- White paper v0.4: zero-knowledge proofs of aggregation described as planned for M4; the event-log commitment must be hiding; canary events as a partial check on log completeness.
+- Roadmap: M1 renamed *Design and sign-off*, without the funding application; M4 acceptance window aligned with prover integration (from week 14); fallback acceptance if the circuit audit slips.
+- Backlog: canary events (VPR-038); Spanish and Portuguese block page and appeal form (VPR-017).
+- ADR-0007 retitled to describe small-cell suppression.
+
 ## [0.1.0] - 2026-11-09
 
 First public release: a proof of concept and the documentation needed for external review. The contracts are not audited and not deployed on any production network.
