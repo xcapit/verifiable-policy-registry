@@ -1,16 +1,19 @@
-"""Sorted-pair keccak256 Merkle tree.
+"""Sorted-pair keccak256 Merkle tree with domain separation (dataset format 2).
 
-Same scheme as OpenZeppelin's MerkleProof and contracts/src/MetricsAnchor.sol#verifyLeaf:
-parent = keccak256(min(a, b) || max(a, b)). Odd nodes are promoted unchanged to the next level.
+Leaves are hashed by the caller with a 0x00 prefix (see metrics.Row.leaf); internal nodes are
+keccak256(0x01 || min(a, b) || max(a, b)), as in contracts/src/MetricsAnchor.sol#verifyRow and in
+the spirit of RFC 9162. Odd nodes are promoted unchanged to the next level.
 """
 
 from __future__ import annotations
 
 from .hashing import keccak256
 
+NODE_PREFIX = b"\x01"
+
 
 def hash_pair(a: bytes, b: bytes) -> bytes:
-    return keccak256(a + b) if a < b else keccak256(b + a)
+    return keccak256(NODE_PREFIX + a + b) if a < b else keccak256(NODE_PREFIX + b + a)
 
 
 def build_levels(leaves: list[bytes]) -> list[list[bytes]]:

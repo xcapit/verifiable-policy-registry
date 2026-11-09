@@ -46,17 +46,26 @@ def test_domain_cannot_be_blocked_and_excepted():
 
 def test_rpz_exceptions_win_over_feeds():
     p = policy.load(EXAMPLE)
-    feeds = {f.stem: policy.load_feed(f) for f in FEEDS.glob("*.txt")}
-    zone = policy.compile_rpz(p, feeds, block_page="block.example.org", serial=1)
+    zone = policy.compile_rpz(p, _feeds(), block_page="block.example.org", serial=1)
     assert "wikipedia.org CNAME rpz-passthru." in zone
     assert "wikipedia.org CNAME block.example.org." not in zone
     assert "bad-malware.example CNAME block.example.org." in zone
     assert "casino-example.example CNAME block.example.org." in zone
 
 
+def _feeds():
+    return {f.stem: policy.load_feed(f) for f in FEEDS.glob("*.txt")}
+
+
+def _with_restricted(domains):
+    doc = copy.deepcopy(policy.load(EXAMPLE).doc)
+    doc["restricted_list_hash"] = policy.restricted_list_hash(domains)
+    return policy.validate(doc)
+
+
 def test_restricted_entries_are_not_labelled():
-    p = policy.load(EXAMPLE)
-    zone = policy.compile_rpz(p, {}, restricted=["hidden-one.example"], serial=1)
+    p = _with_restricted(["hidden-one.example"])
+    zone = policy.compile_rpz(p, _feeds(), restricted=["hidden-one.example"], serial=1)
     line = next(l for l in zone.splitlines() if l.startswith("hidden-one.example"))
     assert ";" not in line  # no source label: the zone must not reveal which entries come from the restricted list
 
@@ -65,3 +74,41 @@ def test_restricted_list_hash_is_order_independent():
     a = policy.restricted_list_hash(["b.example", "a.example"])
     b = policy.restricted_list_hash(["a.example", "b.example", "a.example"])
     assert a == b
+
+
+def test_compiler_fails_closed_on_missing_feed():
+    p = policy.load(EXAMPLE)
+    with pytest.raises(policy.PolicyError):
+        policy.compile_rpz(p, {"malware": ["bad-malware.example"]}, serial=1)
+    # explicit opt-out for testing only
+    assert policy.compile_rpz(p, {}, serial=1, allow_missing_feeds=True)
+
+
+def test_restricted_list_must_match_the_declared_hash():
+    p = _with_restricted(["hidden-one.example"])
+    with pytest.raises(policy.PolicyError):
+        policy.compile_rpz(p, _feeds(), restricted=["other.example"], serial=1)
+    with pytest.raises(policy.PolicyError):
+        policy.compile_rpz(p, _feeds(), serial=1)  # declared but not supplied
+    with pytest.raises(policy.PolicyError):
+        policy.compile_rpz(policy.load(EXAMPLE), _feeds(), restricted=["hidden-one.example"], serial=1)  # undeclared
+
+
+@pytest.mark.parametrize(
+    "key,value",
+    [
+        ("profile", "university"),
+        ("version", 0),
+        ("valid_days", 0),
+        ("reason_code", 9),
+        ("scope", "Giga-AR-primary"),
+        ("threat_feeds", [{"provider": "x"}]),
+        ("categories", ["malware", "malware"]),
+        ("unexpected", True),
+    ],
+)
+def test_schema_rules_are_enforced_at_runtime(key, value):
+    doc = copy.deepcopy(policy.load(EXAMPLE).doc)
+    doc[key] = value
+    with pytest.raises(policy.PolicyError):
+        policy.validate(doc)

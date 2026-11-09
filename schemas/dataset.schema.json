@@ -1,29 +1,65 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/xcapit/verifiable-policy-registry/schemas/dataset.schema.json",
-  "title": "VPR daily aggregate dataset (JSON summary)",
-  "description": "Output of `vpr aggregate`. The CSV form has the columns school_id,day,category,count with the same rules. License: CC0-1.0. See docs/INTERFACES.md#i6--public-dataset-aggregator--public.",
+  "title": "VPR daily aggregate dataset (JSON summary, format 2)",
+  "description": "Output of `vpr aggregate` for one UTC day. The CSV form has the columns school_id,day,category,count with the same rules. The number of suppressed cells is deliberately not published. License: CC0-1.0. See docs/INTERFACES.md#i6--public-dataset-aggregator--public.",
   "type": "object",
-  "required": ["k", "suppressed_cells", "root", "rows"],
+  "required": [
+    "format",
+    "k",
+    "root",
+    "rows"
+  ],
   "additionalProperties": false,
   "properties": {
-    "k": { "type": "integer", "minimum": 2 },
-    "suppressed_cells": { "type": "integer", "minimum": 0 },
+    "format": {
+      "const": "vpr-dataset/2"
+    },
+    "k": {
+      "type": "integer",
+      "minimum": 2
+    },
     "root": {
-      "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^0x[0-9a-f]{64}$" }],
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{64}$"
+        }
+      ],
       "description": "Merkle root of the rows; null when every cell was suppressed"
     },
     "rows": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["school_id", "day", "category", "count"],
+        "required": [
+          "school_id",
+          "day",
+          "category",
+          "count"
+        ],
         "additionalProperties": false,
         "properties": {
-          "school_id": { "type": "string", "pattern": "^[^|]+$" },
-          "day": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-          "category": { "type": "string", "pattern": "^[^|]+$" },
-          "count": { "type": "integer", "minimum": 2 }
+          "school_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 2
+          }
         }
       }
     }

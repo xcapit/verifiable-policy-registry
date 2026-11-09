@@ -7,8 +7,10 @@ pragma solidity ^0.8.24;
 ///      expected to be a Safe multisig (for example 2-of-3: UNICEF Giga, Ministry of Education and an
 ///      independent reviewer). The registry stores commitments only: the full policy document lives
 ///      off-chain at `uri` and is identified by `contentHash`. Legally restricted lists (such as the IWF
-///      list) are represented only by `restrictedListHash`. The registry's own logic stores no personal data;
-///      appeal URIs are caller-supplied, and their storage is being redesigned (VPR-048).
+///      list) are represented only by `restrictedListHash`. Appeals are recorded as hashes of appeal
+///      documents validated off-chain, so no caller can place free text on-chain through an appeal.
+///      Scope names are not authenticated by the contract: verifiers must pin the chain id, this contract's
+///      address, the scope id and the expected governor from a deployment manifest published by the partners.
 contract VerifiablePolicyRegistry {
     struct Scope {
         address governor;
@@ -19,7 +21,7 @@ contract VerifiablePolicyRegistry {
     struct PolicyVersion {
         bytes32 contentHash; // keccak256 of the canonical policy document
         bytes32 restrictedListHash; // commitment to lists that cannot be published (0 if none)
-        string uri; // where the full policy document is published (https, ipfs, ...)
+        string uri; // where the full policy document is published (https, ipfs, ...); set by the governor only
         uint16 reasonCode; // why this version was published (see docs/GOVERNANCE.md)
         uint64 publishedAt;
         uint64 expiresAt;
@@ -36,16 +38,32 @@ contract VerifiablePolicyRegistry {
     struct Appeal {
         bytes32 scopeId;
         AppealStatus status;
+        uint32 round; // 1 for the first filing of a document, incremented on resubmission after rejection
         uint64 filedAt;
-        string uri; // public description of the appeal (domain + reason), never personal data
+        bytes32 documentHash; // keccak256 of the appeal document (format vpr-appeal/2), validated off-chain
+        bytes32 resolutionHash; // hash of the reasoned rejection, or the content hash of the accepting version
+    }
+
+    /// @notice Roles that may issue attestations for a scope. One address holds at most one role per scope,
+    ///         so the operator can never also be the reviewer or the auditor.
+    enum Role {
+        None,
+        Operator,
+        Reviewer,
+        Auditor
     }
 
     mapping(bytes32 => Scope) public scopes;
     mapping(bytes32 => PolicyVersion[]) private _versions;
     mapping(bytes32 => Appeal) public appeals;
+    /// @notice Latest filing round per (scope, appeal document).
+    mapping(bytes32 => uint32) public appealRounds;
+    /// @notice Attestation issuer role of an address within a scope.
+    mapping(bytes32 => mapping(address => Role)) public issuerRole;
 
     event ScopeCreated(bytes32 indexed scopeId, address indexed governor, uint64 maxValidity);
     event GovernorChanged(bytes32 indexed scopeId, address indexed previousGovernor, address indexed newGovernor);
+    event IssuerSet(bytes32 indexed scopeId, address indexed issuer, Role role);
     event PolicyPublished(
         bytes32 indexed scopeId,
         uint256 indexed version,
@@ -56,8 +74,8 @@ contract VerifiablePolicyRegistry {
         uint64 expiresAt,
         bytes32 resolvesAppeal
     );
-    event AppealFiled(bytes32 indexed appealId, bytes32 indexed scopeId, string uri);
-    event AppealResolved(bytes32 indexed appealId, bool accepted);
+    event AppealFiled(bytes32 indexed appealId, bytes32 indexed scopeId, bytes32 documentHash, uint32 round);
+    event AppealResolved(bytes32 indexed appealId, bool accepted, bytes32 resolutionHash);
 
     error ScopeAlreadyExists();
     error UnknownScope();
@@ -65,6 +83,8 @@ contract VerifiablePolicyRegistry {
     error InvalidValidity();
     error ZeroAddress();
     error EmptyContentHash();
+    error EmptyDocumentHash();
+    error EmptyReason();
     error AppealAlreadyExists();
     error AppealNotOpen();
     error AppealScopeMismatch();
@@ -76,10 +96,12 @@ contract VerifiablePolicyRegistry {
         _;
     }
 
-    /// @notice Create a new policy scope. Anyone can create a scope; trust comes from who the governor is.
+    /// @notice Create a new policy scope. Only the governor itself can create its scope, so nobody can create a
+    ///         scope that appears to be governed by someone else's Safe.
     function createScope(bytes32 scopeId, address governor, uint64 maxValidity) external {
         if (scopes[scopeId].exists) revert ScopeAlreadyExists();
         if (governor == address(0)) revert ZeroAddress();
+        if (msg.sender != governor) revert NotGovernor();
         if (maxValidity == 0) revert InvalidValidity();
         scopes[scopeId] = Scope({governor: governor, maxValidity: maxValidity, exists: true});
         emit ScopeCreated(scopeId, governor, maxValidity);
@@ -91,6 +113,13 @@ contract VerifiablePolicyRegistry {
         address previous = scopes[scopeId].governor;
         scopes[scopeId].governor = newGovernor;
         emit GovernorChanged(scopeId, previous, newGovernor);
+    }
+
+    /// @notice Grant, change or revoke (Role.None) the attestation role of an address in a scope.
+    function setIssuer(bytes32 scopeId, address issuer, Role role) external onlyGovernor(scopeId) {
+        if (issuer == address(0)) revert ZeroAddress();
+        issuerRole[scopeId][issuer] = role;
+        emit IssuerSet(scopeId, issuer, role);
     }
 
     /// @notice Publish a new policy version. It becomes the policy in force until it expires or is replaced.
@@ -114,7 +143,8 @@ contract VerifiablePolicyRegistry {
             if (a.status != AppealStatus.Open) revert AppealNotOpen();
             if (a.scopeId != scopeId) revert AppealScopeMismatch();
             a.status = AppealStatus.Accepted;
-            emit AppealResolved(resolvesAppeal, true);
+            a.resolutionHash = contentHash;
+            emit AppealResolved(resolvesAppeal, true, contentHash);
         }
 
         uint64 nowTs = uint64(block.timestamp);
@@ -135,24 +165,48 @@ contract VerifiablePolicyRegistry {
         );
     }
 
-    /// @notice File an appeal against a block (for example an educational site that was wrongly blocked).
-    /// @dev Open to anyone. The appeal id is derived from its content so duplicates are rejected.
-    function fileAppeal(bytes32 scopeId, string calldata uri) external returns (bytes32 appealId) {
-        if (!scopes[scopeId].exists) revert UnknownScope();
-        appealId = keccak256(abi.encode(scopeId, uri));
-        if (appeals[appealId].status != AppealStatus.None) revert AppealAlreadyExists();
-        appeals[appealId] = Appeal({scopeId: scopeId, status: AppealStatus.Open, filedAt: uint64(block.timestamp), uri: uri});
-        emit AppealFiled(appealId, scopeId, uri);
+    /// @notice Id of the appeal for a document in a given filing round.
+    function appealIdOf(bytes32 scopeId, bytes32 documentHash, uint32 round) public pure returns (bytes32) {
+        return keccak256(abi.encode(scopeId, documentHash, round));
     }
 
-    /// @notice Reject an appeal. Accepting one is done by publishing a policy version that resolves it.
-    function rejectAppeal(bytes32 appealId) external {
+    /// @notice File an appeal against a block (for example an educational site that was wrongly blocked).
+    /// @dev Open to anyone. Only the hash of the appeal document is stored; the document itself is validated and
+    ///      published off-chain by the block page relayer. A document can be filed again after a rejection, which
+    ///      opens a new round; it cannot be filed while an earlier round is open or after it was accepted.
+    function fileAppeal(bytes32 scopeId, bytes32 documentHash) external returns (bytes32 appealId) {
+        if (!scopes[scopeId].exists) revert UnknownScope();
+        if (documentHash == bytes32(0)) revert EmptyDocumentHash();
+        bytes32 key = keccak256(abi.encode(scopeId, documentHash));
+        uint32 round = appealRounds[key];
+        if (round != 0) {
+            AppealStatus previous = appeals[appealIdOf(scopeId, documentHash, round)].status;
+            if (previous != AppealStatus.Rejected) revert AppealAlreadyExists();
+        }
+        round += 1;
+        appealRounds[key] = round;
+        appealId = appealIdOf(scopeId, documentHash, round);
+        appeals[appealId] = Appeal({
+            scopeId: scopeId,
+            status: AppealStatus.Open,
+            round: round,
+            filedAt: uint64(block.timestamp),
+            documentHash: documentHash,
+            resolutionHash: bytes32(0)
+        });
+        emit AppealFiled(appealId, scopeId, documentHash, round);
+    }
+
+    /// @notice Reject an appeal with a reasoned decision, committed by its hash and published off-chain.
+    ///         Accepting one is done by publishing a policy version that resolves it.
+    function rejectAppeal(bytes32 appealId, bytes32 reasonHash) external {
         Appeal storage a = appeals[appealId];
         if (a.status != AppealStatus.Open) revert AppealNotOpen();
-        Scope storage s = scopes[a.scopeId];
-        if (msg.sender != s.governor) revert NotGovernor();
+        if (msg.sender != scopes[a.scopeId].governor) revert NotGovernor();
+        if (reasonHash == bytes32(0)) revert EmptyReason();
         a.status = AppealStatus.Rejected;
-        emit AppealResolved(appealId, false);
+        a.resolutionHash = reasonHash;
+        emit AppealResolved(appealId, false, reasonHash);
     }
 
     /// @notice Number of versions published for a scope.

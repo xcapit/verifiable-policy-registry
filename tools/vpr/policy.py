@@ -33,6 +33,10 @@ REASON_CODES = {
 }
 
 REQUIRED_KEYS = {"scope", "version", "profile", "categories", "local_blocks", "exceptions"}
+OPTIONAL_KEYS = {"valid_days", "reason_code", "threat_feeds", "restricted_list_hash"}
+PROFILES = {"primary", "secondary", "teachers"}
+SCOPE_RE = re.compile(r"^[a-z0-9-]+:[A-Z]{2}:[a-z0-9-]+$")
+CATEGORY_RE = re.compile(r"^[a-z0-9_-]+$")
 
 
 class PolicyError(ValueError):
@@ -66,19 +70,48 @@ def _check_domain(d: str, where: str) -> str:
     return d
 
 
+def _is_int(v) -> bool:
+    return isinstance(v, int) and not isinstance(v, bool)
+
+
 def validate(doc: dict) -> Policy:
+    """Validate a policy document against format 1 (same rules as schemas/policy.schema.json)."""
+    if not isinstance(doc, dict):
+        raise PolicyError("policy document must be a mapping")
     missing = REQUIRED_KEYS - set(doc)
     if missing:
         raise PolicyError(f"missing keys: {sorted(missing)}")
-    if not isinstance(doc["categories"], list) or not all(isinstance(c, str) for c in doc["categories"]):
-        raise PolicyError("categories must be a list of strings")
+    unknown = set(doc) - REQUIRED_KEYS - OPTIONAL_KEYS
+    if unknown:
+        raise PolicyError(f"unknown keys: {sorted(unknown)}")
+    if not isinstance(doc["scope"], str) or not SCOPE_RE.match(doc["scope"]):
+        raise PolicyError("scope must look like <programme>:<CC>:<profile>, e.g. giga:AR:primary")
+    if not _is_int(doc["version"]) or doc["version"] < 1:
+        raise PolicyError("version must be an integer >= 1")
+    if doc["profile"] not in PROFILES:
+        raise PolicyError(f"profile must be one of {sorted(PROFILES)}")
+    cats = doc["categories"]
+    if not isinstance(cats, list) or not all(isinstance(c, str) and CATEGORY_RE.match(c) for c in cats):
+        raise PolicyError("categories must be a list of lowercase identifiers")
+    if len(cats) != len(set(cats)):
+        raise PolicyError("categories must not repeat")
+    if "valid_days" in doc and (not _is_int(doc["valid_days"]) or doc["valid_days"] < 1):
+        raise PolicyError("valid_days must be an integer >= 1")
+    if "reason_code" in doc and doc["reason_code"] not in REASON_CODES:
+        raise PolicyError(f"reason_code must be one of {sorted(REASON_CODES)}")
+    feeds = doc.get("threat_feeds", [])
+    if not isinstance(feeds, list) or not all(
+        isinstance(f, dict) and set(f) == {"provider", "version"} and all(isinstance(v, str) and v for v in f.values())
+        for f in feeds
+    ):
+        raise PolicyError("threat_feeds entries need exactly a non-empty provider and version")
     for section in ("local_blocks", "exceptions"):
         entries = doc[section]
         if not isinstance(entries, list):
             raise PolicyError(f"{section} must be a list")
         for i, e in enumerate(entries):
-            if not isinstance(e, dict) or "domain" not in e or "reason" not in e:
-                raise PolicyError(f"{section}[{i}] needs 'domain' and 'reason' (every entry must say why)")
+            if not isinstance(e, dict) or set(e) != {"domain", "reason"}:
+                raise PolicyError(f"{section}[{i}] needs exactly 'domain' and 'reason' (every entry must say why)")
             e["domain"] = _check_domain(e["domain"], f"{section}[{i}]")
             if not str(e["reason"]).strip():
                 raise PolicyError(f"{section}[{i}] has an empty reason")
@@ -114,6 +147,7 @@ def compile_rpz(
     restricted: list[str] | None = None,
     block_page: str | None = None,
     serial: int | None = None,
+    allow_missing_feeds: bool = False,
 ) -> str:
     """Compile a policy into an RPZ zone (RFC-draft Response Policy Zones), usable by Unbound or PowerDNS.
 
@@ -121,8 +155,22 @@ def compile_rpz(
     - `exceptions` are emitted as PASSTHRU rules, which take precedence.
     - If `block_page` is given, blocked names are redirected there (so users see a notice and can appeal);
       otherwise they get NXDOMAIN.
+    - Fails closed: a category without a feed, or a restricted list whose hash differs from the one declared in
+      the policy, is an error rather than a silently weaker zone.
     """
     feeds = feeds or {}
+    missing = [c for c in policy.doc["categories"] if c not in feeds]
+    if missing and not allow_missing_feeds:
+        raise PolicyError(f"no feed for categories {missing}: refusing to compile a zone without promised protection")
+    declared = policy.doc.get("restricted_list_hash")
+    if declared and restricted is None:
+        raise PolicyError("the policy declares a restricted list but none was supplied")
+    if restricted is not None:
+        if not declared:
+            raise PolicyError("a restricted list was supplied but the policy does not declare its hash")
+        actual = restricted_list_hash(restricted)
+        if actual != declared:
+            raise PolicyError(f"restricted list hash {actual} does not match the policy ({declared})")
     blocked: dict[str, str] = {}
     for cat in policy.doc["categories"]:
         for d in feeds.get(cat, []):

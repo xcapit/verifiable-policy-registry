@@ -42,7 +42,7 @@ jobs:
         run: |
           vpr policy-hash policies/example-primary.yaml
           vpr compile-rpz policies/example-primary.yaml --feeds-dir examples/feeds --block-page block.example.org > /dev/null
-          ROOT=$(vpr aggregate examples/events.csv --k 10 --out-csv dataset.csv | python -c "import sys, json; print(json.load(sys.stdin)['root'])")
+          ROOT=$(vpr aggregate examples/events.csv --day 2026-11-01 --k 10 --out-csv dataset.csv | python -c "import sys, json; print(json.load(sys.stdin)['root'])")
           vpr verify-root dataset.csv "$ROOT"
 
   e2e:

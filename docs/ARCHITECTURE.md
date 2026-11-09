@@ -46,8 +46,8 @@ sequenceDiagram
   Op->>Op: aggregate with k-suppression, build Merkle tree
   Op->>Anc: commitRoot(scope, day, root, datasetUri)
   Pub->>Anc: recompute root from published CSV and compare
-  Pub->>Reg: fileAppeal(scope, uri)
-  Gov->>Reg: publishPolicy(..., resolvesAppeal) or rejectAppeal
+  Pub->>Reg: fileAppeal(scope, documentHash) via relayer
+  Gov->>Reg: publishPolicy(..., resolvesAppeal) or rejectAppeal(id, reasonHash)
 ```
 
 ## On-chain vs off-chain
@@ -69,21 +69,21 @@ Full specification, including events, errors and invariants: [INTERFACES.md](INT
 
 `VerifiablePolicyRegistry`
 
-- `createScope(bytes32 scopeId, address governor, uint64 maxValidity)`
+- `createScope(bytes32 scopeId, address governor, uint64 maxValidity)`: called by the governor itself
 - `setGovernor(bytes32 scopeId, address newGovernor)`: governor only
+- `setIssuer(bytes32 scopeId, address issuer, Role role)`: governor only; one attestation role per address per scope
 - `publishPolicy(bytes32 scopeId, bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 validity, bytes32 resolvesAppeal) returns (uint256 version)`: governor only; `0 < validity <= maxValidity`
-- `fileAppeal(bytes32 scopeId, string uri) returns (bytes32 appealId)`: anyone; id = `keccak256(abi.encode(scopeId, uri))`
-- `rejectAppeal(bytes32 appealId)`: governor only
+- `fileAppeal(bytes32 scopeId, bytes32 documentHash) returns (bytes32 appealId)`: anyone; stores only the hash of a validated appeal document; resubmission after rejection opens a new round
+- `rejectAppeal(bytes32 appealId, bytes32 reasonHash)`: governor only, with the hash of a reasoned decision
 - `currentPolicy(bytes32 scopeId) returns (uint256 version, PolicyVersion policy, bool inForce)`
 
-`MetricsAnchor`
+`MetricsAnchor` (constructed with the registry address)
 
-- `configure(bytes32 scopeId, address admin, address publisher)`: one-time
-- `setPublisher(bytes32 scopeId, address publisher)`: admin only
+- `setPublisher(bytes32 scopeId, address publisher)`: the scope's governor in the registry only
 - `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)`: publisher only, write-once per day
-- `verifyLeaf(bytes32 scopeId, uint32 day, bytes32 leaf, bytes32[] proof) returns (bool)`
+- `verifyRow(bytes32 scopeId, uint32 day, string schoolId, string category, uint256 count, bytes32[] proof) returns (bool)`
 
-Merkle scheme: sorted-pair keccak256 (OpenZeppelin-compatible). Leaf = `keccak256("school_id|day|category|count")`. Implemented identically in `tools/vpr/merkle.py` and tested against the same vector in both languages.
+Merkle scheme (dataset format 2): sorted pairs, leaves `keccak256(0x00 ‖ day ‖ count ‖ len ‖ school ‖ len ‖ category)` and nodes `keccak256(0x01 ‖ min ‖ max)`. Implemented identically in `tools/vpr/merkle.py` and `tools/vpr/metrics.py`, and tested against the same vector in both languages.
 
 ## Deployment topology (pilot)
 

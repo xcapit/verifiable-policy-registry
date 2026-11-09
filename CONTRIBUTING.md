@@ -42,7 +42,7 @@ Smoke test of the CLI from the repository root:
 
 ```bash
 vpr policy-hash policies/example-primary.yaml
-vpr aggregate examples/events.csv --k 10 --out-csv dataset.csv
+vpr aggregate examples/events.csv --day 2026-11-01 --k 10 --out-csv dataset.csv
 ```
 
 ## Making a change

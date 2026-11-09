@@ -14,9 +14,9 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-004 | DPIA template `docs/DPIA.md` aligned with UNICEF Policy on Personal Data Protection | Sections for data inventory, necessity, risks, mitigations; reviewed by Giga |
 | VPR-005 | Finalise `docs/PRIVACY_STATEMENT.md` (RFC 8932 RPS) | Placeholders resolved; `vpr` command prints its keccak256 |
 | VPR-006 | Filtering profiles: `policies/profiles/{primary,secondary,teachers}.yaml` mapped to ITU COP categories | Each validates with `vpr policy-hash`; mapping table in `docs/PROFILES.md` |
-| VPR-007 | Validate policy documents against `schemas/policy.schema.json` in `vpr.policy.validate` (`valid_days`, `reason_code`, `profile`, `threat_feeds`, unknown keys) | Invalid example documents fail with a clear message; the shipped example passes; schema and code agree on every field |
-| VPR-008 | `vpr restricted-hash <file>` command printing the restricted list commitment | Output equals `policy.restricted_list_hash()`; documented in `docs/INTERFACES.md` |
-| VPR-009 | Restrict `MetricsAnchor.configure` so only the registry governor of a scope (or a factory) can configure it | A third party cannot claim a scope; tests cover the front-running case; INTERFACES updated |
+| VPR-007 | **Done in 0.2.0.** Validate policy documents against `schemas/policy.schema.json` in `vpr.policy.validate` (`valid_days`, `reason_code`, `profile`, `threat_feeds`, unknown keys) | Invalid example documents fail with a clear message; the shipped example passes; schema and code agree on every field |
+| VPR-008 | **Done in 0.2.0.** `vpr restricted-hash <file>` command printing the restricted list commitment | Output equals `policy.restricted_list_hash()`; documented in `docs/INTERFACES.md` |
+| VPR-009 | **Done in 0.2.0.** Restrict `MetricsAnchor.configure` so only the registry governor of a scope (or a factory) can configure it | A third party cannot claim a scope; tests cover the front-running case; INTERFACES updated |
 
 ## M2 · Registry, resolver and attestations (weeks 5–10)
 
@@ -24,7 +24,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | --- | --- | --- |
 | VPR-010 | Deployment scripts (Hardhat Ignition or scripts/) for OP Sepolia and OP Mainnet | One command deploys both contracts and creates a scope with a Safe as governor; addresses written to `deployments/<network>.json` |
 | VPR-011 | Safe integration: script to propose `publishPolicy` as a Safe transaction | Proposal appears in the Safe UI; executed with 2 of 3 signatures on testnet |
-| VPR-012 | EAS schema registration script | Registers the three schemas on OP Sepolia; UIDs stored in `deployments/` |
+| VPR-012 | EAS schema registration script, with a schema resolver that accepts an attestation only from an address holding the matching role in the registry | Registers the three schemas on OP Sepolia; UIDs stored in `deployments/` |
 | VPR-013 | `vpr attest-deployment` and `vpr attest-test` CLI commands (EAS SDK or ethers) | Creates attestations on testnet; reviewer key and operator key are distinct; README documents usage |
 | VPR-014 | Policy publisher: `vpr publish` uploads the canonical document (IPFS or HTTPS) and prints the Safe transaction data | Fetched document hashes to the on-chain `contentHash` |
 | VPR-015 | Resolver sync daemon: watches `PolicyPublished`, fetches and verifies the document, recompiles RPZ, reloads Unbound | Refuses documents whose hash mismatches; logs only version numbers; integration test with a local chain |
@@ -32,7 +32,8 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-017 | Block page with appeal form that calls `fileAppeal` through a relayer | Appeal text limited to domain + reason; no personal data fields; rate-limited; block page and form available in Spanish and Portuguese, with strings in a translation file |
 | VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
 | VPR-047 | Use Giga Maps school identifiers as `school_id` in the exporter mapping, attestations and datasets | Every attested school resolves to a Giga Maps record; the dashboard joins metrics with Giga Maps data by identifier |
-| VPR-048 | Redesign appeal storage: the contract stores only a versioned, size-bounded commitment to an appeal document validated off-chain, never a caller-supplied free-text URI; reasoned resolutions and resubmission after rejection | Direct calls cannot place arbitrary text on-chain; tests cover oversize, wrong scheme and resubmission; INTERFACES I9 and DO_NO_HARM H6 updated |
+| VPR-048 | **Done in 0.2.0.** Redesign appeal storage: the contract stores only a versioned, size-bounded commitment to an appeal document validated off-chain, never a caller-supplied free-text URI; reasoned resolutions and resubmission after rejection | Direct calls cannot place arbitrary text on-chain; tests cover oversize, wrong scheme and resubmission; INTERFACES I9 and DO_NO_HARM H6 updated |
+| VPR-049 | Deployment manifest per network (`deployments/<network>.json`), published by the partners: chain id, registry and anchor addresses, scope ids, expected governors and issuer roles; dashboard and tools pin it | A scope created under a canonical-looking name by another address is shown as untrusted; alert on governor, Safe owner or threshold changes |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
 ## M3 · Metrics, dashboard and audit (weeks 8–16)
@@ -45,7 +46,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-023 | UK Safer Internet Centre self-certification checklist | Completed and published in `docs/compliance/` |
 | VPR-024 | Security analysis with MIESC + external audit preparation | Findings triaged; no open high-severity issues |
 | VPR-025 | DPG application package | Every item in the *Still to do* list of `docs/DPG.md` closed; all 9 DPG Standard indicators evidenced with links; application submitted by the authorised representative |
-| VPR-027 | Domain-separate Merkle leaves and internal nodes (RFC 9162-style `0x00`/`0x01` prefixes) in `MetricsAnchor.verifyLeaf`, `tools/vpr/merkle.py` and the JavaScript tests | An internal node presented as a leaf no longer verifies; shared test vector updated in all three implementations; ADR and new dataset format version per INTERFACES.md |
+| VPR-027 | **Done in 0.2.0.** Domain-separate Merkle leaves and internal nodes (RFC 9162-style `0x00`/`0x01` prefixes) in `MetricsAnchor.verifyLeaf`, `tools/vpr/merkle.py` and the JavaScript tests | An internal node presented as a leaf no longer verifies; shared test vector updated in all three implementations; ADR and new dataset format version per INTERFACES.md |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
 ## M4 · Zero-knowledge proofs of aggregation (weeks 5–16)

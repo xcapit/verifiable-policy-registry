@@ -6,7 +6,7 @@
 
 Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is usually delivered by network-level filtering. The same mechanism is among the most common instruments of internet censorship. A filter is legitimate only when people outside the operator can see what it blocks, who decided it and for how long, and can be sure that it does not record what children do. Conventional filters provide none of these guarantees.
 
-The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. The protocol never needs personal data on-chain; appeals submitted directly to the contract can still carry arbitrary text today, and their storage is being redesigned (VPR-048).
+The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. No personal data, and no caller-supplied free text, is written on-chain: appeals are recorded as hashes of documents validated off-chain.
 
 The first deployment is a proposed pilot with **UNICEF Giga** in 20 to 50 connected schools in Latin America. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
 
@@ -85,7 +85,7 @@ From the repository root:
 ```bash
 vpr policy-hash policies/example-primary.yaml        # scopeId and contentHash to publish on-chain
 vpr compile-rpz policies/example-primary.yaml --feeds-dir examples/feeds --block-page block.example.org
-vpr aggregate examples/events.csv --k 10 --out-csv dataset.csv   # prints the daily Merkle root
+vpr aggregate examples/events.csv --day 2026-11-01 --k 10 --out-csv dataset.csv   # prints the daily Merkle root
 vpr verify-root dataset.csv 0x<root>                 # anyone can recompute a published root
 ```
 
@@ -97,7 +97,7 @@ The pilot targets school networks, but the components are generic and released f
 | --- | --- | --- |
 | EAS schemas `VPR.Deployment.v1`, `VPR.IndependentTest.v1`, `VPR.Conformance.v1` ([`schemas/`](schemas), CC0) | Defined | Attestations for "deployed", "independently tested" and "conforms to framework X", with one issuer role per schema so that an operator never certifies itself |
 | Policy registry pattern (`VerifiablePolicyRegistry`) | Implemented, not audited | Versioned commitments with a stated reason, mandatory expiry bounded per scope, on-chain appeals and a governor that can be any Safe |
-| `MetricsAnchor` | Implemented, not audited | Write-once daily Merkle roots per scope, with an OpenZeppelin-compatible `verifyLeaf` |
+| `MetricsAnchor` | Implemented, not audited | Write-once daily Merkle roots per scope, publisher appointed by the governor, and on-chain verification of a single row with domain-separated hashing |
 | `vpr` tools | Implemented | Canonical hashing of policy documents, RPZ compilation, aggregation with small-cell suppression and Merkle proofs |
 | ZK aggregation verifier and `vpr verify-proof` | Planned (M4) | On-chain check that a published table is the correct suppressed aggregation of a committed private log |
 
