@@ -4,7 +4,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 
 ## M1 · Design and sign-off (weeks 1–4)
 
-See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--weeks-14--10). VPR-033 (ZK specification) is also delivered in this milestone.
+See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--weeks-14--15). VPR-033 (ZK specification) is also delivered in this milestone.
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-008 | **Done in 0.2.0.** `vpr restricted-hash <file>` command printing the restricted list commitment | Output equals `policy.restricted_list_hash()`; documented in `docs/INTERFACES.md` |
 | VPR-009 | **Done in 0.2.0.** Restrict `MetricsAnchor.configure` so only the registry governor of a scope (or a factory) can configure it | A third party cannot claim a scope; tests cover the front-running case; INTERFACES updated |
 
-## M2 · Registry, resolver and attestations (weeks 5–10)
+## M2 · Testnet reference implementation and alpha (weeks 5–10)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-049 | Deployment manifest per network (`deployments/<network>.json`), published by the partners: chain id, registry and anchor addresses, scope ids, expected governors and issuer roles; dashboard and tools pin it | A scope created under a canonical-looking name by another address is shown as untrusted; alert on governor, Safe owner or threshold changes |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
-## M3 · Metrics, dashboard and audit (weeks 8–16)
+## M3 · Metrics, audit and registry on mainnet (weeks 9–16)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -49,7 +49,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-027 | **Done in 0.2.0.** Domain-separate Merkle leaves and internal nodes (RFC 9162-style `0x00`/`0x01` prefixes) in `MetricsAnchor.verifyLeaf`, `tools/vpr/merkle.py` and the JavaScript tests | An internal node presented as a leaf no longer verifies; shared test vector updated in all three implementations; ADR and new dataset format version per INTERFACES.md |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
-## M4 · Zero-knowledge proofs of aggregation (weeks 5–16)
+## M4 · Zero-knowledge aggregation, reference implementation (weeks 5–16, testnet)
 
 Statement to prove for each daily release: the published table is the k-suppressed aggregation of an event log committed by `logCommitment`, and every event's category belongs to the policy in force (content hash *h*). The event log stays private.
 
@@ -60,7 +60,7 @@ Statement to prove for each daily release: the published table is the k-suppress
 | VPR-030 | Circuit or zkVM program for counting, k-suppression and category membership | Matches the oracle on randomised tests, including edge cases (empty day, all cells suppressed, k boundary) |
 | VPR-036 | Benchmarks on commodity hardware | Proving time, memory and on-chain verification gas for 50 schools × 1 day; documented in the spec; per-school fallback decided before the freeze |
 | VPR-035 | On-chain verifier and an anchoring function that accepts a daily root only with a valid proof | Tests for valid proof, altered root, wrong policy hash and replay; INTERFACES and ARCHITECTURE updated; frozen at end of week 12 |
-| VPR-037 | Prover in the daily job; proofs published with each release; `vpr verify-proof` | Every release from week 14 has a proof accepted on-chain; an outside party verifies one with the CLI |
+| VPR-037 | Prover in the daily job; proofs published with each release; `vpr verify-proof` | Every alpha release from week 14 has a proof accepted by the verifier on OP Sepolia; mainnet verification follows the circuit audit in phase 2; an outside party verifies one with the CLI |
 
 ## Future work
 
