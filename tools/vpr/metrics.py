@@ -80,9 +80,9 @@ def validate_release(rows: list[Row], k: int | None = None) -> None:
     if len(cells) != len(set(cells)):
         raise ValueError("duplicate (school_id, day, category) cells")
     floor = k if k is not None else 1
-    bad = [r for r in rows if r.count < floor]
-    if bad:
-        raise ValueError(f"cells below the release threshold: {bad[:3]}")
+    if any(r.count < floor for r in rows):
+        # deliberately says nothing about which cells or values: an error message must not leak them
+        raise ValueError("release contains cells below the threshold")
 
 
 def aggregate(events: Iterable[tuple[str, str, str]], k: int = DEFAULT_K) -> tuple[list[Row], int]:
@@ -111,28 +111,58 @@ def row_proof(rows: list[Row], index: int) -> list[str]:
     return [to_hex(p) for p in merkle.proof([r.leaf() for r in rows], index)]
 
 
-def to_csv(rows: list[Row]) -> str:
+def to_csv(rows: list[Row], unit_column: str = "school_id") -> str:
+    if unit_column not in UNIT_COLUMNS:
+        raise ValueError(f"unit_column must be one of {UNIT_COLUMNS}")
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator="\n")
-    w.writerow(["school_id", "day", "category", "count"])
+    w.writerow([unit_column, "day", "category", "count"])
     for r in rows:
         w.writerow([r.school_id, r.day, r.category, r.count])
     return buf.getvalue()
 
 
-def to_json(rows: list[Row], k: int) -> str:
+def to_json(rows: list[Row], k: int, unit_column: str = "school_id") -> str:
     """Public summary of a release. The number of suppressed cells is deliberately not published."""
+    if unit_column not in UNIT_COLUMNS:
+        raise ValueError(f"unit_column must be one of {UNIT_COLUMNS}")
     return json.dumps(
         {
             "format": FORMAT,
             "k": k,
             "root": dataset_root(rows) if rows else None,
-            "rows": [r.__dict__ for r in rows],
+            "rows": [{unit_column: r.school_id, "day": r.day, "category": r.category, "count": r.count} for r in rows],
         },
         indent=2,
     )
 
 
+UNIT_COLUMNS = ("school_id", "unit_id")
+
+
 def read_csv(text: str) -> list[Row]:
+    """Read a published release. The unit column may be named `school_id` (school use case) or `unit_id`
+    (any other use case); the leaf encoding is the same."""
     reader = csv.DictReader(io.StringIO(text))
-    return sorted(Row(r["school_id"], r["day"], r["category"], int(r["count"])) for r in reader)
+    fields = reader.fieldnames or []
+    unit = next((c for c in UNIT_COLUMNS if c in fields), None)
+    if unit is None or not {"day", "category", "count"} <= set(fields):
+        raise ValueError(f"release header must be <unit>,day,category,count with <unit> in {UNIT_COLUMNS}")
+    rows = []
+    for r in reader:
+        try:
+            count = int(r["count"])
+        except (TypeError, ValueError):
+            raise ValueError("count must be an integer") from None
+        rows.append(Row(r[unit], r["day"], r["category"], count))
+    return sorted(rows)
+
+
+def read_events(text: str) -> list[tuple[str, str, str]]:
+    """Read block or service events: header <unit>,day,category with <unit> in UNIT_COLUMNS; nothing else."""
+    reader = csv.DictReader(io.StringIO(text))
+    fields = reader.fieldnames or []
+    unit = next((c for c in UNIT_COLUMNS if c in fields), None)
+    if unit is None or set(fields) != {unit, "day", "category"}:
+        raise ValueError(f"event header must be exactly <unit>,day,category with <unit> in {UNIT_COLUMNS}")
+    return [(r[unit], r["day"], r["category"]) for r in reader]

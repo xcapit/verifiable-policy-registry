@@ -128,7 +128,11 @@ def validate(doc: dict) -> Policy:
 
 def load(path: str | Path) -> Policy:
     with open(path, encoding="utf-8") as f:
-        return validate(yaml.safe_load(f))
+        try:
+            doc = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            raise PolicyError(f"not a valid YAML or JSON policy document: {getattr(e, 'problem', e)}") from None
+    return validate(doc)
 
 
 def load_feed(path: str | Path) -> list[str]:
@@ -207,3 +211,50 @@ def restricted_list_hash(domains: list[str]) -> str:
     """Commitment to a restricted list: keccak256 of the sorted, newline-joined domains."""
     norm = sorted({_check_domain(d, "restricted") for d in domains})
     return to_hex(keccak256("\n".join(norm).encode("utf-8")))
+
+
+def evaluate_zone(zone: str, domain: str) -> dict:
+    """Evaluate a domain against a compiled RPZ zone (as produced by `compile_rpz`).
+
+    This is a zone evaluation, not DNS resolution: it applies RPZ QNAME-trigger precedence (an exact owner
+    name wins over wildcards, and a more specific wildcard wins over a less specific one) to the zone text,
+    so the artefact that a resolver would load is what gets tested. It does not query any resolver.
+    """
+    name = _check_domain(domain, "query")
+    exact: dict[str, tuple[str, str]] = {}
+    wild: dict[str, tuple[str, str]] = {}
+    for line in zone.splitlines():
+        body, _, comment = line.partition(";")
+        parts = body.split()
+        if len(parts) != 3 or parts[1] != "CNAME":
+            continue
+        owner, _, target = parts
+        rule = (target, comment.strip() or "unlabelled")
+        if owner.startswith("*."):
+            wild[owner[2:]] = rule
+        else:
+            exact[owner] = rule
+    match, rule = None, None
+    if name in exact:
+        match, rule = name, exact[name]
+    else:
+        labels = name.split(".")
+        for i in range(1, len(labels)):
+            parent = ".".join(labels[i:])
+            if parent in wild:
+                target, source = wild[parent]
+                # compile_rpz labels the exact owner line only; the wildcard inherits that label
+                if source == "unlabelled" and parent in exact:
+                    source = exact[parent][1]
+                match, rule = f"*.{parent}", (target, source)
+                break
+    if rule is None:
+        return {"domain": name, "action": "allow", "rule": None, "source": None}
+    target, source = rule
+    if target == "rpz-passthru.":
+        action = "passthru"
+    elif target == ".":
+        action = "nxdomain"
+    else:
+        action = "redirect"
+    return {"domain": name, "action": action, "rule": match, "source": None if action == "passthru" else source}
