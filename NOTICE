@@ -1,0 +1,26 @@
+Verifiable Policy Registry
+Copyright (C) 2026 CryptoLab S.A.S. (Xcapit) and contributors
+
+This repository contains material under three licences:
+
+  Code (contracts/, tools/, deploy/, .github/ and other source files)
+    GNU Affero General Public License v3.0 only (AGPL-3.0-only)
+    See LICENSE and LICENSES/AGPL-3.0-only.txt
+
+  Schemas (schemas/)
+    Creative Commons Zero v1.0 Universal (CC0-1.0)
+    See LICENSES/CC0-1.0.txt
+
+  Documentation (docs/ and the Markdown files at the repository root)
+    Creative Commons Attribution 4.0 International (CC-BY-4.0)
+    See LICENSES/CC-BY-4.0.txt
+    Suggested attribution: "Verifiable Policy Registry, Xcapit and contributors, CC BY 4.0"
+
+CODE_OF_CONDUCT.md is adapted from the Contributor Covenant v2.1 (CC BY 4.0),
+https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
+
+"Xcapit" is a name and trademark of CryptoLab S.A.S. The licences above do not grant
+rights to use it, except to describe the origin of the work.
+
+Third-party names (UNICEF, Giga, ITU, Ethereum, Safe, EAS, Optimism, Unbound, IWF and others)
+are used only to describe interoperability or the intended context, and do not imply endorsement.

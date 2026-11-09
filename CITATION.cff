@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use or refer to this work, please cite it as below."
+title: "Verifiable Policy Registry: accountable, privacy-preserving content filtering"
+type: software
+authors:
+  - family-names: Boiero
+    given-names: Fernando
+    affiliation: Xcapit
+  - name: "Xcapit and contributors"
+repository-code: "https://github.com/xcapit/verifiable-policy-registry"
+license: AGPL-3.0-only
+version: 0.1.0
+date-released: 2026-11-09
+keywords: [digital public good, content filtering, child online protection, ethereum, attestations, dns, privacy]

@@ -1,0 +1,34 @@
+name: Bug report
+description: Something does not work as documented
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please do **not** include personal data (IPs, names, student details) or real blocklists.
+        Security problems go through [the security policy](https://github.com/xcapit/verifiable-policy-registry/security/policy), not here.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options: [contracts, tools (vpr CLI), schemas, resolver config, docs, other]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Commands, inputs (use .example domains) and output.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit

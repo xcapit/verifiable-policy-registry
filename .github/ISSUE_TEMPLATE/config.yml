@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/xcapit/verifiable-policy-registry/security/advisories/new
+    about: Please report vulnerabilities privately.
+  - name: A site is wrongly blocked at a school
+    url: https://github.com/xcapit/verifiable-policy-registry/blob/main/SUPPORT.md#a-site-is-wrongly-blocked-at-a-school
+    about: Use the appeal link on the block page instead of an issue.
+  - name: Questions
+    url: https://github.com/xcapit/verifiable-policy-registry/discussions
+    about: Ask and discuss deployments here.

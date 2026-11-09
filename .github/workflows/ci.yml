@@ -32,6 +32,11 @@ jobs:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
       - run: pytest -q
+      - name: Validate example policy against the JSON schema
+        working-directory: .
+        run: |
+          pip install "jsonschema>=4.18"
+          python -c "import json, yaml, jsonschema; jsonschema.Draft202012Validator(json.load(open('schemas/policy.schema.json'))).validate(yaml.safe_load(open('policies/example-primary.yaml'))); print('policy schema ok')"
       - name: CLI smoke test
         working-directory: .
         run: |

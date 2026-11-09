@@ -1,0 +1,5 @@
+# Default reviewers. Contracts, schemas and the privacy model need two approvals (GOVERNANCE.md).
+*                         @fboiero
+/contracts/               @fboiero
+/schemas/                 @fboiero
+/docs/PRIVACY_STATEMENT.md @fboiero

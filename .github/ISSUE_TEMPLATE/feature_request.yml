@@ -1,0 +1,37 @@
+name: Feature or task
+description: Propose new work or pick up a backlog item
+labels: ["enhancement", "triage"]
+body:
+  - type: input
+    id: backlog
+    attributes:
+      label: Backlog ID
+      description: For example VPR-015. Leave empty if this is a new idea.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who needs this and why?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Core principles
+      options:
+        - label: The change adds no personal data anywhere (code, chain, datasets, logs).
+          required: true
+        - label: The change stays within bounded networks (no ISP-wide or national blocking).
+          required: true
+        - label: The operator still cannot certify itself.
+          required: true
