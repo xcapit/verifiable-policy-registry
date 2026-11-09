@@ -61,7 +61,16 @@ jobs:
         working-directory: contracts
       - run: pip install -e tools
       - name: End-to-end demo
-        run: ./examples/e2e/run.sh
+        run: E2E_OUT=e2e-out ./examples/e2e/run.sh
+      - name: Release benchmark (synthetic rows)
+        run: python tools/bench/bench_merkle.py | tee e2e-out/bench-merkle.json
+      - name: Upload demo evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-evidence
+          path: e2e-out/
+          if-no-files-found: warn
 
   links:
     runs-on: ubuntu-latest
