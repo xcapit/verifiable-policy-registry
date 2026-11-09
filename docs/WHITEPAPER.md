@@ -247,13 +247,13 @@ We deliberately exclude the following: the UK Department for Education filtering
 
 ## 8. Deployment considerations
 
-The proposed network is OP Mainnet, where EAS is deployed and transaction costs are low; Base is an alternative with the same properties. The expected load is small: one anchoring transaction per scope per day, one transaction per policy change, and one attestation per school per test cycle. Institutional signers use hardware wallets or passkey-based smart accounts through a web interface, so neither the ministry nor the schools handle cryptocurrency. Resolvers run as at least two instances on dedicated infrastructure in the region of the pilot, following NIST SP 800-81r3. Policy documents and released datasets are mirrored, for example on IPFS and in a public repository, so that P1 does not depend on a single host. Giga has previously worked with the Ethereum ecosystem on connectivity financing [24]; the present design concerns a different question, namely making the safety of that connectivity accountable.
+The proposed network is OP Mainnet, where EAS is deployed and transaction costs are low; Base is an alternative with the same properties. During the pilot, the accountability records start on OP Sepolia and move to mainnet once the external audit is closed. Filtering itself does not depend on the network, so schools are protected from the day they are onboarded. The expected load is small: one anchoring transaction per scope per day, one transaction per policy change, and one attestation per school per test cycle. Institutional signers use hardware wallets or passkey-based smart accounts through a web interface, so neither the ministry nor the schools handle cryptocurrency. Resolvers run as at least two instances on dedicated infrastructure in the region of the pilot, following NIST SP 800-81r3. Policy documents and released datasets are mirrored, for example on IPFS and in a public repository, so that P1 does not depend on a single host. Giga has previously worked with the Ethereum ecosystem on connectivity financing [24]; the present design concerns a different question, namely making the safety of that connectivity accountable.
 
 ---
 
 ## 9. Evaluation plan
 
-The pilot will be evaluated against the following indicators, to be agreed with Giga.
+The pilot lasts four months: one month of application and initial design, followed by three months of build, deployment and measurement (see the roadmap [4]). It will be evaluated against the following indicators, to be agreed with Giga.
 
 | Indicator | Target |
 | --- | --- |

@@ -2,7 +2,7 @@
 
 Issue-ready tasks after the proof of concept. Each has acceptance criteria so it can be implemented spec-first. IDs are stable; reference them in commits (`VPR-012: ...`).
 
-## M1 · Specification
+## M1 · Application and initial design (weeks 1–4)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -16,7 +16,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-008 | `vpr restricted-hash <file>` command printing the restricted list commitment | Output equals `policy.restricted_list_hash()`; documented in `docs/INTERFACES.md` |
 | VPR-009 | Restrict `MetricsAnchor.configure` so only the registry governor of a scope (or a factory) can configure it | A third party cannot claim a scope; tests cover the front-running case; INTERFACES updated |
 
-## M2 · Registry and attestations
+## M2 · Build and onboard (weeks 5–10)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -31,7 +31,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
-## M3 · Metrics and audit
+## M3 · Measure and audit (weeks 8–16)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-027 | Domain-separate Merkle leaves and internal nodes (RFC 9162-style tags) in Solidity, JS and Python, with a new shared test vector | `verifyLeaf` rejects an internal node presented as a leaf; dataset format version bumped; INTERFACES updated |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
-## M4 · Research
+## M4 · Research (optional, weeks 11–16)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
