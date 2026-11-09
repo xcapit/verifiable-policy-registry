@@ -6,6 +6,8 @@ A content filter for children can harm the people it is meant to protect. It can
 
 ## Harms we anticipate
 
+The full threat register, with owners and verification methods, is in [security/THREAT_MODEL.md](security/THREAT_MODEL.md); privacy risks from published metrics are analysed in [privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md](privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md); recourse and emergency procedures are in [GOVERNANCE.md](GOVERNANCE.md#escalation-and-external-recourse).
+
 | # | Harm | Who is affected | Design response | Where |
 | --- | --- | --- | --- | --- |
 | H1 | Children's browsing is recorded or exposed | Students, teachers | No query logs; the exporter emits only `(school_id, day, category)`; small-cell suppression with k = 10; no personal data on-chain | [PRIVACY_STATEMENT](PRIVACY_STATEMENT.md), [ADR-0007](adr/0007-k-anonymous-metrics-merkle.md), [INTERFACES I5](INTERFACES.md#i5--block-events-resolver-exporter--aggregator) |

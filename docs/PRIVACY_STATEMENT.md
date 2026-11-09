@@ -4,10 +4,10 @@
 
 ## 1. Policy
 
-1. **Treatment of IP addresses.** Client IP addresses are used only to answer queries and to apply access control. They are not written to disk and not shared.
+1. **Treatment of IP addresses.** The resolver necessarily processes client IP addresses and queried names in memory to answer each query; this is personal-data processing even though nothing is retained. Client IP addresses are used only to answer queries and to apply access control. They are not written to disk and not shared. The full data inventory, with retention, is in the [privacy and re-identification analysis](privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md).
 2. **Data collection and sharing.** No queried names, client IPs or device identifiers are logged. For each blocked query, the resolver emits a single event `(school_id, day, category)`, where `school_id` is the public Giga school identifier derived from the network the query came from. No other data leaves the resolver.
 3. **Exceptions.** A rolling in-memory operational buffer of up to [N] hours may exist for abuse and incident handling. It is never exported. [N to be fixed in the DPIA.]
-4. **Associated entities.** None receive query data. Aggregated datasets, with every cell below k = 10 events suppressed, are published openly.
+4. **Associated entities.** None receive query data. Aggregated datasets are published openly, with every cell below the threshold suppressed (pilot default k = 10 events) and the number of suppressed cells not published. The threshold counts events, not people; the release policy for small schools and sensitive categories is fixed in the DPIA.
 5. **Correlation of data.** Not performed.
 6. **Result filtering.** Filtering follows the policy in force for the scope, published in full with reasons at the URI recorded in the Verifiable Policy Registry. Restricted lists (IWF) are applied and committed to by hash.
 7. **Applicable law.** UNICEF Policy on Personal Data Protection; data-protection law of the pilot country.

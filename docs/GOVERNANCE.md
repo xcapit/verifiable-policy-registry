@@ -35,3 +35,28 @@ Used in `publishPolicy(..., reasonCode, ...)` and in policy documents.
 4. Restricted lists are referenced only by hash; their use is stated in the document.
 5. The charter of each scope defines the fallback when a policy expires without renewal (recommended: protective-only categories: malware and phishing).
 6. Key management: hardware wallets or passkey-based smart accounts for institutional signers; documented recovery; signer rotation via Safe and `setGovernor`.
+
+## Scope charter
+
+Every scope has a charter, signed by all governor signers before its first policy version, and published with a hash in the policy document. It fixes at least:
+
+- maximum validity, and the fallback when a version expires without renewal;
+- **categories that may never be blocked as such**: education, health (including sexual and reproductive health information for the appropriate age), human rights, journalism, political information, and information for LGBTQ+ young people. Individual domains inside these areas can still be blocked only with a stated reason that the reviewer checks;
+- the response time for appeals, and the external recourse path (below);
+- the release policy for metrics (threshold, minimum cohort, category tiers, delay), taken from the DPIA ([privacy analysis](privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md));
+- the identities of the issuers for each attestation role, recorded on-chain with `setIssuer`.
+
+## Emergency changes
+
+- **Emergency unblock.** When a block clearly harms access to education or safety information, any signer may propose a version that removes it, with reason code 6 (`correction`) and a short validity (proposed: 7 days). It still needs the threshold of signatures. The usual review happens afterwards, and the short validity forces it.
+- **Emergency block.** This applies to an active threat, such as a malware campaign. Reason code 4 (`new_threat`), short validity, and the same threshold.
+- An emergency never changes the categories that may never be blocked.
+
+## Escalation and external recourse
+
+A rejected appeal records the hash of a reasoned decision that is published off-chain. The person who appealed, or anyone else, can resubmit the appeal in a new round with new arguments. If the governor rejects it again, the charter names an external body that can review the case, such as an ombudsperson, a data-protection authority or a child-rights body depending on the country. The governor commits to publishing that body's conclusion. The protocol records the process; it cannot force the outcome ([threat model T16](security/THREAT_MODEL.md)).
+
+## Monitoring governance changes
+
+Changes to who governs are as important as changes to what is blocked. Dashboards and the deployment manifest (VPR-049) alert on `GovernorChanged`, on changes of Safe owners or threshold, and on `IssuerSet`. Such changes are announced publicly with a reason. Proposed: a waiting period of 7 days for non-emergency signer changes, during which they can be contested.
+
