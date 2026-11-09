@@ -1,20 +1,8 @@
 # Digital Public Good readiness
 
-*CC BY 4.0 · Checked against the [DPG Standard](https://github.com/DPGAlliance/DPG-Standard) v1.1.6 (tag `v1.1.6`, the current version according to the DPGA repository) · Last review: 2026-11-09. The application itself is made through the DPGA's live questionnaire, which takes precedence over this page.*
+*CC BY 4.0 · Project self-assessment, not a DPGA decision. The VPR is not a registered Digital Public Good.*
 
-We intend to submit the Verifiable Policy Registry to the [Digital Public Goods Alliance](https://digitalpublicgoods.net/) during milestone M3 of phase 1, once the evidence for indicators 7–9 is signed ([ROADMAP](ROADMAP.md)). This page maps each indicator to the evidence in this repository, so reviewers and contributors can see what is done and what is missing. It is tracked as [VPR-025](BACKLOG.md).
-
-| # | Indicator | Status | Evidence |
-| --- | --- | --- | --- |
-| 1 | Relevance to the SDGs | Ready | [§1 below](#1-relevance-to-the-sdgs), [WHITEPAPER](WHITEPAPER.md) |
-| 2 | Approved open licence | Ready | [LICENSE](../LICENSE) (AGPL-3.0-only, OSI-approved), [LICENSES/](../LICENSES), [NOTICE](../NOTICE), [ADR-0002](adr/0002-licensing.md) |
-| 3 | Clear ownership | Ready | [NOTICE](../NOTICE), [GOVERNANCE.md](../GOVERNANCE.md#ownership) |
-| 4 | Platform independence | Credible path | [§4 below](#4-platform-independence) |
-| 5 | Documentation | Credible path | [README](../README.md), [ARCHITECTURE](ARCHITECTURE.md), [INTERFACES](INTERFACES.md), [CONTRIBUTING](../CONTRIBUTING.md) |
-| 6 | Mechanism for extracting data and content | Ready | [§6 below](#6-extracting-data-and-content) |
-| 7 | Privacy and applicable laws | Gap (DPIA, data inventory and country analysis due in M1) | [PRIVACY_STATEMENT](PRIVACY_STATEMENT.md), [§7 below](#7-privacy-and-applicable-laws) |
-| 8 | Standards and best practices | Credible path | [WHITEPAPER §7](WHITEPAPER.md#7-standards-and-compliance), [§8 below](#8-standards-and-best-practices) |
-| 9 | Do no harm by design | Gap (appeal storage, escalation and impact assessment) | [DO_NO_HARM](DO_NO_HARM.md), [CODE_OF_CONDUCT](../CODE_OF_CONDUCT.md), [SECURITY](../SECURITY.md) |
+The authoritative, indicator-by-indicator assessment, with evidence, gaps, owners and milestones, is in **[DPG_EVIDENCE_MATRIX.md](DPG_EVIDENCE_MATRIX.md)**. It records the DPG Standard version checked, including the v1.1.7 changes listed in the DPGA changelog. This page keeps the supporting material that the matrix cites. The application is planned for milestone M3 of phase 1, once the evidence for indicators 7 and 9 is signed ([ROADMAP](ROADMAP.md), VPR-025 in [BACKLOG](BACKLOG.md)).
 
 ## 1. Relevance to the SDGs
 
@@ -49,31 +37,3 @@ All data the project produces is non-PII and published in open formats:
 - attestations: EAS records, readable through public EAS indexers or directly from the chain;
 - registry and anchor state: public contract storage and events, readable with any Ethereum client;
 - compiled filters: standard RPZ zone files.
-
-## 7. Privacy and applicable laws
-
-A recursive resolver necessarily processes client IP addresses and queried names in memory in order to answer queries; that processing is personal-data processing even if nothing is retained. The design minimises it: nothing identifying is retained, exported or published (see [DO_NO_HARM §9a](DO_NO_HARM.md#9a--data-privacy-and-security)). Each deployment must comply with:
-
-- the UNICEF Policy on Personal Data Protection, for deployments with UNICEF;
-- the data-protection law of the country where the network runs (for the Latin American pilot, for example, Argentina's Law 25.326, Brazil's LGPD or the equivalent national law);
-- a published RFC 8932 privacy statement for the resolver, whose hash is attested on-chain.
-
-A DPIA is completed with the deploying partner before the pilot (milestone M1). Development and operation follow Xcapit's ISO/IEC 27001-certified information security management system.
-
-## 8. Standards and best practices
-
-- Open standards: RPZ, DNSSEC (RFC 4033–4035), DoT (RFC 7858), DoH (RFC 8484), RFC 8932, EAS, W3C VC 2.0, JSON Schema 2020-12, SPDX licence identifiers.
-- Sector guidance: NIST SP 800-81r3, UK Safer Internet Centre filtering criteria, ITU Child Online Protection guidelines.
-- Development practice: [Principles for Digital Development](https://digitalprinciples.org/) (open standards, privacy by design, reuse), Conventional Commits, DCO sign-off, continuous integration, ADRs, semantic versioning.
-
-## Still to do before submission
-
-Status words above: *Ready* means the evidence exists in this repository; *Credible path* means the evidence is planned with an owner and a milestone; *Gap* means a known blocker. This is a self-assessment, not a DPGA decision.
-
-- [ ] Externalise the block page and appeal strings in Spanish and Portuguese (VPR-017), then set `localisationReady: true` and add `es` and `pt` in `publiccode.yml`.
-- [ ] Fill the operating cost figures in [SUSTAINABILITY.md](SUSTAINABILITY.md).
-- [ ] Complete the DPIA and resolve the placeholders in the privacy statement (VPR-004, VPR-005).
-- [ ] Publish the threat model (VPR-003).
-- [ ] Deploy to OP Sepolia and add contract addresses to the README (VPR-010).
-- [ ] Add the country hotline link to the block page (VPR-017).
-- [ ] Confirm the authorised representative details in the DPGA application form.
