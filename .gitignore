@@ -1,0 +1,13 @@
+node_modules/
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+contracts/coverage/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv/
+dataset.csv
+*.rpz
+.env
+deployments/*.local.json

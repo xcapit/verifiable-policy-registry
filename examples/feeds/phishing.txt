@@ -1,0 +1,2 @@
+# example phishing feed
+fake-bank-login.example

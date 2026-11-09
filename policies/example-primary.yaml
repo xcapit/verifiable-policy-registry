@@ -1,0 +1,24 @@
+# Example public policy document for a primary-school profile.
+# This file is what gets published (for example on IPFS); its keccak256 over the canonical JSON
+# form is the contentHash recorded on-chain. Every local block and exception must state a reason.
+scope: "giga:XX:primary"          # XX = pilot country code, to be agreed with Giga
+version: 1
+profile: primary                   # primary | secondary | teachers
+valid_days: 90                     # must not exceed the scope's maxValidity on-chain
+reason_code: 1                     # 1 = initial_policy (see docs/GOVERNANCE.md)
+categories:                        # mapped to ITU Child Online Protection content categories
+  - malware
+  - phishing
+  - adult
+threat_feeds:                      # third-party feeds are referenced by provider and version, not copied
+  - provider: "example-threat-intel"
+    version: "2026-11-01"
+restricted_list_hash: null         # set to the commitment of the IWF domain list in production
+local_blocks:
+  - domain: casino-example.example
+    reason: "Online gambling; not age-appropriate for primary schools"
+exceptions:
+  - domain: wikipedia.org
+    reason: "Educational reference; never blocked by category feeds"
+  - domain: khanacademy.org
+    reason: "Educational platform used in the national curriculum"

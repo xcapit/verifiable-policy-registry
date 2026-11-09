@@ -1,0 +1,27 @@
+{
+  "license": "CC0-1.0",
+  "description": "EAS schemas for the Verifiable Policy Registry. Issuer roles are separated so that the operator never certifies itself. No personal data: schools are identified only by their public Giga school ID.",
+  "schemas": [
+    {
+      "name": "VPR.Deployment.v1",
+      "issuer_role": "operator",
+      "revocable": true,
+      "schema": "string schoolId,bytes32 scopeId,uint256 policyVersion,bytes32 resolverConfigHash,uint64 deployedAt",
+      "meaning": "The operator states that the school's network resolves through a resolver configured with the given policy version. resolverConfigHash commits to the published, minimal-retention resolver configuration."
+    },
+    {
+      "name": "VPR.IndependentTest.v1",
+      "issuer_role": "independent_reviewer",
+      "revocable": true,
+      "schema": "string schoolId,bytes32 scopeId,uint256 policyVersion,bool categoriesBlocked,bool exceptionsReachable,bool dnssecValidated,bool bypassResisted,bytes32 reportHash,uint64 testedAt,uint64 validUntil",
+      "meaning": "The independent reviewer ran black-box tests from the school network: blocked categories are blocked, exceptions are reachable (no over-blocking), DNSSEC validates, and known bypasses (external DoH/DoT, alternative DNS) fail. reportHash commits to the public test report."
+    },
+    {
+      "name": "VPR.Conformance.v1",
+      "issuer_role": "auditor",
+      "revocable": true,
+      "schema": "bytes32 scopeId,string framework,string frameworkVersion,bytes32 reportHash,uint64 assessedAt,uint64 validUntil",
+      "meaning": "An auditor records conformance of the resolver service to a named framework, e.g. framework='NIST SP 800-81r3' or 'RFC 8932 RPS' or 'UKSIC appropriate filtering'."
+    }
+  ]
+}

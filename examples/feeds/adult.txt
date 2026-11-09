@@ -1,0 +1,4 @@
+# example adult-content feed
+adult-site.example
+# deliberately overlaps an exception to show precedence
+wikipedia.org
