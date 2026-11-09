@@ -31,6 +31,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-016 | Metrics exporter for Unbound RPZ hits → `(school_id, day, category)` | No IPs or qnames leave the process (unit test asserts emitted fields); school_id derived from source network mapping |
 | VPR-017 | Block page with appeal form that calls `fileAppeal` through a relayer | Appeal text limited to domain + reason; no personal data fields; rate-limited; block page and form available in Spanish and Portuguese, with strings in a translation file |
 | VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
+| VPR-047 | Use Giga Maps school identifiers as `school_id` in the exporter mapping, attestations and datasets | Every attested school resolves to a Giga Maps record; the dashboard joins metrics with Giga Maps data by identifier |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
 ## M3 · Metrics, dashboard and audit (weeks 8–16)
@@ -74,5 +75,6 @@ Statement to prove for each daily release: the published table is the k-suppress
 | VPR-040 | Add `slither`/MIESC and `ruff` to CI | CI fails on high-severity findings and lint errors |
 | VPR-041 | Gas report for typical operations | Table in `docs/ARCHITECTURE.md` |
 | VPR-042 | Fuzz/invariant tests for the registry (Foundry or Echidna) | Invariants from VPR-001 hold under fuzzing |
+| VPR-046 | End-to-end demo (`examples/e2e/run.sh`): policy, registry, RPZ, aggregation, anchored root and row verification on a local network | Runs from a clean checkout with one command; CI job green on every push |
 | VPR-043 | REUSE compliance: SPDX headers on every file, `REUSE.toml` for files without headers | `reuse lint` passes in CI |
 | VPR-044 | Docs site (MkDocs or similar) published from `docs/` | Site builds in CI and is linked from the README |
