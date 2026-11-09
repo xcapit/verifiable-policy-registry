@@ -1,6 +1,8 @@
-# Governance
+# Policy governance
 
 *CC BY 4.0*
+
+This page covers who governs each **filtering policy**. How the open-source project itself is run is described in [GOVERNANCE.md](../GOVERNANCE.md) at the repository root.
 
 ## Roles
 

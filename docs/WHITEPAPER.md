@@ -1,6 +1,6 @@
 # Verifiable Policy Registry: accountable, privacy-preserving content filtering
 
-*White paper · version 0.1 (draft) · November 2026 · Xcapit · CC BY 4.0*
+*White paper · version 0.2 (draft) · November 2026 · Xcapit · CC BY 4.0*
 
 ## Abstract
 
@@ -33,13 +33,17 @@ Commercial filters partly address the first two. None addresses the third: if th
 - National or ISP-wide filtering. The design targets bounded networks with an accountable governor.
 - Page-level (URL) filtering. DNS works at domain level; URL-level entries need another layer.
 
+### Relevance to the Sustainable Development Goals
+
+The project contributes to SDG 4.a (safe and effective learning environments), SDG 16.2 (ending abuse and exploitation of children), SDG 16.6 (accountable and transparent institutions) and SDG 16.10 (public access to information and protection of fundamental freedoms). The last two are the reason the design insists on publishing and expiring every block: protection that cannot be audited is hard to tell apart from censorship. The mapping is detailed in [DPG.md](DPG.md#1-relevance-to-the-sdgs).
+
 ## 3. System model
 
 **Actors.** *Governor*: a Safe multisig per scope (for example UNICEF Giga, the Ministry of Education and an independent reviewer, 2-of-3). *Operator*: runs the resolver and publishes metrics (Xcapit during the pilot). *Independent reviewer*: a child-protection NGO or university that tests deployments and handles appeals. *Auditor*: assesses conformance to standards. *Schools*: change one network setting and report wrongly blocked sites. *Public*: donors, journalists and researchers who verify.
 
 **Scope.** A named policy context, for example `giga:AR:primary`, identified on-chain by `keccak256(scope)`.
 
-**Components.** (1) `VerifiablePolicyRegistry` contract; (2) EAS attestations with three schemas and separate issuer roles; (3) `MetricsAnchor` contract; (4) a filtering DNS resolver driven by the published policy (RPZ); (5) off-chain tooling to hash policies, compile zones, aggregate metrics and verify roots. Details in [ARCHITECTURE.md](ARCHITECTURE.md).
+**Components.** (1) `VerifiablePolicyRegistry` contract; (2) EAS attestations with three schemas and separate issuer roles; (3) `MetricsAnchor` contract; (4) a filtering DNS resolver driven by the published policy (RPZ); (5) off-chain tooling to hash policies, compile zones, aggregate metrics and verify roots. Details in [ARCHITECTURE.md](ARCHITECTURE.md); the formats exchanged between components are specified in [INTERFACES.md](INTERFACES.md).
 
 ## 4. Policy lifecycle
 
@@ -83,6 +87,7 @@ A research track (roadmap M4) studies zero-knowledge proofs that published aggre
 | Filter bypass (external DoH, VPN, alternative DNS) | Resolver blocks known public resolvers; reviewer tests bypasses each cycle |
 | Signer key loss or compromise | Safe with hardware wallets or passkeys; `setGovernor` rotation; documented recovery |
 | Contract bugs | Minimal contracts; tests; external audit and MIESC analysis before mainnet |
+| A third party claims a metrics scope before the operator | Known gap in `MetricsAnchor.configure`; deployment scripts configure scopes atomically until it is fixed (VPR-009) |
 
 ## 8. Standards
 
@@ -110,7 +115,7 @@ Pilot indicators (to be agreed with Giga): schools with a valid independent test
 
 ## 11. Limitations
 
-DNS filtering is coarse (domain level) and can be bypassed by devices that ignore network DNS; it complements, not replaces, education and device management. Governance quality depends on the independence of the reviewer. Expiry by default requires an operational process to renew policies on time.
+Harms the design anticipates, and the response to each, are listed in [DO_NO_HARM.md](DO_NO_HARM.md). DNS filtering is coarse (domain level) and can be bypassed by devices that ignore network DNS; it complements, not replaces, education and device management. Governance quality depends on the independence of the reviewer. Expiry by default requires an operational process to renew policies on time.
 
 ## 12. References
 
