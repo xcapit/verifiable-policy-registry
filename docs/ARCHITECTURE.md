@@ -107,3 +107,17 @@ flowchart TB
 ```
 
 Resolvers run on dedicated infrastructure, at least two instances, with DNS from schools forced to them (outbound port 53/853 to other resolvers blocked at the provider), following NIST SP 800-81r3.
+
+## Deployment conditions
+
+**Satellite and low-bandwidth links.** Many Giga schools connect over satellite or congested rural links, where each round trip can cost hundreds of milliseconds. Resolvers are placed in the cloud region or ISP point of presence closest to the schools' egress, not in a distant central location. They cache aggressively within record TTLs and serve stale answers when an upstream is slow (RFC 8767), so that a slow upstream does not stall page loads. The latency budget per school is measured during onboarding and recorded in the deployment attestation report.
+
+**What the connectivity provider must configure.** DNS-level enforcement only works if the network sends DNS to the resolver. The provider redirects or blocks outbound port 53 and 853 to other resolvers, and blocks the known public DNS-over-HTTPS endpoints. The reviewer test kit checks each of these from the school network (VPR-018, VPR-019), so a missing rule shows up as a failed `bypassResisted` in the attestation rather than going unnoticed. Encrypted Client Hello does not affect DNS filtering, which acts on the queried name, provided that clients use the network resolver; it matters only for filtering based on the TLS server name, which this project does not use.
+
+**Resolver unreachable.** With DNS forced to the pilot resolvers, losing both instances means losing name resolution, which is fail-closed in effect. The scope charter decides the alternative: either a secondary protective resolver configured at the provider, or no fallback. An unfiltered fallback is not recommended for school networks. Availability is tracked against the 99.9% target of the evaluation plan.
+
+## Integration with Giga
+
+- **School identifiers.** `school_id` is the public school identifier used by [Giga Maps](https://maps.giga.global/), so dashboards and datasets join directly with Giga's school data (VPR-047).
+- **Measurement.** Giga already measures connectivity in schools with Giga Meter ([unicef/project-connect-daily-check-app](https://github.com/unicef/project-connect-daily-check-app)) and, since 2025, through a partnership with Cloudflare. VPR does not measure connectivity. It adds a different signal, whether the school is protected under an accountable policy. The reviewer test kit is designed to run alongside Giga Meter on the same school machines where it is already installed.
+- **Data.** VPR publishes only aggregates per school, day and category. These can be shown next to connectivity data in Giga Maps without adding any personal data.

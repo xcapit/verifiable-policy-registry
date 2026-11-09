@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- End-to-end demo (`examples/e2e/run.sh`) and CI job: policy, registry, RPZ, aggregation, anchored root, verification of a published and a tampered row (VPR-046).
+- CI check of internal links and heading anchors.
+- README sections on running the demo and on components other builders can reuse.
+- `docs/SUSTAINABILITY.md`: cost model per school, operating options after the pilot, handover package, behaviour if funding stops.
+- Deployment conditions (satellite links, provider configuration, unreachable resolver) and integration with Giga Maps identifiers and Giga Meter, in the architecture and the white paper; Giga Maps identifiers as `school_id` (VPR-047).
+
 ### Changed
 - White paper v0.4: zero-knowledge proofs of aggregation described as planned for M4; the event-log commitment must be hiding; canary events as a partial check on log completeness.
 - Roadmap: M1 renamed *Design and sign-off*, without the funding application; M4 acceptance window aligned with prover integration (from week 14); fallback acceptance if the circuit audit slips.

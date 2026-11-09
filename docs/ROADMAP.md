@@ -89,9 +89,13 @@ The proof binds the published figures to the committed log. It does not prove th
 - **Audit capacity.** External auditors are often booked weeks ahead, and few review circuits. The slot is reserved in week 4 with the ZK scope included, and all contracts are frozen at the end of week 12.
 - **Circuit audit.** If the review of the circuit and verifier is not closed by week 16, M4 is accepted on the testnet verifier and on independent verification with `vpr verify-proof`, and the verifier moves to OP Mainnet once the audit closes. The other contracts are not held back.
 - **Proving cost.** If proving a full day exceeds the daily budget on commodity hardware, the fallback is to prove per school and aggregate the proofs. The benchmarks in weeks 8–11 decide this before the freeze.
+- **Network conditions.** Satellite and congested rural links, and providers that cannot redirect DNS or block external resolvers, can delay onboarding or weaken protection. Each school's latency and bypass status are measured at onboarding, and schools whose provider cannot enforce DNS are reported as not protected rather than attested ([ARCHITECTURE](ARCHITECTURE.md#deployment-conditions)).
 - **School onboarding.** Onboarding depends on the ministry and the connectivity provider. Schools are onboarded in waves from week 8, so that a delay does not hold up the whole cohort.
 - **Data window.** Four months leave six to eight weeks of metrics for the impact report. Longer-term figures are reported after the pilot, from the same public datasets.
 
 ## After the pilot
+
+Operating options, cost per school and the handover package are described in [SUSTAINABILITY.md](SUSTAINABILITY.md).
+
 
 Scale to more countries through Giga; recertify every policy cycle; community governance of the schemas; explore an EAS community standard for the schemas; evaluate trusted execution (VPR-032) and verifiable differential privacy (VPR-031).
