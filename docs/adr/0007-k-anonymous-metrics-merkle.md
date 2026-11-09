@@ -13,6 +13,10 @@ Donors and partners need impact figures. Children must not be identifiable from 
 - Cells with fewer than k = 10 events are suppressed before publication.
 - Each daily dataset is committed with a Merkle root (sorted-pair keccak256, OpenZeppelin-compatible), anchored in `MetricsAnchor`. Solidity and Python share the same test vector.
 
+## Note (2026-11-09)
+
+The threshold counts blocked queries per cell, not distinct children, so the mechanism is small-cell suppression rather than k-anonymity in the sense of Sweeney (2002). The decision stands; the wording in public documents was corrected accordingly (white paper §5.2).
+
 ## Consequences
 
 Small schools will see many suppressed cells: reporting degrades before privacy does. Changing k or the leaf encoding is a breaking interface change.
