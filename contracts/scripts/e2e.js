@@ -29,12 +29,14 @@ async function send(label, txPromise) {
   return receipt;
 }
 
-async function reverts(promise) {
+// True only if the call reverts with the named custom error (not for any other failure).
+async function reverts(promise, errorName) {
   try {
     await promise;
     return false;
   } catch (e) {
-    return true;
+    const text = `${e.message || ""} ${e.errorName || ""} ${JSON.stringify(e.revert || {})}`;
+    return text.includes(errorName);
   }
 }
 
@@ -62,7 +64,7 @@ function writeManifest(passed) {
     onchainStages: stages,
     gasUsed: gas,
     notImplemented: [
-      { stage: "dns-resolution", note: "No resolver runs in the demo; the compiled zone is evaluated (vpr evaluate). A pinned resolver container is planned (VPR-019)." },
+      { stage: "dns-resolution", note: "No resolver runs in the demo; the compiled zone is evaluated (vpr evaluate). A pinned resolver container is planned (VPR-055)." },
       { stage: "zk-proof", note: "Zero-knowledge proof of aggregation is Designed, not implemented. Specification: docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md; milestone M4 (docs/ROADMAP.md)." },
     ],
     limitations: [
@@ -90,7 +92,7 @@ async function main() {
   await registry.connect(governor).setIssuer(d.scopeId, reviewer.address, Role.Reviewer);
   await send("setPublisher", anchor.connect(governor).setPublisher(d.scopeId, operator.address));
   console.log(`2. governor created ${d.scope}, registered operator and reviewer roles, appointed the publisher`);
-  check(await reverts(anchor.connect(stranger).setPublisher(d.scopeId, stranger.address)), "a stranger cannot claim the scope's publisher");
+  check(await reverts(anchor.connect(stranger).setPublisher(d.scopeId, stranger.address), "NotGovernor"), "a stranger cannot claim the scope's publisher (NotGovernor)");
 
   await send(
     "publishPolicy",
@@ -125,9 +127,12 @@ async function main() {
   check(await anchor.verifyRow(d.scopeId, d.dayNumber, r.school_id, r.category, r.count, d.proof), "published row verifies on-chain");
   check(!(await anchor.verifyRow(d.scopeId, d.dayNumber, t.school_id, t.category, t.count, d.proof)), "tampered row (count + 1) is rejected");
   check(!(await anchor.verifyRow(d.scopeId, d.dayNumber + 1, r.school_id, r.category, r.count, d.proof)), "the same row is rejected for another day");
-  check(stored.root !== ethers.id("wrong root"), "a different root does not match the anchored commitment");
+  // a different root anchored for another day: the published row must not verify against it
+  const otherDay = d.dayNumber + 2;
+  await anchor.connect(operator).commitRoot(d.scopeId, otherDay, ethers.id("unrelated root"), d.datasetUri);
+  check(!(await anchor.verifyRow(d.scopeId, otherDay, r.school_id, r.category, r.count, d.proof)), "the published row does not verify against a different anchored root");
   gas.verifyRow_estimate = Number(await anchor.verifyRow.estimateGas(d.scopeId, d.dayNumber, r.school_id, r.category, r.count, d.proof));
-  check(await reverts(anchor.connect(operator).commitRoot(d.scopeId, d.dayNumber, ethers.id("other"), d.datasetUri)), "an anchored day cannot be rewritten");
+  check(await reverts(anchor.connect(operator).commitRoot(d.scopeId, d.dayNumber, ethers.id("other"), d.datasetUri), "DayAlreadyCommitted"), "an anchored day cannot be rewritten (DayAlreadyCommitted)");
 
   if (d.service) {
     const s = d.service;

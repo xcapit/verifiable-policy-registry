@@ -9,7 +9,8 @@
     vpr verify-row       proof.json
     vpr restricted-hash  restricted.txt
 
-Exit codes: 0 success; 1 verification failed (mismatching root or proof); 2 invalid input or usage.
+Exit codes: 0 success; 1 verification failed (mismatching root or proof); 2 invalid input or usage,
+including any unexpected error. verify-row without --root only checks self-consistency (anchored=false).
 With --json, results are printed as a single JSON object on stdout. Errors go to stderr and never echo
 dataset values.
 """
@@ -18,12 +19,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
 from . import metrics, policy, toolkit
 
 EXIT_OK, EXIT_MISMATCH, EXIT_INVALID = 0, 1, 2
+ROOT_RE = re.compile(r"0x[0-9a-fA-F]{64}")
 
 
 def _out(a, obj: dict, text: str) -> None:
@@ -46,8 +49,12 @@ def cmd_compile_rpz(a):
     restricted = policy.load_feed(a.restricted) if a.restricted else None
     zone = policy.compile_rpz(p, feeds, restricted, a.block_page, allow_missing_feeds=a.allow_missing_feeds)
     if a.out:
-        Path(a.out).write_text(zone, encoding="utf-8")
-        print(f"wrote {a.out}", file=sys.stderr)
+        # the zone contains restricted entries in clear: it is an operator-confidential file
+        out = Path(a.out)
+        out.touch(mode=0o600, exist_ok=True)
+        out.chmod(0o600)
+        out.write_text(zone, encoding="utf-8")
+        print(f"wrote {a.out} (mode 0600; do not publish)", file=sys.stderr)
     else:
         sys.stdout.write(zone)
     return EXIT_OK
@@ -69,14 +76,24 @@ def cmd_aggregate(a):
     rows = toolkit.aggregate([e for e in events if e[1] == day], a.k)
     if not rows:
         raise ValueError(f"no cell reaches k={a.k} on {day}; nothing to publish")
+    summary = metrics.to_json(rows, a.k, a.unit_column)  # validates the release before anything is written
     if a.out_csv:
         Path(a.out_csv).write_text(metrics.to_csv(rows, a.unit_column), encoding="utf-8")
-    print(metrics.to_json(rows, a.k, a.unit_column))
+    print(summary)
     return EXIT_OK
+
+
+def _root(value: str) -> str:
+    if not ROOT_RE.fullmatch(value or ""):
+        raise ValueError("root must be 0x followed by 64 hexadecimal digits")
+    return value.lower()
 
 
 def cmd_verify_root(a):
     rows = toolkit.read_release(Path(a.dataset).read_text(encoding="utf-8"))
+    a.root = _root(a.root)
+    if a.k is not None:
+        metrics.validate_release(rows, a.k)  # the root does not commit to k: the verifier checks it
     got = toolkit.release_root(rows)
     ok = got.lower() == a.root.lower()
     _out(a, {"computed": got, "expected": a.root, "match": ok}, f"computed {got}\nexpected {a.root}\n{'MATCH' if ok else 'MISMATCH'}")
@@ -103,10 +120,18 @@ def cmd_prove_row(a):
 def cmd_verify_row(a):
     obj = json.loads(Path(a.proof).read_text(encoding="utf-8"))
     row = obj["row"]
-    r = toolkit.Row(row["unit_id"], row["day"], row["category"], int(row["count"]))
-    root = a.root or obj["root"]
-    ok = toolkit.verify_row(r, obj["proof"], root)
-    _out(a, {"root": root, "match": ok}, "MATCH" if ok else "MISMATCH")
+    if not isinstance(row.get("count"), int) or isinstance(row.get("count"), bool):
+        raise ValueError("count must be an integer")
+    r = toolkit.Row(row["unit_id"], row["day"], row["category"], row["count"])
+    anchored = a.root is not None
+    root = _root(a.root if anchored else obj["root"])
+    ok = toolkit.verify_row(r, [_root(x) for x in obj["proof"]], root)
+    if not anchored:
+        # without --root this only checks that the file is self-consistent, not that the row was published
+        text = "CONSISTENT (not checked against an anchored root; pass --root from MetricsAnchor)" if ok else "MISMATCH"
+    else:
+        text = "MATCH" if ok else "MISMATCH"
+    _out(a, {"root": root, "anchored": anchored, "match": ok}, text)
     return EXIT_OK if ok else EXIT_MISMATCH
 
 
@@ -154,6 +179,7 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("verify-root", help="recompute a published release's root")
     s.add_argument("dataset")
     s.add_argument("root")
+    s.add_argument("--k", type=int, help="also check that every published count is at least k (the root does not commit to k)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_verify_root)
 
@@ -176,6 +202,9 @@ def main(argv=None):
         code = a.func(a)
     except (policy.PolicyError, ValueError, KeyError, OSError, json.JSONDecodeError) as e:
         print(f"error: {e}", file=sys.stderr)
+        code = EXIT_INVALID
+    except Exception as e:  # noqa: BLE001 - any other failure is invalid input, never a verification result
+        print(f"error: invalid input ({type(e).__name__})", file=sys.stderr)
         code = EXIT_INVALID
     sys.exit(code)
 

@@ -19,9 +19,25 @@ DATASET_FORMAT = metrics.FORMAT
 Row = metrics.Row
 
 
+def _no_floats(obj: Any) -> None:
+    if isinstance(obj, float):
+        raise ValueError("canonical documents contain no floating-point numbers")
+    if isinstance(obj, dict):
+        for v in obj.values():
+            _no_floats(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            _no_floats(v)
+
+
 def canonical_json(obj: Any) -> bytes:
-    """Deterministic JSON: sorted keys, no whitespace, UTF-8 (the encoding of policy and appeal documents)."""
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    """Deterministic JSON: sorted keys, no whitespace, UTF-8 (the encoding of policy and appeal documents).
+
+    Floats and NaN are rejected, because their serialisation differs across languages. This is the
+    normative form; it is not RFC 8785 (JCS).
+    """
+    _no_floats(obj)
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
 
 
 def document_hash(obj: Any) -> str:

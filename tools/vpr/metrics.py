@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date
@@ -30,12 +31,25 @@ LEAF_PREFIX = b"\x00"
 EPOCH = date(1970, 1, 1)
 
 
+DAY_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+COUNT_RE = re.compile(r"[0-9]{1,30}")
+# Units and categories are identifiers, never domain names, addresses or free text: no dots, colons,
+# slashes or spaces. This keeps queried names and IP addresses out of a release even if an exporter is wrong.
+UNIT_RE = re.compile(r"[A-Za-z0-9_-]{1,64}")
+CATEGORY_RE = re.compile(r"[a-z0-9_-]{1,64}")
+
+
 def day_number(day: str) -> int:
-    """Days since 1970-01-01 (UTC) for an ISO date, as used on-chain."""
+    """Days since 1970-01-01 (UTC) for a strict ISO date YYYY-MM-DD, as used on-chain (1970 or later)."""
+    if not isinstance(day, str) or not DAY_RE.fullmatch(day):
+        raise ValueError("day must be an ISO date YYYY-MM-DD")
     try:
-        return (date.fromisoformat(day) - EPOCH).days
-    except ValueError as e:
-        raise ValueError(f"day must be an ISO date (YYYY-MM-DD): {day!r}") from e
+        n = (date.fromisoformat(day) - EPOCH).days
+    except ValueError:
+        raise ValueError("day must be an ISO date YYYY-MM-DD") from None
+    if not 0 <= n < 2**32:
+        raise ValueError("day out of range")
+    return n
 
 
 @dataclass(frozen=True, order=True)
@@ -55,8 +69,8 @@ class Row:
         cat = self.category.encode("utf-8")
         if not school or not cat or len(school) > 0xFFFF or len(cat) > 0xFFFF:
             raise ValueError("school_id and category must be 1..65535 bytes")
-        if self.count < 1:
-            raise ValueError("count must be positive")
+        if not isinstance(self.count, int) or isinstance(self.count, bool) or not 1 <= self.count < 2**256:
+            raise ValueError("count must be a positive integer below 2**256")
         return keccak256(
             LEAF_PREFIX
             + day_number(self.day).to_bytes(4, "big")
@@ -150,11 +164,11 @@ def read_csv(text: str) -> list[Row]:
         raise ValueError(f"release header must be <unit>,day,category,count with <unit> in {UNIT_COLUMNS}")
     rows = []
     for r in reader:
-        try:
-            count = int(r["count"])
-        except (TypeError, ValueError):
-            raise ValueError("count must be an integer") from None
-        rows.append(Row(r[unit], r["day"], r["category"], count))
+        if None in r or any(v is None for v in r.values()):
+            raise ValueError("release row has the wrong number of fields")
+        if not COUNT_RE.fullmatch(r["count"]):
+            raise ValueError("count must be a non-negative decimal integer")
+        rows.append(Row(r[unit], r["day"], r["category"], int(r["count"])))
     return sorted(rows)
 
 
@@ -165,4 +179,15 @@ def read_events(text: str) -> list[tuple[str, str, str]]:
     unit = next((c for c in UNIT_COLUMNS if c in fields), None)
     if unit is None or set(fields) != {unit, "day", "category"}:
         raise ValueError(f"event header must be exactly <unit>,day,category with <unit> in {UNIT_COLUMNS}")
-    return [(r[unit], r["day"], r["category"]) for r in reader]
+    events = []
+    for r in reader:
+        if None in r or any(v is None for v in r.values()):
+            raise ValueError("event row has the wrong number of fields")
+        # error messages never include the offending value
+        if not UNIT_RE.fullmatch(r[unit]):
+            raise ValueError("event unit is not an identifier (letters, digits, '-' or '_', at most 64)")
+        if not CATEGORY_RE.fullmatch(r["category"]):
+            raise ValueError("event category is not an identifier (lowercase letters, digits, '-' or '_')")
+        day_number(r["day"])
+        events.append((r[unit], r["day"], r["category"]))
+    return events
