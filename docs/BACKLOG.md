@@ -23,12 +23,12 @@ Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANA
 | VPR-062 | Run the demonstrator on a second EVM network and with a second resolver implementation (DPG indicator 4) | VPR-010, VPR-055 | Planned (M2) |
 | VPR-063 | Bulk export of on-chain history (versions, appeals, roots) to CSV/JSON (DPG indicator 6) | — | Planned (M3) |
 | VPR-064 | Playbook for new countries (charters, profiles, onboarding) | VPR-026 | Planned (M3) |
-| VPR-065 | Bind feed contents (hash per feed in `threat_feeds`) and the produced zone (`resolverConfigHash`) to the policy version | Compiler refuses a feed whose hash differs; the attestation carries the zone hash | Planned (M2) |
-| VPR-066 | Anchor hardening: bound `day` to a window around the current date, explicit publisher revocation, governor-gated correction record, length cap on `datasetUri`/`uri`, daily release-or-empty marker | Tests for future/past days, revocation, correction and caps | Planned before the audit freeze (M3) |
-| VPR-067 | Registry hardening: two-step `setGovernor`, protocol cap on `maxValidity`, on-chain validation of reason codes | Tests for each; INTERFACES updated | Planned before the audit freeze (M3) |
-| VPR-068 | Derive the scope id on-chain from the governor and the scope name, so canonical names cannot be front-run | Front-running test; manifest format updated | Planned (M2, with VPR-049) |
-| VPR-069 | Appeal format 3 with a document salt; documentation that rounds are not an escalation count; optional time-out of open appeals | Pre-filing of a guessable document no longer possible; tests | Planned (M2) |
-| VPR-060 | Check of `valid_days` and document version against the on-chain call in tools and dashboard | — | Planned (M2, with VPR-015) |
+| VPR-065 | Bind feed contents (hash per feed in `threat_feeds`) and the produced zone (`resolverConfigHash`) to the policy version | Compiler refuses a feed whose hash differs; the attestation carries the zone hash | **Done (pre-audit hardening)** |
+| VPR-066 | Anchor hardening: bound `day` to a window around the current date, explicit publisher revocation, governor-gated correction record, length cap on `datasetUri`/`uri`, daily release-or-empty marker | Tests for future/past days, revocation, correction and caps | **Done (pre-audit hardening)** |
+| VPR-067 | Registry hardening: two-step `setGovernor`, protocol cap on `maxValidity`, on-chain validation of reason codes | Tests for each; INTERFACES updated | **Done (pre-audit hardening)** |
+| VPR-068 | Derive the scope id on-chain from the governor and the scope name, so canonical names cannot be front-run | Front-running test; manifest format updated | **Done (pre-audit hardening)** |
+| VPR-069 | Appeal format 3 with a document salt; documentation that rounds are not an escalation count; optional time-out of open appeals | Pre-filing of a guessable document no longer possible; tests | **Done (pre-audit hardening)** |
+| VPR-060 | Check of `valid_days` and document version against the on-chain call in tools and dashboard | — | **Done (pre-audit hardening)** |
 
 ## M1 · Design and sign-off (weeks 1–4)
 
@@ -52,7 +52,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | --- | --- | --- |
 | VPR-010 | Deployment scripts (Hardhat Ignition or scripts/) for OP Sepolia and OP Mainnet | One command deploys both contracts and creates a scope with a Safe as governor; addresses written to `deployments/<network>.json` |
 | VPR-011 | Safe integration: script to propose `publishPolicy` as a Safe transaction | Proposal appears in the Safe UI; executed with 2 of 3 signatures on testnet |
-| VPR-012 | EAS schema registration script, with a schema resolver that accepts an attestation only from an address holding the matching role in the registry | Registers the three schemas on OP Sepolia; UIDs stored in `deployments/` |
+| VPR-012 | **Resolver done (pre-audit hardening); registration on a public network remains M2.** EAS schema registration script, with a schema resolver that accepts an attestation only from an address holding the matching role in the registry | Registers the three schemas on OP Sepolia; UIDs stored in `deployments/` |
 | VPR-013 | `vpr attest-deployment` and `vpr attest-test` CLI commands (EAS SDK or ethers) | Creates attestations on testnet; reviewer key and operator key are distinct; README documents usage |
 | VPR-014 | Policy publisher: `vpr publish` uploads the canonical document (IPFS or HTTPS) and prints the Safe transaction data | Fetched document hashes to the on-chain `contentHash` |
 | VPR-015 | Resolver sync daemon: watches `PolicyPublished`, fetches and verifies the document, recompiles RPZ, reloads Unbound | Refuses documents whose hash mismatches; logs only version numbers; integration test with a local chain |
@@ -61,7 +61,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
 | VPR-047 | Use Giga Maps school identifiers as `school_id` in the exporter mapping, attestations and datasets | Every attested school resolves to a Giga Maps record; the dashboard joins metrics with Giga Maps data by identifier |
 | VPR-048 | **Done in 0.2.0.** Redesign appeal storage: the contract stores only a versioned, size-bounded commitment to an appeal document validated off-chain, never a caller-supplied free-text URI; reasoned resolutions and resubmission after rejection | Direct calls cannot place arbitrary text on-chain; tests cover oversize, wrong scheme and resubmission; INTERFACES I9 and DO_NO_HARM H6 updated |
-| VPR-049 | Deployment manifest per network (`deployments/<network>.json`), published by the partners: chain id, registry and anchor addresses, scope ids, expected governors and issuer roles; dashboard and tools pin it | A scope created under a canonical-looking name by another address is shown as untrusted; alert on governor, Safe owner or threshold changes |
+| VPR-049 | **Format and schema done (pre-audit hardening); real manifests are published at deployment.** Deployment manifest per network (`deployments/<network>.json`), published by the partners: chain id, registry and anchor addresses, scope ids, expected governors and issuer roles; dashboard and tools pin it | A scope created under a canonical-looking name by another address is shown as untrusted; alert on governor, Safe owner or threshold changes |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
 ## M3 · Metrics, audit and registry on mainnet (weeks 9–16)
@@ -105,6 +105,7 @@ Statement to prove for each daily release: the published table is the k-suppress
 | VPR-040 | Add `slither`/MIESC and `ruff` to CI | CI fails on high-severity findings and lint errors |
 | VPR-041 | Gas report for typical operations | Table in `docs/ARCHITECTURE.md` |
 | VPR-042 | Fuzz/invariant tests for the registry (Foundry or Echidna) | Invariants from VPR-001 hold under fuzzing |
+| VPR-070 | Integration test of `IssuerRoleResolver` against the real EAS contracts (`SchemaRegistry` + `EAS.attest`, as a devDependency or a fork test), and a deployment check that each schema's registered resolver has the matching `SchemaKind` | Test attests and is refused through EAS itself; deployment script fails on a mismatch |
 | VPR-046 | End-to-end demo (`examples/e2e/run.sh`): policy, registry, RPZ, aggregation, anchored root and row verification on a local network | Runs from a clean checkout with one command; CI job green on every push |
 | VPR-043 | REUSE compliance: SPDX headers on every file, `REUSE.toml` for files without headers | `reuse lint` passes in CI |
 | VPR-044 | Docs site (MkDocs or similar) published from `docs/` | Site builds in CI and is linked from the README |

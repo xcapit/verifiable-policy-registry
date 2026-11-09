@@ -79,3 +79,28 @@ def read_release(text: str) -> list[Row]:
 
 def write_release(rows: list[Row], unit_column: str = "unit_id") -> str:
     return metrics.to_csv(rows, unit_column)
+
+
+APPEAL_FORMAT = "vpr-appeal/3"
+APPEAL_KEYS = {"format", "scope", "domain", "request", "reason", "nonce"}
+
+
+def appeal_document_hash(doc: dict) -> str:
+    """Validate an appeal document (format vpr-appeal/3) and return its hash for `fileAppeal`.
+
+    The random 32-byte `nonce` makes the document unguessable, so nobody can pre-file it. Only these six
+    fields are allowed; the relayer adds no others, and none may describe a person.
+    """
+    import re as _re
+
+    if not isinstance(doc, dict) or set(doc) != APPEAL_KEYS or doc["format"] != APPEAL_FORMAT:
+        raise ValueError(f"appeal document must have exactly {sorted(APPEAL_KEYS)} and format {APPEAL_FORMAT}")
+    if doc["request"] not in ("unblock", "block"):
+        raise ValueError("request must be 'unblock' or 'block'")
+    if not isinstance(doc["reason"], str) or not 0 < len(doc["reason"]) <= 280:
+        raise ValueError("reason must be 1 to 280 characters")
+    if not isinstance(doc["nonce"], str) or not _re.fullmatch(r"0x[0-9a-f]{64}", doc["nonce"]):
+        raise ValueError("nonce must be 0x followed by 64 lowercase hex digits (random)")
+    if not isinstance(doc["domain"], str) or not _re.fullmatch(r"(?=.{1,253}$)([a-z0-9-]{1,63}\.)+[a-z][a-z0-9-]{1,62}", doc["domain"]):
+        raise ValueError("domain is not a valid lowercase domain name")
+    return document_hash(doc)

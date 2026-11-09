@@ -53,7 +53,7 @@ Prerequisites: Node.js 20 or later, Python 3.10 or later. No secrets, no paid se
 - **ZK.** The proof of aggregation is Designed only. The proving-system decision is open.
 - **DNS stage.** The demo evaluates the compiled zone; it does not resolve queries. No-logging is asserted by configuration, not tested.
 - **Log completeness.** Completeness and truthfulness of the event log rest on institutional controls.
-- **Roles in EAS.** Issuer roles are recorded on-chain, but EAS does not yet enforce them.
+- **Roles in EAS.** Issuer roles are recorded on-chain and enforced at issuance by `IssuerRoleResolver` (added after v0.3.0); the schemas are not yet registered on a public network.
 - **Scope discovery.** It relies on a deployment manifest that is not yet specified (VPR-049).
 - **Release policy.** The threshold, minimum cohort and category tiers need pilot data and the DPIA.
 - **Dataset licence.** The licence of published datasets is undeclared (VPR-059, blocked on a maintainer decision).

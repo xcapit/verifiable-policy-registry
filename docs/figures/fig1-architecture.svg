@@ -49,7 +49,7 @@
   <text x="170" y="450" font-size="12" fill="#475569" text-anchor="middle">governor = Safe m-of-n</text>
 
   <rect x="350" y="370" width="260" height="92" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
-  <text x="480" y="396" font-size="14" font-weight="600" fill="#0f172a" text-anchor="middle">EAS attestations</text>
+  <text x="480" y="396" font-size="14" font-weight="600" fill="#0f172a" text-anchor="middle">EAS + IssuerRoleResolver</text>
   <text x="480" y="416" font-size="12" fill="#475569" text-anchor="middle">Deployment (operator)</text>
   <text x="480" y="433" font-size="12" fill="#475569" text-anchor="middle">IndependentTest (reviewer)</text>
   <text x="480" y="450" font-size="12" fill="#475569" text-anchor="middle">Conformance (auditor)</text>
@@ -57,7 +57,7 @@
   <rect x="660" y="370" width="260" height="92" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
   <text x="790" y="396" font-size="14" font-weight="600" fill="#0f172a" text-anchor="middle">MetricsAnchor</text>
   <text x="790" y="416" font-size="12" fill="#475569" text-anchor="middle">one Merkle root per scope per day</text>
-  <text x="790" y="433" font-size="12" fill="#475569" text-anchor="middle">write-once</text>
+  <text x="790" y="433" font-size="12" fill="#475569" text-anchor="middle">publisher once · governor corrects</text>
   <text x="790" y="450" font-size="12" fill="#475569" text-anchor="middle">on-chain row verification</text>
 
   <path d="M250,370 L250,300 L340,300 L340,178" fill="none" stroke="#2563eb" stroke-width="1.5" marker-end="url(#b)"/>

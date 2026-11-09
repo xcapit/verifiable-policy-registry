@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
+<rect width="960" height="400" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">The designed aggregation relation R: who supplies each input</text>
+<text x="40" y="52" font-size="12" fill="#b45309">Designed, not implemented: no prover, no verifier and no benchmarks exist (milestone M4).</text>
+<g font-size="12">
+<!-- witness -->
+<rect x="30" y="72" width="250" height="150" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-dasharray="6 4"/>
+<text x="46" y="94" font-weight="600" fill="#991b1b">PRIVATE WITNESS · operator</text>
+<text x="46" y="118" fill="#0f172a">events e₁ … eₘ</text><text x="46" y="136" fill="#475569">(unit, day, category, scope)</text>
+<text x="46" y="160" fill="#0f172a">per-event salts, salt r</text>
+<text x="46" y="184" fill="#0f172a">m, the number of events</text><text x="46" y="202" fill="#475569">private: it reveals suppressed totals</text>
+
+<!-- circuit -->
+<rect x="350" y="92" width="260" height="190" rx="8" fill="#fff" stroke="#94a3b8" stroke-dasharray="6 4"/>
+<text x="480" y="116" font-weight="600" fill="#0f172a" text-anchor="middle">Relation R (circuit or zkVM)</text>
+<text x="366" y="144" fill="#0f172a">(a) the events open C_L</text>
+<text x="366" y="170" fill="#0f172a">(b) each event is in scope s, day d,</text><text x="388" y="186" fill="#0f172a">an admitted unit and a category</text><text x="388" y="202" fill="#0f172a">of the version in force</text>
+<text x="366" y="228" fill="#0f172a">(c) root = Merkle root of Agg_k(L)</text>
+<text x="480" y="264" font-size="11" fill="#475569" text-anchor="middle">ZK in L: suppressed cells stay hidden</text>
+
+<!-- public inputs -->
+<rect x="680" y="72" width="250" height="110" rx="8" fill="#ecfdf5" stroke="#059669" stroke-dasharray="6 4"/>
+<text x="696" y="94" font-weight="600" fill="#065f46">FROM THE REGISTRY · not the prover</text>
+<text x="696" y="118" fill="#0f172a">policy version, contentHash</text>
+<text x="696" y="140" fill="#0f172a">catRoot, unitRoot, k</text>
+<text x="696" y="162" fill="#475569">ADR-0010: read by the verifier</text>
+<rect x="680" y="196" width="250" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-dasharray="6 4"/>
+<text x="696" y="218" font-weight="600" fill="#1d4ed8">PUBLIC INPUTS · statement</text>
+<text x="696" y="240" fill="#0f172a">chain id, verifier, anchor; s, d</text>
+<text x="696" y="262" fill="#0f172a">C_L = H(0x04 ‖ MR ‖ r), root, format</text>
+
+<!-- verifier -->
+<rect x="250" y="316" width="460" height="56" rx="8" fill="#fff" stroke="#94a3b8" stroke-dasharray="6 4"/>
+<text x="480" y="339" font-weight="600" fill="#0f172a" text-anchor="middle">On-chain verifier, then MetricsAnchor accepts the root</text>
+<text x="480" y="357" fill="#475569" text-anchor="middle">testnet in M4; circuit audit and mainnet verifier in phase 2</text>
+</g>
+<g stroke="#334155" stroke-width="1.3" fill="none">
+<path d="M280,150 L346,170" marker-end="url(#a)"/>
+<path d="M680,130 L614,160" marker-end="url(#a)"/>
+<path d="M680,240 L614,232" marker-end="url(#a)"/>
+<path d="M480,282 L480,312" marker-end="url(#a)"/>
+<path d="M805,182 L805,192" marker-end="url(#a)"/>
+</g>
+<text x="40" y="392" font-size="11" fill="#475569">Not proved: that L is complete or that its events occurred; that link rests on the reviewer, canary events and audit (§11.2).</text>
+</svg>

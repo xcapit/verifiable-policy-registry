@@ -19,7 +19,9 @@ import platform
 from pathlib import Path
 
 from vpr import __version__, metrics, policy, toolkit
-from vpr.hashing import keccak256, to_hex
+import secrets
+
+from vpr.hashing import to_hex
 
 ALLOWED_PROBES = ["wikipedia.org", "en.wikipedia.org", "khanacademy.org", "neutral-site.example"]
 BLOCKED_PROBES = ["bad-malware.example", "cdn.bad-malware.example", "casino-example.example"]
@@ -51,10 +53,12 @@ def main() -> None:
     stages.append({"stage": "policy-validate-and-hash", "status": "passed", "contentHash": p.content_hash()})
 
     probes = []
+    zone_hash_value = None
     if a.feeds_dir:
         feeds = {f.stem: policy.load_feed(f) for f in Path(a.feeds_dir).glob("*.txt")}
         zone = policy.compile_rpz(p, feeds, block_page="block.example.org", serial=1)
         (out / "policy.rpz").write_text(zone, encoding="utf-8")
+        zone_hash_value = policy.zone_hash(zone)
         for d in ALLOWED_PROBES + BLOCKED_PROBES:
             r = policy.evaluate_zone(zone, d)
             expected_blocked = d in BLOCKED_PROBES
@@ -81,7 +85,6 @@ def main() -> None:
         s0 = srows[0]
         service = {
             "scope": "public-service:XX:water",
-            "scopeId": to_hex(keccak256(b"public-service:XX:water")),
             "day": s0.day,
             "dayNumber": toolkit.day_number(s0.day),
             "root": toolkit.release_root(srows),
@@ -90,20 +93,21 @@ def main() -> None:
         }
         stages.append({"stage": "aggregate-suppress-commit (public service)", "status": "passed", "publishedRows": len(srows)})
 
-    appeal_doc = {"format": "vpr-appeal/2", "scope": p.scope, "domain": "educational-site.example",
-                  "request": "unblock", "reason": "Used in the science curriculum"}
+    # appeal format 3: the random nonce makes the document unguessable (no pre-filing by others)
+    appeal_doc = {"format": "vpr-appeal/3", "scope": p.scope, "domain": "educational-site.example",
+                  "request": "unblock", "reason": "Used in the science curriculum", "nonce": to_hex(secrets.token_bytes(32))}
     tampered_doc = dict(p.doc, local_blocks=p.doc["local_blocks"] + [{"domain": "added-later.example", "reason": "not approved"}])
 
     data = {
         "scope": p.scope,
-        "scopeId": p.scope_id(),
+        "zoneHash": zone_hash_value,
         "policyVersion": p.doc["version"],
         "contentHash": p.content_hash(),
         "tamperedDocumentHash": toolkit.document_hash(tampered_doc),
         "policyUri": "ipfs://example-policy",
         "validDays": int(p.doc.get("valid_days", 90)),
         "reasonCode": int(p.doc.get("reason_code", 1)),
-        "appealDocumentHash": toolkit.document_hash(appeal_doc),
+        "appealDocumentHash": toolkit.appeal_document_hash(appeal_doc),
         "day": a.day,
         "dayNumber": metrics.day_number(a.day),
         "k": a.k,

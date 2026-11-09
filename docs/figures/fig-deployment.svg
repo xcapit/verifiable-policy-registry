@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" width="960" height="380" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
+<rect width="960" height="380" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">Proposed deployment: where each part would run (nothing is deployed today)</text>
+<g font-size="12">
+<!-- region -->
+<rect x="30" y="56" width="430" height="300" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-dasharray="6 4"/>
+<text x="46" y="78" font-weight="600" fill="#475569">IN-COUNTRY · region of the pilot</text>
+<rect x="50" y="94" width="170" height="56" rx="6" fill="#fff" stroke="#64748b"/>
+<text x="135" y="117" font-weight="600" fill="#0f172a" text-anchor="middle">School networks</text><text x="135" y="134" fill="#475569" text-anchor="middle">fibre or satellite link</text>
+<rect x="50" y="176" width="170" height="56" rx="6" fill="#fff" stroke="#64748b"/>
+<text x="135" y="199" font-weight="600" fill="#0f172a" text-anchor="middle">Connectivity provider</text><text x="135" y="216" fill="#475569" text-anchor="middle">forces DNS, blocks DoH</text>
+<rect x="260" y="94" width="180" height="138" rx="6" fill="#fff" stroke="#94a3b8" stroke-dasharray="5 4"/>
+<text x="350" y="117" font-weight="600" fill="#0f172a" text-anchor="middle">Resolver pair</text>
+<text x="350" y="137" fill="#475569" text-anchor="middle">≥ 2 instances</text><text x="350" y="154" fill="#475569" text-anchor="middle">NIST SP 800-81r3</text>
+<text x="350" y="171" fill="#475569" text-anchor="middle">sync daemon · exporter</text><text x="350" y="188" fill="#475569" text-anchor="middle">block page · relayer</text>
+<text x="350" y="216" font-size="11" fill="#64748b" text-anchor="middle">planned (M2)</text>
+<rect x="50" y="258" width="390" height="80" rx="6" fill="#fff" stroke="#64748b"/>
+<text x="66" y="280" font-weight="600" fill="#0f172a">Institutional signers</text>
+<text x="66" y="300" fill="#475569">Giga counterpart · ministry · independent reviewer</text>
+<text x="66" y="318" fill="#475569">hardware wallets or passkeys through a web interface;</text>
+<text x="66" y="334" fill="#475569">they sign the Safe; no one handles cryptocurrency</text>
+
+<!-- chain -->
+<rect x="500" y="56" width="430" height="176" rx="10" fill="#eff6ff" stroke="#2563eb"/>
+<text x="516" y="78" font-weight="600" fill="#1d4ed8">ETHEREUM L2 · OP Sepolia, then OP Mainnet after audit</text>
+<rect x="520" y="94" width="190" height="56" rx="6" fill="#fff" stroke="#2563eb"/>
+<text x="615" y="117" font-weight="600" fill="#0f172a" text-anchor="middle">Registry · Anchor</text><text x="615" y="134" fill="#475569" text-anchor="middle">implemented, unaudited</text>
+<rect x="724" y="94" width="190" height="56" rx="6" fill="#fff" stroke="#2563eb"/>
+<text x="819" y="117" font-weight="600" fill="#0f172a" text-anchor="middle">EAS + resolvers</text><text x="819" y="134" fill="#475569" text-anchor="middle">schemas to be registered</text>
+<rect x="520" y="162" width="394" height="56" rx="6" fill="#fff" stroke="#2563eb"/>
+<text x="717" y="185" font-weight="600" fill="#0f172a" text-anchor="middle">Governor Safe (2-of-3, proposed)</text><text x="717" y="202" fill="#475569" text-anchor="middle">load: one root per scope per day, one tx per policy change</text>
+
+<!-- mirrors -->
+<rect x="500" y="258" width="430" height="80" rx="10" fill="#ecfdf5" stroke="#059669"/>
+<text x="516" y="280" font-weight="600" fill="#065f46">MIRRORS · independent hosts</text>
+<text x="516" y="300" fill="#475569">policy documents and daily releases on IPFS and in a</text>
+<text x="516" y="318" fill="#475569">public repository, so availability (P1) has no single host;</text>
+<text x="516" y="334" fill="#475569">school ids are Giga Maps ids, joinable with Giga data</text>
+</g>
+<g stroke="#334155" stroke-width="1.3" fill="none">
+<path d="M135,150 L135,172" marker-end="url(#a)"/>
+<path d="M220,204 L256,186" marker-end="url(#a)"/>
+<path d="M440,120 L516,120" marker-end="url(#a)"/>
+<path d="M440,214 L470,214 L470,298 L496,298" marker-end="url(#a)"/>
+</g>
+<g font-size="11" fill="#475569">
+<text x="478" y="112" text-anchor="middle">roots</text>
+<text x="476" y="252">releases</text>
+</g>
+</svg>

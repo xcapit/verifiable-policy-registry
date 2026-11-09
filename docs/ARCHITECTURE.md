@@ -18,6 +18,7 @@ The exact formats exchanged between these components (documents, events, dataset
 | Aggregator (`vpr.metrics`) | Operator / anyone | Small-cell suppression, dataset, Merkle root and proofs | Implemented + tests |
 | Verification toolkit (`vpr.toolkit`, CLI) | Anyone | Use-case-independent hashing, release roots, row proofs and verification; zone evaluation | Implemented + tests ([guide](toolkit/INTEGRATION_GUIDE.md)) |
 | Demonstrator (`examples/e2e`) | CI / anyone | Synthetic end-to-end run with an evidence manifest | Demonstrated in CI |
+| `IssuerRoleResolver` | Ethereum L2 (EAS) | Accepts an attestation only from the holder of the schema's role in the scope | Implemented + tests; not registered on a public network |
 | Block page | Web | Explains the block; links to appeal | Pending (BACKLOG) |
 | ZK aggregation prover | Next to the aggregator | Proves that each daily release is the k-suppressed aggregation of the committed event log under the policy in force | Planned (ROADMAP M4) |
 | ZK verifier | Ethereum L2 | Verifies the daily proof before a root is accepted | Planned (ROADMAP M4 on testnet; mainnet in phase 2) |
@@ -71,8 +72,8 @@ Full specification, including events, errors and invariants: [INTERFACES.md](INT
 
 `VerifiablePolicyRegistry`
 
-- `createScope(bytes32 scopeId, address governor, uint64 maxValidity)`: called by the governor itself
-- `setGovernor(bytes32 scopeId, address newGovernor)`: governor only
+- `createScope(string name, uint64 maxValidity) returns (bytes32 scopeId)`: the caller becomes the governor; `scopeId = keccak256(abi.encode(governor, name))`; validity at most 365 days
+- `proposeGovernor(bytes32 scopeId, address newGovernor)` and `acceptGovernor(bytes32 scopeId)`: two-step handover
 - `setIssuer(bytes32 scopeId, address issuer, Role role)`: governor only; one attestation role per address per scope
 - `publishPolicy(bytes32 scopeId, bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 validity, bytes32 resolvesAppeal) returns (uint256 version)`: governor only; `0 < validity <= maxValidity`
 - `fileAppeal(bytes32 scopeId, bytes32 documentHash) returns (bytes32 appealId)`: anyone; stores only the hash of a validated appeal document; resubmission after rejection opens a new round
@@ -81,8 +82,9 @@ Full specification, including events, errors and invariants: [INTERFACES.md](INT
 
 `MetricsAnchor` (constructed with the registry address)
 
-- `setPublisher(bytes32 scopeId, address publisher)`: the scope's governor in the registry only
-- `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)`: publisher only, write-once per day
+- `setPublisher(bytes32 scopeId, address publisher, uint32 maxLagDays)`: the scope's governor in the registry only; `address(0)` revokes
+- `markEmpty(bytes32 scopeId, uint32 day)`: publisher; `correctRoot(…, reasonHash)`: governor
+- `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)`: publisher only, once per day, only after the UTC day has ended and within the scope's back-fill limit
 - `verifyRow(bytes32 scopeId, uint32 day, string schoolId, string category, uint256 count, bytes32[] proof) returns (bool)`
 
 Merkle scheme (dataset format 2): sorted pairs, leaves `keccak256(0x00 ‖ day ‖ count ‖ len ‖ school ‖ len ‖ category)` and nodes `keccak256(0x01 ‖ min ‖ max)`. Implemented identically in `tools/vpr/merkle.py` and `tools/vpr/metrics.py`, and tested against the same vector in both languages.

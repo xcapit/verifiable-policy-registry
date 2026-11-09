@@ -13,6 +13,10 @@ categories:                        # mapped to ITU Child Online Protection conte
 threat_feeds:                      # third-party feeds are referenced by provider and version, not copied
   - provider: "example-threat-intel"
     version: "2026-11-01"
+feed_hashes:                       # keccak256 of each category feed (vpr list-hash); binds feed contents to this version
+  malware: "0xcaea08538723e6f92b3c2000c7caeecf944fe048d18c9bb2a155bfd3adce83db"
+  phishing: "0x6a648280f076d00cc9316622dbc738713b922670c499b10da7a7da5ca855ea28"
+  adult: "0x9ffdba0a6b8499e9020cfbbbe2745c4632951286653f465cbb064082025d920f"
 restricted_list_hash: null         # set to the commitment of the IWF domain list in production
 local_blocks:
   - domain: casino-example.example

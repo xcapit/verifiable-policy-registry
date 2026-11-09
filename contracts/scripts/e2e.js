@@ -86,13 +86,22 @@ async function main() {
   console.log(`1. deployed registry ${await registry.getAddress()} and anchor ${await anchor.getAddress()}`);
   manifestBase.contracts = { registry: await registry.getAddress(), anchor: await anchor.getAddress() };
 
-  check(ethers.id(d.scope) === d.scopeId, "scopeId computed off-chain equals keccak256(scope)");
-  await send("createScope", registry.connect(governor).createScope(d.scopeId, governor.address, 90n * DAY));
+  await send("createScope", registry.connect(governor).createScope(d.scope, 90n * DAY));
+  d.scopeId = await registry.scopeIdOf(governor.address, d.scope);
+  const expectedId = ethers.keccak256(ethers.AbiCoder.defaultAbiCoder().encode(["address", "string"], [governor.address, d.scope]));
+  check(d.scopeId === expectedId, "scope id is derived on-chain from the governor and the scope name");
+  await registry.connect(stranger).createScope(d.scope, 90n * DAY);
+  check(
+    (await registry.scopes(d.scopeId)).governor === governor.address,
+    "the same scope name created by another address does not affect this scope (no front-running)"
+  );
   await send("setIssuer", registry.connect(governor).setIssuer(d.scopeId, operator.address, Role.Operator));
   await registry.connect(governor).setIssuer(d.scopeId, reviewer.address, Role.Reviewer);
-  await send("setPublisher", anchor.connect(governor).setPublisher(d.scopeId, operator.address));
+  // the demonstrator anchors fixed historical synthetic data, so it disables the back-fill bound
+  const NO_LAG_LIMIT = await anchor.NO_LAG_LIMIT();
+  await send("setPublisher", anchor.connect(governor).setPublisher(d.scopeId, operator.address, NO_LAG_LIMIT));
   console.log(`2. governor created ${d.scope}, registered operator and reviewer roles, appointed the publisher`);
-  check(await reverts(anchor.connect(stranger).setPublisher(d.scopeId, stranger.address), "NotGovernor"), "a stranger cannot claim the scope's publisher (NotGovernor)");
+  check(await reverts(anchor.connect(stranger).setPublisher(d.scopeId, stranger.address, 1), "NotGovernor"), "a stranger cannot claim the scope's publisher (NotGovernor)");
 
   await send(
     "publishPolicy",
@@ -103,7 +112,16 @@ async function main() {
   check(version === 1n && inForce, "policy v1 published and in force");
   check(current.contentHash === d.contentHash, "on-chain contentHash equals the hash of the published document");
   check(current.contentHash !== d.tamperedDocumentHash, "a modified policy document does not match the on-chain contentHash");
-  manifestBase.policy = { scope: d.scope, scopeId: d.scopeId, version: d.policyVersion, contentHash: d.contentHash };
+  manifestBase.policy = { scope: d.scope, scopeId: d.scopeId, governor: governor.address, version: d.policyVersion, contentHash: d.contentHash, zoneHash: d.zoneHash };
+
+  const resolver = await (await ethers.getContractFactory("IssuerRoleResolver")).deploy(stranger.address, await registry.getAddress(), 1 /* SchemaKind.IndependentTest */);
+  const testData = ethers.AbiCoder.defaultAbiCoder().encode(
+    ["string", "bytes32", "uint256", "bool", "bool", "bool", "bool", "bytes32", "uint64", "uint64"],
+    ["giga-0001", d.scopeId, 1, true, true, true, true, ethers.id("report"), 1, 2]
+  );
+  const att = (attester) => ({ uid: ethers.ZeroHash, schema: ethers.ZeroHash, time: 0, expirationTime: 0, revocationTime: 0, refUID: ethers.ZeroHash, recipient: ethers.ZeroAddress, attester, revocable: true, data: testData });
+  check(await resolver.connect(stranger).attest.staticCall(att(reviewer.address)), "EAS resolver accepts a test attestation from the reviewer");
+  check(!(await resolver.connect(stranger).attest.staticCall(att(operator.address))), "EAS resolver rejects a test attestation from the operator");
 
   await send("fileAppeal", registry.connect(teacher).fileAppeal(d.scopeId, d.appealDocumentHash));
   const appealId = await registry.appealIdOf(d.scopeId, d.appealDocumentHash, 1);
@@ -132,12 +150,22 @@ async function main() {
   await anchor.connect(operator).commitRoot(d.scopeId, otherDay, ethers.id("unrelated root"), d.datasetUri);
   check(!(await anchor.verifyRow(d.scopeId, otherDay, r.school_id, r.category, r.count, d.proof)), "the published row does not verify against a different anchored root");
   gas.verifyRow_estimate = Number(await anchor.verifyRow.estimateGas(d.scopeId, d.dayNumber, r.school_id, r.category, r.count, d.proof));
+  const currentDay = Number(await anchor.today());
+  check(
+    await reverts(anchor.connect(operator).commitRoot(d.scopeId, currentDay, d.root, d.datasetUri), "DayNotClosed"),
+    "the current UTC day, still accumulating, cannot be anchored (DayNotClosed)"
+  );
+  await send("markEmpty", anchor.connect(operator).markEmpty(d.scopeId, d.dayNumber - 1));
+  check((await anchor.getCommitment(d.scopeId, d.dayNumber - 1)).empty, "a day with nothing publishable is marked empty, so the gap is not ambiguous");
+  await send("correctRoot", anchor.connect(governor).correctRoot(d.scopeId, otherDay, d.root, d.datasetUri, ethers.id("correction note")));
+  check((await anchor.getCommitment(d.scopeId, otherDay)).revision === 1n, "the governor corrected an anchored root, with a reason, and the revision is counted");
   check(await reverts(anchor.connect(operator).commitRoot(d.scopeId, d.dayNumber, ethers.id("other"), d.datasetUri), "DayAlreadyCommitted"), "an anchored day cannot be rewritten (DayAlreadyCommitted)");
 
   if (d.service) {
     const s = d.service;
-    await registry.connect(governor).createScope(s.scopeId, governor.address, 90n * DAY);
-    await anchor.connect(governor).setPublisher(s.scopeId, operator.address);
+    await registry.connect(governor).createScope(s.scope, 90n * DAY);
+    s.scopeId = await registry.scopeIdOf(governor.address, s.scope);
+    await anchor.connect(governor).setPublisher(s.scopeId, operator.address, NO_LAG_LIMIT);
     await anchor.connect(operator).commitRoot(s.scopeId, s.dayNumber, s.root, "ipfs://example-service-dataset");
     check(
       await anchor.verifyRow(s.scopeId, s.dayNumber, s.row.unit_id, s.row.category, s.row.count, s.proof),

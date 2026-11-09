@@ -27,7 +27,7 @@ flowchart LR
 | Hash function | keccak256 (Ethereum), not NIST SHA3-256 |
 | Hex encoding | `0x` prefix, lowercase, 32 bytes = 64 hex characters |
 | Scope name | UTF-8 string `<programme>:<country>:<profile>`, for example `giga:AR:primary`. Country is ISO 3166-1 alpha-2 (`XX` in examples) |
-| Scope id | `bytes32 scopeId = keccak256(utf8(scope))` |
+| Scope id | `bytes32 scopeId = keccak256(abi.encode(governor, scope))`, computed by `VerifiablePolicyRegistry.scopeIdOf` and `vpr policy-hash --governor` |
 | School id | Public Giga school identifier (or the equivalent public id of the network). Never a personal identifier |
 | Dates | `YYYY-MM-DD`, UTC, in documents and datasets |
 | Day number | On-chain `uint32 day` = whole days since 1970-01-01 UTC. `2026-11-01` is day `20758` |
@@ -72,28 +72,22 @@ Source: [`contracts/src/VerifiablePolicyRegistry.sol`](../contracts/src/Verifiab
 
 | Function | Caller | Effect | Reverts |
 | --- | --- | --- | --- |
-| `createScope(bytes32 scopeId, address governor, uint64 maxValidity)` | the governor itself | Creates a scope | `ScopeAlreadyExists`, `ZeroAddress`, `NotGovernor`, `InvalidValidity` |
-| `setGovernor(bytes32 scopeId, address newGovernor)` | governor | Rotates the governor | `UnknownScope`, `NotGovernor`, `ZeroAddress` |
-| `setIssuer(bytes32 scopeId, address issuer, Role role)` | governor | Grants, changes or revokes (`Role.None`) the attestation role of an address | `UnknownScope`, `NotGovernor`, `ZeroAddress` |
-| `publishPolicy(bytes32 scopeId, bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 validity, bytes32 resolvesAppeal) → uint256 version` | governor | Appends a version (1-based); optionally accepts an appeal, recording `contentHash` as its resolution | `UnknownScope`, `NotGovernor`, `EmptyContentHash`, `InvalidValidity`, `AppealNotOpen`, `AppealScopeMismatch` |
+| `createScope(string name, uint64 maxValidity) → bytes32 scopeId` | anyone; becomes the governor | Creates the scope `scopeIdOf(msg.sender, name)`; name ≤ 128 bytes; `0 < maxValidity ≤ 365 days` | `EmptyName`, `NameTooLong`, `InvalidValidity`, `ScopeAlreadyExists` |
+| `scopeIdOf(address governor, string name) → bytes32` | pure | `keccak256(abi.encode(governor, name))` | none |
+| `proposeGovernor(bytes32 scopeId, address newGovernor)` | governor | Starts a handover; `address(0)` cancels; an address holding an issuer role cannot be proposed | `UnknownScope`, `NotGovernor`, `GovernorCannotHoldRole` |
+| `acceptGovernor(bytes32 scopeId)` | the proposed governor | Completes the handover; refused if the proposed address holds an issuer role | `UnknownScope`, `NotPendingGovernor`, `GovernorCannotHoldRole` |
+| `setIssuer(bytes32 scopeId, address issuer, Role role)` | governor | Grants, changes or revokes (`Role.None`) an attestation role; neither the governor nor the pending governor can hold one | `UnknownScope`, `NotGovernor`, `ZeroAddress`, `GovernorCannotHoldRole` |
+| `publishPolicy(bytes32 scopeId, bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 validity, bytes32 resolvesAppeal) → uint256 version` | governor | Appends a version (1-based); `reasonCode` in 1..6, and 3 if and only if `resolvesAppeal` is set; `uri` ≤ 256 bytes | `UnknownScope`, `NotGovernor`, `EmptyContentHash`, `InvalidValidity`, `UriTooLong`, `InvalidReasonCode`, `AppealNotOpen`, `AppealScopeMismatch` |
 | `fileAppeal(bytes32 scopeId, bytes32 documentHash) → bytes32 appealId` | anyone | Opens an appeal for the hash of an appeal document (I9); a rejected document can be filed again in a new round | `UnknownScope`, `EmptyDocumentHash`, `AppealAlreadyExists` |
-| `rejectAppeal(bytes32 appealId, bytes32 reasonHash)` | governor of the appeal's scope | Closes an appeal as rejected, with the hash of a reasoned decision published off-chain | `AppealNotOpen`, `NotGovernor`, `EmptyReason` |
+| `rejectAppeal(bytes32 appealId, bytes32 reasonHash)` | governor of the appeal's scope | Closes an appeal as rejected with the hash of a reasoned decision | `AppealNotOpen`, `NotGovernor`, `EmptyReason` |
 | `appealIdOf(bytes32 scopeId, bytes32 documentHash, uint32 round) → bytes32` | pure | `keccak256(abi.encode(scopeId, documentHash, round))` | none |
-| `currentPolicy(bytes32 scopeId) → (uint256 version, PolicyVersion policy, bool inForce)` | view | Latest version; `inForce = block.timestamp < expiresAt` | none |
-| `getVersion(bytes32 scopeId, uint256 version) → PolicyVersion` | view | A specific version | panics on out-of-range |
-| `versionCount(bytes32 scopeId) → uint256` | view | Number of versions | none |
-| `scopes(bytes32) → (address governor, uint64 maxValidity, bool exists)` | view | Scope record | none |
-| `issuerRole(bytes32 scopeId, address) → Role` | view | `0 None, 1 Operator, 2 Reviewer, 3 Auditor`; one role per address per scope | none |
-| `appeals(bytes32) → (bytes32 scopeId, uint8 status, uint32 round, uint64 filedAt, bytes32 documentHash, bytes32 resolutionHash)` | view | Appeal record; status `0 None, 1 Open, 2 Accepted, 3 Rejected` | none |
-| `appealRounds(bytes32 key) → uint32` | view | Latest round for `key = keccak256(abi.encode(scopeId, documentHash))` | none |
+| `currentPolicy`, `getVersion`, `versionCount`, `scopes`, `scopeName`, `pendingGovernor`, `issuerRole`, `appeals`, `appealRounds` | view | State | `getVersion` reverts `UnknownVersion` for 0 or out of range |
 
-`PolicyVersion = (bytes32 contentHash, bytes32 restrictedListHash, string uri, uint16 reasonCode, uint64 publishedAt, uint64 expiresAt, bytes32 resolvesAppeal)`.
+Events: `ScopeCreated(scopeId, governor, name, maxValidity)`, `GovernorProposed(scopeId, currentGovernor, proposedGovernor)`, `GovernorChanged(scopeId, previousGovernor, newGovernor)`, `IssuerSet(scopeId, issuer, role)`, `PolicyPublished(…)`, `AppealFiled(appealId, scopeId, documentHash, round)`, `AppealResolved(appealId, accepted, resolutionHash)`.
 
-Events: `ScopeCreated(scopeId, governor, maxValidity)`, `GovernorChanged(scopeId, previousGovernor, newGovernor)`, `IssuerSet(scopeId, issuer, role)`, `PolicyPublished(scopeId, version, contentHash, restrictedListHash, uri, reasonCode, expiresAt, resolvesAppeal)`, `AppealFiled(appealId, scopeId, documentHash, round)`, `AppealResolved(appealId, accepted, resolutionHash)`.
+Invariants: versions are append-only; every version expires within at most 365 days; an appeal moves only `Open → Accepted` or `Open → Rejected`; a document has at most one open or accepted round; a scope id belongs to the address that created it.
 
-Invariants: versions are append-only; every version expires; an appeal moves only `Open → Accepted` or `Open → Rejected`; a document has at most one open or accepted round; no caller-supplied free text is stored through appeals (the policy `uri` is written by the governor only).
-
-**Scope discovery.** Scope names are not authenticated by the contract: anyone who controls an address can create a scope under any unused name with itself as governor. Verifiers therefore never trust a scope by its name. They pin, from a deployment manifest published by the partners (planned, VPR-049), the chain id, the registry and anchor addresses, the scope id and the expected governor, and they alert on `GovernorChanged` and on changes to the Safe's owners or threshold.
+**Scope discovery.** Scope ids cannot be front-run, but anyone can still create a scope with a familiar name under their own address. Verifiers therefore pin the chain id, contract addresses, scope ids and governors from the deployment manifest (I11) and alert on governor proposals, `GovernorChanged`, `IssuerSet` and changes to the Safe's owners or threshold.
 
 ## I3 · Registry → sync daemon (planned, [VPR-015](BACKLOG.md))
 
@@ -116,7 +110,7 @@ Produced by `vpr compile-rpz`. Standard Response Policy Zone usable by Unbound o
   ```
 - Exceptions: `<domain> CNAME rpz-passthru.` and `*.<domain> CNAME rpz-passthru.`
 - Blocks: `<domain> CNAME <block-page>.` (or `CNAME .` for NXDOMAIN), plus the wildcard. A comment states the source (`category:<name>` or `local`). Restricted entries carry no comment.
-- SOA serial: `YYYYMMDDHH` in UTC.
+- SOA serial: the policy version, so the same policy and feeds always produce the same zone (and the same `zoneHash`).
 
 ## I5 · Block events (resolver exporter → aggregator)
 
@@ -140,16 +134,18 @@ Source: [`contracts/src/MetricsAnchor.sol`](../contracts/src/MetricsAnchor.sol).
 
 | Function | Caller | Effect | Reverts |
 | --- | --- | --- | --- |
-| `setPublisher(bytes32 scopeId, address publisher)` | the scope's current governor in the registry | Appoints or rotates the publisher (operator) | `UnknownScope`, `NotGovernor`, `ZeroAddress` |
-| `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)` | publisher | Write-once root for a day | `NotPublisher`, `EmptyRoot`, `DayAlreadyCommitted` |
-| `getCommitment(bytes32 scopeId, uint32 day) → (bytes32 root, string datasetUri, uint64 committedAt)` | view | Stored commitment | none |
-| `leafHash(uint32 day, string schoolId, string category, uint256 count) → bytes32` | pure | Leaf of a row (I6) | `FieldTooLong` |
-| `verifyRow(bytes32 scopeId, uint32 day, string schoolId, string category, uint256 count, bytes32[] proof) → bool` | view | Computes the leaf from the row and the anchored day, then checks the proof | `FieldTooLong` |
-| `registry() → address`, `publisher(bytes32) → address` | view | Configuration | none |
+| `setPublisher(bytes32 scopeId, address publisher, uint32 maxLagDays)` | the scope's current governor in the registry | Appoints, rotates or revokes (`address(0)` with `maxLagDays` 0) the publisher, and sets the back-fill limit: at least 1 (yesterday only), or `NO_LAG_LIMIT` (2³²−1) for no bound | `UnknownScope`, `NotGovernor`, `InvalidLag` |
+| `commitRoot(bytes32 scopeId, uint32 day, bytes32 root, string datasetUri)` | publisher | Root for a day: once, only after the UTC day has ended (`day < today()`), and `day + maxLagDays ≥ today()`; `datasetUri` ≤ 256 bytes | `NotPublisher`, `DayNotClosed`, `DayTooOld`, `DayAlreadyCommitted`, `EmptyRoot`, `UriTooLong` |
+| `markEmpty(bytes32 scopeId, uint32 day)` | publisher | Declares a day with no publishable cell | as `commitRoot` |
+| `correctRoot(bytes32 scopeId, uint32 day, bytes32 newRoot, string datasetUri, bytes32 reasonHash)` | governor | Replaces the root of an anchored or empty day, increments `revision`, keeps the previous root in the event; `newRoot` 0 turns the day into an empty day | `NotGovernor`, `DayNotCommitted`, `NoChange`, `EmptyReason`, `UriTooLong` |
+| `getCommitment(bytes32 scopeId, uint32 day) → (root, datasetUri, committedAt, revision, empty)` | view | Stored commitment | none |
+| `leafHash(uint32 day, string unitId, string category, uint256 count) → bytes32` | pure | Leaf of a row (I6) | `FieldTooLong` |
+| `verifyRow(bytes32 scopeId, uint32 day, string unitId, string category, uint256 count, bytes32[] proof) → bool` | view | Checks a row against the current root of the day | `FieldTooLong` |
+| `today() → uint32` | view | Current UTC day number | none |
 
-Events: `PublisherSet(scopeId, governor, publisher)`, `RootCommitted(scopeId, day, root, datasetUri)`.
+Events: `PublisherSet(scopeId, governor, publisher, maxLagDays)`, `RootCommitted(scopeId, day, root, datasetUri)`, `EmptyDayMarked(scopeId, day)`, `RootCorrected(scopeId, day, previousRoot, newRoot, datasetUri, reasonHash, revision)`. An anchored root is never 0, so a root of 0 in `RootCorrected` always means an empty day.
 
-There is no first-caller configuration: the governor recorded in the registry is the only party that can appoint a publisher, and a governor rotation in the registry immediately transfers that power. The anchor accepts rows, not raw leaves, so an internal node cannot be presented as a row.
+A governor handover does not revoke the publisher; the new governor should confirm or replace it. Verifiers read `revision` and the `RootCorrected` events, and compare `committedAt` with `day`. The leaf does not bind the scope id: roots are stored per scope, and a row is verified only against the root of the scope it is checked for (decision recorded before the audit, so the leaf encoding and test vectors stay frozen).
 
 ## I8 · EAS attestations
 
@@ -161,25 +157,30 @@ Definitions: [`schemas/eas-schemas.json`](../schemas/eas-schemas.json) (CC0). Re
 | `VPR.IndependentTest.v1` | independent reviewer | `string schoolId, bytes32 scopeId, uint256 policyVersion, bool categoriesBlocked, bool exceptionsReachable, bool dnssecValidated, bool bypassResisted, bytes32 reportHash, uint64 testedAt, uint64 validUntil` |
 | `VPR.Conformance.v1` | auditor | `bytes32 scopeId, string framework, string frameworkVersion, bytes32 reportHash, uint64 assessedAt, uint64 validUntil` |
 
-All schemas are revocable. For `VPR.IndependentTest.v1`, the booleans are the public summary; `reportHash` commits to the full report, which is shared with the governor signers and not published, since a per-school account of bypass attempts can be useful to an attacker. Verifiers must check that the attester address belongs to the expected role for the scope, and that `validUntil` has not passed. A school counts as protected only with a valid, unrevoked `VPR.IndependentTest.v1` for the policy version in force.
+All schemas are revocable. Each schema is registered with its own `IssuerRoleResolver` ([`contracts/src/IssuerRoleResolver.sol`](../contracts/src/IssuerRoleResolver.sol)), constructed with `(eas, registry, SchemaKind)`. The kind fixes the role and the encoding (Deployment → Operator, IndependentTest → Reviewer, Conformance → Auditor), so a resolver cannot be deployed with a mismatched role or slot. It accepts an attestation only if the attester holds that role in the registry for the scope carried in the attestation, at issuance time. It reads the scope id from the ABI head (slot 1 for Deployment and IndependentTest, slot 0 for Conformance), after checking that the head is complete and that the first string offset is canonical; it does not decode the tail, so verifiers decode `data` strictly and treat a decoding failure as no attestation. The role is checked at issuance only: an attestation stays valid on EAS after the attester's role is withdrawn, so verifiers compare the attestation time with the `IssuerSet` history. `policyVersion` is not checked on-chain. Registration of the schemas on a public network is Planned (M2). For `VPR.IndependentTest.v1`, the booleans are the public summary; `reportHash` commits to the full report, which is shared with the governor signers and not published, since a per-school account of bypass attempts can be useful to an attacker. Verifiers must check that the attester address belongs to the expected role for the scope, and that `validUntil` has not passed. A school counts as protected only with a valid, unrevoked `VPR.IndependentTest.v1` for the policy version in force.
 
-## I9 · Appeal document (format 2; relayer planned, [VPR-017](BACKLOG.md))
+## I9 · Appeal document (format 3; relayer planned, [VPR-017](BACKLOG.md))
 
-An appeal is a small JSON document, canonicalised like a policy document (sorted keys, no whitespace, UTF-8). The contract stores only `documentHash = keccak256(canonical document)`:
+An appeal is a small JSON document, canonicalised like a policy document (sorted keys, no whitespace, UTF-8, no floats). The contract stores only `documentHash = keccak256(canonical document)`, computed by `vpr appeal-hash` or `toolkit.appeal_document_hash`, which also validate it:
 
 ```json
 {
-  "format": "vpr-appeal/2",
+  "format": "vpr-appeal/3",
   "scope": "giga:XX:primary",
   "domain": "educational-site.example",
   "request": "unblock",
-  "reason": "Used for the science curriculum in grade 5"
+  "reason": "Used for the science curriculum in grade 5",
+  "nonce": "0x<64 random hexadecimal digits>"
 }
 ```
 
-Rules enforced by the relayer before it files the hash: exactly these five keys; `request` is `unblock` or `block`; `domain` is a valid domain name; `reason` is at most 280 characters; no names, emails, school staff details or anything about a student. The relayer publishes accepted documents off-chain, keyed by their hash, and can withhold or take down a document that breaks these rules without affecting the on-chain record. Anyone can also file a hash directly; since only a hash reaches the chain, a direct filing cannot place free text on-chain, and an appeal whose document is never published is treated as unsubstantiated.
+Rules: exactly these six keys; `request` is `unblock` or `block`; `domain` is a valid lowercase domain; `reason` is 1–280 characters; `nonce` is 32 random bytes. The nonce makes the hash unguessable, so nobody can pre-file someone else's appeal. The relayer also refuses anything resembling personal data, publishes accepted documents off-chain keyed by their hash, and can withhold a document without affecting the on-chain record. Rounds count resubmissions after rejection; they are not an escalation count.
 
-The governor answers each appeal with a reasoned decision. A rejection records the hash of the published reasoning; an acceptance records the content hash of the policy version that resolves it. A rejected document can be filed again, which opens a new round.
+The governor answers each appeal with a reasoned decision: a rejection records the hash of the published reasoning; an acceptance records the content hash of the version that resolves it (reason code 3).
+
+## I11 · Deployment manifest
+
+Format `vpr-manifest/1`, schema [`schemas/deployment-manifest.schema.json`](../schemas/deployment-manifest.schema.json), synthetic example [`deployments/example.local.json.example`](../deployments/example.local.json.example). Published by the deploying partners. It lists the network and chain id, the registry, anchor and resolver addresses, EAS schema UIDs, the confirmation depth, and for each scope its name, scope id, governor and declared threshold, issuers, publisher, back-fill limit and charter hash. Verifiers pin these values and treat any on-chain state that differs as untrusted.
 
 ## I10 · Command-line interface
 
@@ -187,12 +188,16 @@ Installed with `pip install -e tools/`. Exit codes: `0` success, `1` verificatio
 
 | Command | Input | Output |
 | --- | --- | --- |
-| `vpr policy-hash <policy>` | Policy document (I1) | `scope`, `scopeId`, `version`, `contentHash` |
+| `vpr policy-hash <policy> [--governor ADDR] [--json]` | Policy document (I1) | `scope`, `version`, `contentHash`; with `--governor`, the on-chain `scopeId` |
 | `vpr compile-rpz <policy> [--feeds-dir DIR] [--restricted FILE] [--block-page HOST] [--out FILE]` | Policy, feeds (`<category>.txt`, one domain per line, `#` comments), optional restricted list | RPZ zone (I4). Fails closed: a category without a feed, or a restricted list whose hash differs from the policy's, is an error |
 | `vpr aggregate <events.csv> [--day YYYY-MM-DD] [--k N] [--out-csv FILE]` | Block events (I5); `--day` is required when they span several days | JSON summary on stdout, dataset CSV (I6) |
 | `vpr evaluate <zone> <domain>… [--json]` | Compiled zone (I4) and domains | Action per domain (`passthru`, `redirect`, `nxdomain`, `allow`) and matching rule; a zone evaluation, not DNS resolution |
 | `vpr prove-row <release.csv> --index N` | Release (I6) | JSON with the row, day number, leaf, proof and root |
 | `vpr verify-row <proof.json> [--root R] [--json]` | Output of `prove-row`; optionally the anchored root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
+| `vpr list-hash <list>` | Domain list | Its commitment, for `feed_hashes` or `restricted_list_hash` |
+| `vpr zone-hash <zone>` | Compiled zone | keccak256 of the zone (`resolverConfigHash`) |
+| `vpr check-onchain <policy> [--content-hash H] [--version N] [--validity S] [--reason-code C]` | Policy and on-chain values | `ok`/`MISMATCH` per field; exit 1 on any mismatch |
+| `vpr appeal-hash <document.json>` | Appeal document (I9) | Its hash for `fileAppeal`, after validation |
 | `vpr restricted-hash <list>` | Restricted list, one domain per line | Its commitment (I1); the list itself is never published |
 | `vpr verify-root <dataset.csv> <root> [--k K] [--json]` | Dataset (I6) and expected root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
 

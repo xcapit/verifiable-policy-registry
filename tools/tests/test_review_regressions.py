@@ -200,3 +200,58 @@ def test_zone_file_is_written_owner_only(tmp_path, capsys):
     out = tmp_path / "z.rpz"
     run(capsys, "compile-rpz", str(EXAMPLE), "--feeds-dir", str(FEEDS), "--out", str(out))
     assert stat.S_IMODE(os.stat(out).st_mode) == 0o600
+
+
+# Pre-audit hardening ---------------------------------------------------------------------------------
+
+def test_scope_id_matches_the_contract_vector():
+    # Shared vector with contracts/test/VerifiablePolicyRegistry.test.js (Hardhat account #0).
+    from vpr.hashing import scope_id
+
+    assert scope_id("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", "giga:XX:primary") == (
+        "0x8ed60dd6aab12c6e2f1a8fce4a8e3417f75ce71c0f10705b20241392abef33fb"
+    )
+    assert policy.load(EXAMPLE).scope_id("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266").startswith("0x8ed60dd6")
+
+
+def test_feed_contents_are_bound_by_the_policy():
+    p = policy.load(EXAMPLE)
+    feeds = _feeds()
+    policy.compile_rpz(p, feeds, serial=1)  # declared hashes match the example feeds
+    tampered = dict(feeds, malware=feeds["malware"] + ["new-domain.example"])
+    with pytest.raises(policy.PolicyError):
+        policy.compile_rpz(p, tampered, serial=1)
+
+
+def test_feed_hashes_must_cover_exactly_the_categories():
+    doc = copy.deepcopy(policy.load(EXAMPLE).doc)
+    doc["feed_hashes"].pop("adult")
+    with pytest.raises(policy.PolicyError):
+        policy.validate(doc)
+
+
+def test_appeal_format_3_requires_a_nonce_and_known_fields():
+    good = {"format": "vpr-appeal/3", "scope": "giga:XX:primary", "domain": "educational-site.example",
+            "request": "unblock", "reason": "Used in class", "nonce": "0x" + "ab" * 32}
+    assert toolkit.appeal_document_hash(good).startswith("0x")
+    for change in ({"nonce": "0x12"}, {"format": "vpr-appeal/2"}, {"request": "delete"}, {"reason": "x" * 281},
+                   {"student": "name"}):
+        bad = dict(good, **change)
+        with pytest.raises(ValueError):
+            toolkit.appeal_document_hash(bad)
+
+
+def test_check_onchain_detects_mismatches(capsys):
+    p = policy.load(EXAMPLE)
+    ok_args = ["check-onchain", str(EXAMPLE), "--content-hash", p.content_hash(), "--version", "1",
+               "--validity", str(int(p.doc["valid_days"]) * 86400), "--reason-code", "1"]
+    assert run(capsys, *ok_args)[0] == 0
+    assert run(capsys, "check-onchain", str(EXAMPLE), "--validity", "86400")[0] == 1
+    assert run(capsys, "check-onchain", str(EXAMPLE), "--version", "2")[0] == 1
+
+
+def test_zone_hash_is_stable(tmp_path, capsys):
+    out = tmp_path / "z.rpz"
+    run(capsys, "compile-rpz", str(EXAMPLE), "--feeds-dir", str(FEEDS), "--out", str(out))
+    code, h1, _ = run(capsys, "zone-hash", str(out))
+    assert code == 0 and h1.strip() == policy.zone_hash(out.read_text())

@@ -16,7 +16,7 @@ Assumptions: H is collision-resistant and second-preimage-resistant. Where it is
 ## 2. Policy document and content hash · Implemented
 
 - Canonical form: JSON with lexicographically sorted keys, separators `,` and `:` without whitespace, UTF-8, non-ASCII kept, after validation (domains lower-cased, trailing dot removed). Implementation: `tools/vpr/policy.py` (`canonical_json`, `content_hash`) and `tools/vpr/toolkit.py` (`canonical_json`, `document_hash`).
-- `contentHash = H(canonical_json(document))`; `scopeId = H(utf8(scope))`.
+- `contentHash = H(canonical_json(document))`; `scopeId = H(abi.encode(governor, scope))`, computed on-chain by `scopeIdOf` (from v0.4; v0.3.0 and earlier used `H(utf8(scope))`).
 - **What the hash binds.** Every field of the document: scope, version, profile, categories, `valid_days`, `reason_code`, threat feeds by provider and version, local blocks and exceptions with reasons, and `restricted_list_hash`.
 - **What binds the document to the chain.** The governor's `publishPolicy(scopeId, contentHash, …, validity, …)` call. **Gap.** Nothing checks on-chain that `validity` equals `valid_days × 86400`, or that the version number in the document equals the on-chain version. `vpr policy-hash` lets anyone check the content hash. The equality checks for validity and version are planned as VPR-060, used by the sync daemon (VPR-015) and the dashboard (VPR-021).
 - **What the hash does not bind.** Threat feeds are referenced by provider and version strings only, so the hash does not bind the feed contents, and therefore not the effective block set. The `; policy content hash` line in a compiled zone is self-asserted by whoever compiled it. Binding feed contents (a hash per feed in `threat_feeds`) and the produced zone (`resolverConfigHash` in the deployment attestation) is Planned (VPR-065).
@@ -120,7 +120,7 @@ Canaries cannot detect fabricated additional events, and they cannot detect omis
 
 | Risk | Status today | Mitigation | Residual |
 | --- | --- | --- | --- |
-| Replay of a root or proof on another day, scope or chain | Mitigated for roots (day in leaf, write-once per scope/day); Designed for proofs | `domain`, scope and day as public inputs read on-chain | Low once implemented |
+| Replay of a root or proof on another day, scope or chain | Mitigated for roots (day in leaf; the publisher anchors each scope/day once, and only public governor corrections follow); Designed for proofs | `domain`, scope and day as public inputs read on-chain | Low once implemented |
 | Substitution of the policy document | Mitigated | `contentHash` on-chain; `vpr policy-hash` | Document availability (mirrors) |
 | Equivocation (different releases shown to different people) | Partly mitigated | One root per scope/day on a public chain; dataset URI on-chain | Off-chain hosts can serve different files; anyone can detect this by recomputing the root |
 | Truncation or omission of events before aggregation | **Not mitigated cryptographically** | Reviewer tests; canaries (Designed); audit | High until canaries and TEE work exist |

@@ -111,7 +111,7 @@ The pilot targets school networks, but the components are generic and released f
 
 | Component | Status | What it gives you |
 | --- | --- | --- |
-| EAS schemas `VPR.Deployment.v1`, `VPR.IndependentTest.v1`, `VPR.Conformance.v1` ([`schemas/`](schemas), CC0) | Defined; role enforcement Planned | Attestation formats for "deployed", "independently tested" and "conforms to framework X". The registry records one issuer role per address; a Planned schema resolver will enforce those roles at issuance (VPR-012) |
+| EAS schemas `VPR.Deployment.v1`, `VPR.IndependentTest.v1`, `VPR.Conformance.v1` ([`schemas/`](schemas), CC0) | Defined; role-enforcing resolver implemented, not yet registered | Attestation formats for "deployed", "independently tested" and "conforms to framework X". `IssuerRoleResolver` accepts an attestation only from the address holding the schema's role in the scope at issuance time; registration on a public network is Planned (M2) |
 | Policy registry pattern (`VerifiablePolicyRegistry`) | Implemented, not audited | Versioned commitments with a stated reason, mandatory expiry bounded per scope, on-chain appeals and a governor that can be any Safe |
 | `MetricsAnchor` | Implemented, not audited | Write-once daily Merkle roots per scope, publisher appointed by the governor, and on-chain verification of a single row with domain-separated hashing |
 | `vpr` tools | Implemented | Canonical hashing of policy documents, RPZ compilation, aggregation with small-cell suppression and Merkle proofs |

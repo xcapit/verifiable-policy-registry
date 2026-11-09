@@ -15,7 +15,7 @@ This page describes what runs where during the pilot and how the system behaves 
 | Same site | Daily job | Aggregates counts, removes small cells, publishes the dataset and its fingerprint | Implemented (tools); scheduling Planned |
 | Web | Block page and appeal relayer | Explains why a site is blocked and accepts appeals without requiring any account | Planned (VPR-017) |
 | Public record | Policy registry and daily-summary anchor | Holds policy commitments, appeal hashes and daily roots | Implemented, not audited; local test chains only |
-| Public record | EAS attestations | Would hold deployment, test and conformance attestation summaries | Schemas Defined; registration and role-enforcing resolver Planned (VPR-012) |
+| Public record | EAS attestations | Would hold deployment, test and conformance attestation summaries | Schemas Defined; role-enforcing resolver Implemented (not yet registered); registration Planned (M2) |
 | Web | Public dashboard | Shows the policy in force, attested schools and daily summaries | Planned (VPR-021) |
 
 ## Intended information flow

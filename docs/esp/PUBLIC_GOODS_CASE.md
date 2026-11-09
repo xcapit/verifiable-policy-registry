@@ -21,7 +21,7 @@ Neither half is specific to schools. A proposed connected-school use case (schoo
 | --- | --- | --- |
 | A history no single party can rewrite | Append-only contract state with public events; global agreement on order | [`contracts/src/VerifiablePolicyRegistry.sol`](../../contracts/src/VerifiablePolicyRegistry.sol) |
 | Designed threshold authorisation across institutions | The registry trusts one governor address. The proposed deployment uses a Safe multisig; threshold enforcement is external to this contract and Unverified until deployment | [ADR-0004](../adr/0004-multisig-governor-expiry-appeals.md) |
-| Designed separation of who operates and who certifies | Three EAS schemas are defined and issuer roles are recorded in the registry; enforcement at EAS issuance is Planned through a schema resolver (VPR-012) | [`schemas/eas-schemas.json`](../../schemas/eas-schemas.json), [ADR-0005](../adr/0005-issuer-separation.md) |
+| Designed separation of who operates and who certifies | Three EAS schemas are defined and issuer roles are recorded in the registry; a schema resolver that enforces them at issuance is implemented and tested (`IssuerRoleResolver`); registration on a public network is Planned (M2) | [`schemas/eas-schemas.json`](../../schemas/eas-schemas.json), [ADR-0005](../adr/0005-issuer-separation.md) |
 | Publicly checkable aggregates | Write-once daily roots and on-chain verification of a single published row | [`contracts/src/MetricsAnchor.sol`](../../contracts/src/MetricsAnchor.sol) |
 | Contestability without wallets for end users | Appeal hashes and resolution status are Implemented; the walletless relayer is Planned (VPR-017) | [INTERFACES I9](../INTERFACES.md) |
 
@@ -36,7 +36,7 @@ All outputs are open and reusable without permission: code under AGPL-3.0-only, 
 | Output | Status on the v0.3 candidate branch | Who can reuse it |
 | --- | --- | --- |
 | Policy registry pattern: versions, reasons, mandatory expiry, appeals by document hash, on-chain issuer roles | Implemented, tested, not audited | Any governed policy with a bounded audience |
-| `MetricsAnchor`: write-once daily roots, row verification with domain-separated, day-bound leaves | Implemented, tested, not audited | Any programme publishing aggregate counts |
+| `MetricsAnchor`: daily roots anchored once, with public governor corrections, row verification with domain-separated, day-bound leaves | Implemented, tested, not audited | Any programme publishing aggregate counts |
 | EAS schemas for deployment, independent test and conformance attestations | Defined, not yet registered on a network | Any scheme where operators must not certify themselves |
 | `vpr` toolkit: canonical hashing, aggregation with small-cell suppression, Merkle proofs, verification CLI | Implemented, tested | Integrators and independent verifiers ([integration guide](../toolkit/INTEGRATION_GUIDE.md)) |
 | End-to-end demonstrator with synthetic data | Implemented, run in CI | Reviewers and new integrators |

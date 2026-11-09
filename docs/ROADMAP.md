@@ -23,7 +23,7 @@ Every milestone produces artefacts that are useful outside this pilot: other net
 ## M0 · Proof of concept · done
 
 - [x] `VerifiablePolicyRegistry` with versions, reasons, mandatory expiry, appeals by document hash with reasoned resolutions, on-chain issuer roles and governor rotation
-- [x] `MetricsAnchor` with write-once daily roots, a publisher appointed by the governor and on-chain row verification
+- [x] `MetricsAnchor` with daily roots anchored once by the publisher and corrected only publicly by the governor, a publisher appointed by the governor and on-chain row verification
 - [x] Python tooling: full policy validation and hashing, fail-closed RPZ compilation, aggregation with small-cell suppression, Merkle proofs, CLI
 - [x] EAS schema definitions with separate issuer roles
 - [x] End-to-end demo and CI

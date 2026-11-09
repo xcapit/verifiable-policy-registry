@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" width="960" height="380" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<rect width="960" height="380" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">Trust by actor: what each party is, and is not, trusted for</text>
+<g font-size="12">
+<text x="56" y="66" font-weight="600" fill="#475569">ACTOR</text>
+<text x="250" y="66" font-weight="600" fill="#475569">ASSUMED</text>
+<text x="620" y="66" font-weight="600" fill="#475569">NOT ASSUMED</text>
+<line x1="40" y1="74" x2="920" y2="74" stroke="#cbd5e1"/>
+
+<rect x="40" y="84" width="180" height="40" rx="6" fill="#ecfdf5" stroke="#059669"/>
+<text x="56" y="101" font-weight="600" fill="#0f172a">Ledger (L2 + L1)</text><text x="56" y="116" fill="#475569">cryptographic</text>
+<text x="250" y="101" fill="#0f172a">safety; eventual liveness via forced inclusion;</text><text x="250" y="116" fill="#0f172a">keccak-256 and ECDSA / P-256 security</text>
+<text x="620" y="108" fill="#475569">a single honest RPC endpoint</text>
+
+<rect x="40" y="134" width="180" height="40" rx="6" fill="#ecfdf5" stroke="#059669"/>
+<text x="56" y="151" font-weight="600" fill="#0f172a">Governor (Safe)</text><text x="56" y="166" fill="#475569">threshold</text>
+<text x="250" y="151" fill="#0f172a">fewer than m of n signers cannot act; at least</text><text x="250" y="166" fill="#0f172a">one signer acts for children and the public</text>
+<text x="620" y="151" fill="#475569">that a majority cannot misuse it</text><text x="620" y="166" fill="#475569">(made visible and temporary, §6.2 A2)</text>
+
+<rect x="40" y="184" width="180" height="40" rx="6" fill="#fef2f2" stroke="#dc2626"/>
+<text x="56" y="201" font-weight="600" fill="#0f172a">Operator</text><text x="56" y="216" fill="#475569">untrusted</text>
+<text x="250" y="208" fill="#0f172a">nothing; it can only publish and anchor</text>
+<text x="620" y="201" fill="#475569">honest enforcement, no logging,</text><text x="620" y="216" fill="#475569">honest figures (checked by others)</text>
+
+<rect x="40" y="234" width="180" height="40" rx="6" fill="#fffbeb" stroke="#d97706"/>
+<text x="56" y="251" font-weight="600" fill="#0f172a">Independent reviewer</text><text x="56" y="266" fill="#475569">institutional</text>
+<text x="250" y="251" fill="#0f172a">runs its tests honestly, from inside the</text><text x="250" y="266" fill="#0f172a">school network, indistinguishable from users</text>
+<text x="620" y="258" fill="#475569">that the ledger can verify its claims</text>
+
+<rect x="40" y="284" width="180" height="40" rx="6" fill="#fffbeb" stroke="#d97706"/>
+<text x="56" y="301" font-weight="600" fill="#0f172a">Auditor</text><text x="56" y="316" fill="#475569">institutional</text>
+<text x="250" y="301" fill="#0f172a">assesses the service against named</text><text x="250" y="316" fill="#0f172a">frameworks and the compiled restricted list</text>
+<text x="620" y="308" fill="#475569">continuous monitoring</text>
+
+<rect x="40" y="334" width="180" height="36" rx="6" fill="#f8fafc" stroke="#64748b"/>
+<text x="56" y="356" font-weight="600" fill="#0f172a">Schools, public</text>
+<text x="250" y="356" fill="#0f172a">no keys, no tokens, no trust required</text>
+<text x="620" y="356" fill="#475569">technical skill to verify (tools provided)</text>
+</g>
+<line x1="600" y1="80" x2="600" y2="370" stroke="#e2e8f0" stroke-width="2"/>
+</svg>

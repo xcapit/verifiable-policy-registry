@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" width="960" height="360" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
+<rect width="960" height="360" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">Small-cell suppression at k = 10, and what it does not protect</text>
+<g font-size="12">
+<text x="60" y="64" font-weight="600" fill="#475569">AGGREGATED CELLS (one day, synthetic)</text>
+<rect x="40" y="74" width="360" height="26" fill="#f1f5f9"/>
+<text x="56" y="91" font-weight="600" fill="#0f172a">school</text><text x="176" y="91" font-weight="600" fill="#0f172a">category</text><text x="370" y="91" font-weight="600" fill="#0f172a" text-anchor="end">count</text>
+<text x="56" y="120" fill="#0f172a">giga-0001</text><text x="176" y="120" fill="#0f172a">malware</text><text x="370" y="120" fill="#0f172a" text-anchor="end">25</text>
+<text x="56" y="146" fill="#0f172a">giga-0001</text><text x="176" y="146" fill="#0f172a">adult</text><text x="370" y="146" fill="#0f172a" text-anchor="end">40</text>
+<rect x="40" y="156" width="360" height="24" fill="#fef2f2"/>
+<text x="56" y="172" fill="#dc2626">giga-0002</text><text x="176" y="172" fill="#dc2626">adult</text><text x="370" y="172" fill="#dc2626" text-anchor="end">2</text>
+<text x="56" y="198" fill="#0f172a">giga-0003</text><text x="176" y="198" fill="#0f172a">malware</text><text x="370" y="198" fill="#0f172a" text-anchor="end">25</text>
+<rect x="40" y="208" width="360" height="24" fill="#fef2f2"/>
+<text x="56" y="224" fill="#dc2626">giga-0003</text><text x="176" y="224" fill="#dc2626">phishing</text><text x="370" y="224" fill="#dc2626" text-anchor="end">7</text>
+<line x1="40" y1="236" x2="400" y2="236" stroke="#cbd5e1"/>
+
+<path d="M410,156 L470,156" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="440" y="146" font-size="11" fill="#475569" text-anchor="middle">count &lt; k</text>
+
+<text x="500" y="64" font-weight="600" fill="#475569">PUBLISHED RELEASE</text>
+<rect x="480" y="74" width="300" height="26" fill="#f1f5f9"/>
+<text x="496" y="91" font-weight="600" fill="#0f172a">school</text><text x="606" y="91" font-weight="600" fill="#0f172a">category</text><text x="760" y="91" font-weight="600" fill="#0f172a" text-anchor="end">count</text>
+<text x="496" y="120" fill="#0f172a">giga-0001</text><text x="606" y="120" fill="#0f172a">adult</text><text x="760" y="120" fill="#0f172a" text-anchor="end">40</text>
+<text x="496" y="146" fill="#0f172a">giga-0001</text><text x="606" y="146" fill="#0f172a">malware</text><text x="760" y="146" fill="#0f172a" text-anchor="end">25</text>
+<text x="496" y="172" fill="#0f172a">giga-0003</text><text x="606" y="172" fill="#0f172a">malware</text><text x="760" y="172" fill="#0f172a" text-anchor="end">25</text>
+<line x1="480" y1="184" x2="780" y2="184" stroke="#cbd5e1"/>
+<text x="496" y="206" fill="#475569">sorted · root over these rows only</text>
+<text x="496" y="224" fill="#dc2626">number of suppressed cells: not published</text>
+<rect x="800" y="74" width="130" height="90" rx="6" fill="#ecfdf5" stroke="#059669"/>
+<text x="865" y="100" font-weight="600" fill="#0f172a" text-anchor="middle">Merkle root</text>
+<text x="865" y="120" fill="#475569" text-anchor="middle">anchored for</text><text x="865" y="136" fill="#475569" text-anchor="middle">(scope, day)</text>
+<path d="M780,119 L796,119" stroke="#334155" stroke-width="1.2" marker-end="url(#a)"/>
+
+<rect x="40" y="256" width="880" height="88" rx="8" fill="#fffbeb" stroke="#d97706"/>
+<text x="56" y="278" font-weight="600" fill="#92400e">Limits stated in §5.2</text>
+<text x="56" y="298" fill="#0f172a">• Groups, not individuals: 40 adult-content blocks at a one-class school still describe that class.</text>
+<text x="56" y="316" fill="#0f172a">• Events, not children: k counts blocked queries, so one device that retries can fill a cell. This is not k-anonymity.</text>
+<text x="56" y="334" fill="#0f172a">• No composition: each cell is released once; overlapping aggregates would require differential privacy.</text>
+</g>
+</svg>

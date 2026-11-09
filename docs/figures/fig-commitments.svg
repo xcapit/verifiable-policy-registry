@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
+<rect width="960" height="400" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">From a policy to its commitments: four hashes, each with one job</text>
+<g font-size="12">
+<text x="110" y="64" font-weight="600" fill="#475569" text-anchor="middle">INPUT</text>
+<text x="380" y="64" font-weight="600" fill="#475569" text-anchor="middle">TRANSFORMATION</text>
+<text x="640" y="64" font-weight="600" fill="#475569" text-anchor="middle">COMMITMENT</text>
+<text x="840" y="64" font-weight="600" fill="#475569" text-anchor="middle">WHERE IT IS CHECKED</text>
+
+<!-- row 1 -->
+<rect x="40" y="78" width="140" height="56" rx="6" fill="#f8fafc" stroke="#64748b"/>
+<text x="110" y="101" font-weight="600" fill="#0f172a" text-anchor="middle">Policy document</text><text x="110" y="118" fill="#475569" text-anchor="middle">public YAML</text>
+<rect x="230" y="78" width="300" height="56" rx="6" fill="#fff" stroke="#94a3b8"/>
+<text x="380" y="101" fill="#0f172a" text-anchor="middle">validate reasons · normalise domains</text><text x="380" y="118" fill="#0f172a" text-anchor="middle">canonical JSON: sorted keys, UTF-8, no floats</text>
+<rect x="580" y="78" width="120" height="56" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+<text x="640" y="101" font-weight="600" fill="#0f172a" text-anchor="middle">h</text><text x="640" y="118" fill="#475569" text-anchor="middle">contentHash</text>
+<text x="740" y="101" fill="#0f172a">on-chain, per version;</text><text x="740" y="118" fill="#0f172a">anyone re-hashes the document</text>
+
+<!-- row 2 -->
+<rect x="40" y="152" width="140" height="56" rx="6" fill="#f8fafc" stroke="#64748b"/>
+<text x="110" y="175" font-weight="600" fill="#0f172a" text-anchor="middle">Restricted list</text><text x="110" y="192" fill="#475569" text-anchor="middle">never published</text>
+<rect x="230" y="152" width="300" height="56" rx="6" fill="#fff" stroke="#94a3b8"/>
+<text x="380" y="175" fill="#0f172a" text-anchor="middle">normalise · sort · join with newlines</text><text x="380" y="192" fill="#0f172a" text-anchor="middle">entries merged unlabelled into the zone</text>
+<rect x="580" y="152" width="120" height="56" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+<text x="640" y="175" font-weight="600" fill="#0f172a" text-anchor="middle">ρ</text><text x="640" y="192" fill="#475569" text-anchor="middle">restrictedListHash</text>
+<text x="740" y="175" fill="#0f172a">public sees declared / changed;</text><text x="740" y="192" fill="#0f172a">contents checked by the auditor</text>
+
+<!-- row 3 -->
+<rect x="40" y="226" width="140" height="56" rx="6" fill="#f8fafc" stroke="#64748b"/>
+<text x="110" y="249" font-weight="600" fill="#0f172a" text-anchor="middle">Category feeds</text><text x="110" y="266" fill="#475569" text-anchor="middle">third-party lists</text>
+<rect x="230" y="226" width="300" height="56" rx="6" fill="#fff" stroke="#94a3b8"/>
+<text x="380" y="249" fill="#0f172a" text-anchor="middle">sorted unique normalised domains</text><text x="380" y="266" fill="#0f172a" text-anchor="middle">one hash per category, inside the document</text>
+<rect x="580" y="226" width="120" height="56" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+<text x="640" y="249" font-weight="600" fill="#0f172a" text-anchor="middle">feed_hashes</text><text x="640" y="266" fill="#475569" text-anchor="middle">bound by h</text>
+<text x="740" y="249" fill="#0f172a">compiler refuses a feed</text><text x="740" y="266" fill="#0f172a">whose contents differ</text>
+
+<!-- row 4 -->
+<rect x="40" y="300" width="140" height="56" rx="6" fill="#f8fafc" stroke="#64748b"/>
+<text x="110" y="323" font-weight="600" fill="#0f172a" text-anchor="middle">Compiled zone</text><text x="110" y="340" fill="#475569" text-anchor="middle">RPZ, fail-closed</text>
+<rect x="230" y="300" width="300" height="56" rx="6" fill="#fff" stroke="#94a3b8"/>
+<text x="380" y="323" fill="#0f172a" text-anchor="middle">deterministic serial = version</text><text x="380" y="340" fill="#0f172a" text-anchor="middle">same policy and feeds give the same zone</text>
+<rect x="580" y="300" width="120" height="56" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+<text x="640" y="323" font-weight="600" fill="#0f172a" text-anchor="middle">zoneHash</text><text x="640" y="340" fill="#475569" text-anchor="middle">resolverConfigHash</text>
+<rect x="728" y="300" width="196" height="56" rx="6" fill="none" stroke="#94a3b8" stroke-dasharray="5 4"/>
+<text x="740" y="323" fill="#0f172a">in the Deployment attestation</text><text x="740" y="340" fill="#64748b">schema registration planned</text>
+</g>
+<g stroke="#334155" stroke-width="1.2" fill="none">
+<path d="M180,106 L226,106" marker-end="url(#a)"/><path d="M530,106 L576,106" marker-end="url(#a)"/>
+<path d="M180,180 L226,180" marker-end="url(#a)"/><path d="M530,180 L576,180" marker-end="url(#a)"/>
+<path d="M180,254 L226,254" marker-end="url(#a)"/><path d="M530,254 L576,254" marker-end="url(#a)"/>
+<path d="M180,328 L226,328" marker-end="url(#a)"/><path d="M530,328 L576,328" marker-end="url(#a)"/>
+</g>
+<text x="40" y="384" font-size="11" fill="#475569">All hashes are keccak-256. Solid green: implemented and tested. Dashed: defined, not yet registered on a public network.</text>
+</svg>

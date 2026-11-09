@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
+<rect width="960" height="300" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">How a school would join (proposed): five steps, nothing installed on devices</text>
+<g font-size="12">
+<rect x="30" y="64" width="164" height="140" rx="8" fill="#f8fafc" stroke="#64748b"/>
+<circle cx="52" cy="86" r="12" fill="#334155"/><text x="52" y="90" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">1</text>
+<text x="72" y="90" font-weight="600" fill="#0f172a">Select</text>
+<text x="44" y="118" fill="#475569">ministry and Giga</text><text x="44" y="134" fill="#475569">pick the school from</text><text x="44" y="150" fill="#475569">the Giga map</text>
+
+<rect x="214" y="64" width="164" height="140" rx="8" fill="#f8fafc" stroke="#64748b"/>
+<circle cx="236" cy="86" r="12" fill="#334155"/><text x="236" y="90" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">2</text>
+<text x="256" y="90" font-weight="600" fill="#0f172a">Point DNS</text>
+<text x="228" y="118" fill="#475569">router or provider uses</text><text x="228" y="134" fill="#475569">the resolver; outbound</text><text x="228" y="150" fill="#475569">DNS to others blocked</text>
+
+<rect x="398" y="64" width="164" height="140" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+<circle cx="420" cy="86" r="12" fill="#2563eb"/><text x="420" y="90" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">3</text>
+<text x="440" y="90" font-weight="600" fill="#0f172a">Deploy</text>
+<text x="412" y="118" fill="#475569">operator attests</text><text x="412" y="134" fill="#475569">school x uses version i</text><text x="412" y="150" fill="#0f172a">VPR.Deployment.v1</text>
+
+<rect x="582" y="64" width="164" height="140" rx="8" fill="#fffbeb" stroke="#d97706"/>
+<circle cx="604" cy="86" r="12" fill="#d97706"/><text x="604" y="90" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">4</text>
+<text x="624" y="90" font-weight="600" fill="#0f172a">Test</text>
+<text x="596" y="118" fill="#475569">reviewer tests from</text><text x="596" y="134" fill="#475569">the school network</text><text x="596" y="150" fill="#0f172a">VPR.IndependentTest.v1</text>
+
+<rect x="766" y="64" width="164" height="140" rx="8" fill="#ecfdf5" stroke="#059669"/>
+<circle cx="788" cy="86" r="12" fill="#059669"/><text x="788" y="90" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">5</text>
+<text x="808" y="90" font-weight="600" fill="#0f172a">Operate</text>
+<text x="780" y="118" fill="#475569">daily aggregates and</text><text x="780" y="134" fill="#475569">roots; re-test before</text><text x="780" y="150" fill="#475569">the test expires</text>
+</g>
+<g stroke="#334155" stroke-width="1.5" fill="none">
+<path d="M194,134 L210,134" marker-end="url(#a)"/><path d="M378,134 L394,134" marker-end="url(#a)"/>
+<path d="M562,134 L578,134" marker-end="url(#a)"/><path d="M746,134 L762,134" marker-end="url(#a)"/>
+<path d="M848,204 L848,236 L664,236 L664,208" stroke-dasharray="5 4" marker-end="url(#a)"/>
+</g>
+<text x="756" y="252" font-size="11" fill="#475569" text-anchor="middle">renew or revoke the test attestation</text>
+<text x="40" y="280" font-size="12" fill="#0f172a">The school is reported as protected only after step 4, and only while that attestation is valid for the version in force.</text>
+</svg>

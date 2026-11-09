@@ -37,6 +37,9 @@ jobs:
         run: |
           pip install "jsonschema>=4.18"
           python -c "import json, yaml, jsonschema; jsonschema.Draft202012Validator(json.load(open('schemas/policy.schema.json'))).validate(yaml.safe_load(open('policies/example-primary.yaml'))); print('policy schema ok')"
+      - name: Validate the example deployment manifest
+        working-directory: .
+        run: python -c "import json, jsonschema; jsonschema.Draft202012Validator(json.load(open('schemas/deployment-manifest.schema.json'))).validate(json.load(open('deployments/example.local.json.example'))); print('manifest schema ok')"
       - name: CLI smoke test
         working-directory: .
         run: |
