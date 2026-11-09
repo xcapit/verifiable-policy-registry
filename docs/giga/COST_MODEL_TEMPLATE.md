@@ -1,6 +1,6 @@
 # Cost model template
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.3.0*
+*CC BY 4.0 · Proposal package for a school pilot · v0.4.0*
 
 A template for computing the cost of running the system per school. **No figure here is an estimate.** Every input is either a formula over measured quantities or marked "Unknown — input required (owner, milestone)". The cost drivers are the same as in [../SUSTAINABILITY.md](../SUSTAINABILITY.md); this page turns them into a worksheet.
 

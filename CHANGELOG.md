@@ -4,7 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
-Pre-audit hardening (closes VPR-060, VPR-065 to VPR-069; the resolver part of VPR-012; the format of VPR-049). **Breaking changes** to the contracts and tools.
+## [0.4.0] - 2026-11-09
+
+Pre-audit hardening of the contracts, with a further internal review, and white paper v0.6. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment. Pre-audit hardening (closes VPR-060, VPR-065 to VPR-069; the resolver part of VPR-012; the format of VPR-049). **Breaking changes** to the contracts and tools.
 
 ### Added
 - `IssuerRoleResolver`: EAS schema resolver that accepts an attestation only if the attester holds the schema's role in the scope at issuance time.
@@ -111,7 +113,8 @@ First public release: a proof of concept and the documentation needed for extern
 - Code of conduct, security policy, project governance, maintainers, support, contribution guide with DCO, issue and pull request templates.
 - Licence texts (AGPL-3.0-only, CC0-1.0, CC-BY-4.0), NOTICE, CITATION.cff and publiccode.yml.
 
-[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/xcapit/verifiable-policy-registry/releases/tag/v0.1.0
