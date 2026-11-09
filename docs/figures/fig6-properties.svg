@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" width="960" height="380" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
 <rect width="960" height="380" fill="#ffffff"/>
-<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a" text-anchor="start">Figure 6. What each property rests on</text>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a" text-anchor="start">What each property rests on</text>
 <text x="390" y="66" font-size="12" font-weight="600" fill="#1d4ed8" text-anchor="middle">Cryptography / ledger</text>
 <text x="620" y="66" font-size="12" font-weight="600" fill="#92400e" text-anchor="middle">Institutional party</text>
 <text x="830" y="66" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">Mechanism</text>
@@ -43,5 +43,5 @@
 <rect x="300" y="301" width="180" height="18" rx="9" fill="#2563eb"/>
 <rect x="530" y="301" width="180" height="18" rx="9" fill="#d97706"/>
 <text x="830" y="315" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">root binding · inputs from operator</text>
-<text x="480" y="358" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">P1–P4 are enforced by the contracts. P6 and part of P7 can only be recorded on-chain; §11 proposes ways to move them to the left column.</text>
+<text x="480" y="358" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">P1–P4 rest on cryptographic and ledger assumptions. For P6, and for the inputs of P7, the ledger records claims it cannot check (§11).</text>
 </svg>
