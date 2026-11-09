@@ -4,9 +4,9 @@
 
 **Accountable, privacy-preserving content filtering for school connectivity.**
 
-Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is usually delivered by network-level filtering. Filtering is also the most widely deployed instrument of censorship. A filter is legitimate only when people outside the operator can see what it blocks, who decided it and for how long, and can be sure that it does not record what children do. Today's filters offer none of these guarantees.
+Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is usually delivered by network-level filtering. The same mechanism is among the most common instruments of internet censorship. A filter is legitimate only when people outside the operator can see what it blocks, who decided it and for how long, and can be sure that it does not record what children do. Conventional filters provide none of these guarantees.
 
-The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full and authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as k-anonymous aggregates bound to a daily Merkle root that anyone can recompute. No personal data is ever written on-chain.
+The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. No personal data is ever written on-chain.
 
 The first deployment is a proposed pilot with **UNICEF Giga** in 20 to 50 connected schools in Latin America. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
 
@@ -26,7 +26,7 @@ The system is built around seven properties, stated formally in the [white paper
 | Bounded duration | Every version expires (pilot: at most 90 days) unless it is signed again | Contract |
 | Contestability | Anyone can appeal; acceptance or rejection is recorded on-chain | Contract + governor |
 | Attested enforcement | A school counts as protected only with a valid attestation from the independent reviewer | Reviewer |
-| Aggregate integrity | Published impact figures cannot be changed after anchoring, and contain only k-anonymous counts | Cryptography (after aggregation) + operator (inputs) |
+| Aggregate integrity | Published impact figures cannot be changed after anchoring, and contain only counts at or above a suppression threshold | Cryptography (after aggregation) + operator (inputs) |
 
 What the ledger cannot prove is that a resolver behaves as declared at runtime. That gap is covered today by independent black-box testing and audit. The [research agenda](docs/WHITEPAPER.md#11-research-agenda-narrowing-the-enforcementaccountability-gap) explores trusted execution and zero-knowledge proofs of aggregation to narrow it.
 
@@ -45,7 +45,7 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 | Path | Contents |
 | --- | --- |
 | [`contracts/`](contracts) | `VerifiablePolicyRegistry` and `MetricsAnchor` (Solidity 0.8.24) with Hardhat tests |
-| [`tools/`](tools) | Python package and CLI `vpr`: policy validation and canonical hashing, RPZ compilation, k-anonymous aggregation, Merkle proofs |
+| [`tools/`](tools) | Python package and CLI `vpr`: policy validation and canonical hashing, RPZ compilation, aggregation with small-cell suppression, Merkle proofs |
 | [`schemas/`](schemas) | EAS attestation schemas and JSON Schemas for policy documents and datasets (CC0) |
 | [`policies/`](policies) | Example public policy document |
 | [`deploy/`](deploy) | Reference resolver configuration (Unbound with RPZ) |
