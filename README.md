@@ -26,9 +26,9 @@ The system is built around seven properties, stated formally in the [white paper
 | Bounded duration | Every version expires (pilot: at most 90 days) unless it is signed again | Contract |
 | Contestability | Anyone can appeal; acceptance or rejection is recorded on-chain | Contract + governor |
 | Attested enforcement | A school counts as protected only with a valid attestation from the independent reviewer | Reviewer |
-| Aggregate integrity | Published impact figures cannot be changed after anchoring, and contain only counts at or above a suppression threshold | Cryptography (after aggregation) + operator (inputs) |
+| Aggregate integrity | Published impact figures cannot be changed after anchoring, contain only counts at or above a suppression threshold, and come with a zero-knowledge proof that they aggregate the committed event log under the policy in force | Cryptography + ZK proof; completeness of the log rests on the reviewer |
 
-What the ledger cannot prove is that a resolver behaves as declared at runtime. That gap is covered today by independent black-box testing and audit. The [research agenda](docs/WHITEPAPER.md#11-research-agenda-narrowing-the-enforcementaccountability-gap) explores trusted execution and zero-knowledge proofs of aggregation to narrow it.
+What the ledger cannot prove is that a resolver behaves as declared at runtime. It is covered by independent black-box testing and audit. In addition, the pilot implements [zero-knowledge proofs of aggregation](docs/WHITEPAPER.md#11-closing-the-enforcementaccountability-gap): every daily release comes with a proof, verified on-chain, that it is the correct k-suppressed aggregation of a committed event log under the policy in force.
 
 ## Documentation
 

@@ -48,5 +48,5 @@
 <rect x="250" y="326" width="14" height="12" fill="#eff6ff" stroke="#2563eb"/>
 <text x="270" y="337" font-size="12" font-weight="400" fill="#0f172a" text-anchor="start">holds under standard cryptographic assumptions</text>
 <rect x="590" y="326" width="14" height="12" fill="#fff" stroke="#334155" stroke-dasharray="3 2"/>
-<text x="610" y="337" font-size="12" font-weight="400" fill="#0f172a" text-anchor="start">research agenda (§11) and pre-audit hardening</text>
+<text x="610" y="337" font-size="12" font-weight="400" fill="#0f172a" text-anchor="start">delivered in the pilot or planned (§11)</text>
 </svg>

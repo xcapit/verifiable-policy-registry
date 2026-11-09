@@ -17,6 +17,8 @@ The exact formats exchanged between these components (documents, events, dataset
 | Metrics exporter | Next to resolver | Emits `(school_id, day, category)` per block | Pending (BACKLOG) |
 | Aggregator (`vpr.metrics`) | Operator / anyone | k-suppression, dataset, Merkle root and proofs | Implemented + tests |
 | Block page | Web | Explains the block; links to appeal | Pending (BACKLOG) |
+| ZK aggregation prover | Next to the aggregator | Proves that each daily release is the k-suppressed aggregation of the committed event log under the policy in force | Planned (ROADMAP M4) |
+| ZK verifier | Ethereum L2 | Verifies the daily proof before a root is accepted | Planned (ROADMAP M4) |
 | Dashboard | Web | Public view of policies, attestations and metrics | Pending (BACKLOG) |
 
 ## Data flow

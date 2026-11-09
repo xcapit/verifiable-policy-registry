@@ -5,6 +5,8 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- Roadmap compressed to four months: a detailed first month of application and initial design, then three months of work, including zero-knowledge proofs of aggregation implemented and audited within the pilot (M4). The pilot runs on OP Sepolia until the audit closes.
+- White paper §11 now specifies the zero-knowledge statement and its implementation; trusted execution and verifiable differential privacy remain further work.
 - White paper rewritten as v0.3: formal system model with properties P1–P7, adversary model, related work, analysis of k-suppression limits, research agenda (TEE, ZK aggregation, verifiable DP), seven figures and references.
 - README restructured around guarantees and their limits, with evidence for prior work.
 - Independent test reports are committed by hash and shared with the governor; the on-chain summary stays public.
