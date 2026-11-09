@@ -2,6 +2,25 @@
 
 Issue-ready tasks after the proof of concept. Each has acceptance criteria so it can be implemented spec-first. IDs are stable; reference them in commits (`VPR-012: ...`).
 
+## v0.3 · Readiness for external review
+
+Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANALYSIS.md). Items marked **Done in v0.3** are implemented or written in the v0.3 branch; the others carry their milestone.
+
+| ID | Task | Depends on | Status |
+| --- | --- | --- | --- |
+| VPR-050 | Baseline, gap analysis and claims-and-evidence ledger | — | **Done in v0.3** |
+| VPR-051 | Cryptographic evidence pack: encodings, designed ZK relation, risk register, proving-system decision record | VPR-050 | **Done in v0.3** (decision itself due in M1, VPR-033) |
+| VPR-003 | Threat model | VPR-050 | **Done in v0.3** for existing and designed components; review at Gate A |
+| VPR-052 | Privacy and re-identification analysis, data inventory, privacy regression tests | VPR-050 | **Done in v0.3**; release-policy parameters need pilot data (DPIA, M1) |
+| VPR-053 | Generic verification toolkit, second use case, CLI JSON and exit codes (ADR-0009) | — | **Done in v0.3** |
+| VPR-054 | Demonstrator with zone evaluation, expiry, appeal rejection, negative cases and evidence manifest | VPR-053 | **Done in v0.3** |
+| VPR-055 | Pinned resolver container in the demonstrator (real DNS queries, no query logging asserted) | VPR-019 | Planned (M2) |
+| VPR-056 | Giga pilot-readiness package; ESP package; DPG evidence matrix | VPR-050 | **Done in v0.3** (proposal documents; inputs marked) |
+| VPR-057 | Reviewer guide mapped to the 14 review questions | VPR-050–056 | **Done in v0.3** |
+| VPR-058 | Registry fields `catRoot` and `unitRoot` (ADR-0010) and ZK verifier anchoring | VPR-033 | Designed; Planned (M4) |
+| VPR-059 | Declare the licence of published datasets (ODC-PDDL or CC0) | Maintainer decision | Blocked: maintainer decision |
+| VPR-060 | Check of `valid_days` and document version against the on-chain call in tools and dashboard | — | Planned (M2, with VPR-015) |
+
 ## M1 · Design and sign-off (weeks 1–4)
 
 See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--weeks-14--15). VPR-033 (ZK specification) is also delivered in this milestone.

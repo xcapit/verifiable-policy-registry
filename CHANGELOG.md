@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+v0.3 preparation (release candidate, not released). Evidence-driven readiness for external review.
+
+### Added
+- Baseline and gap analysis, claims-and-evidence ledger, reviewer guide mapped to the 14 review questions.
+- Cryptographic evidence pack: normative encodings, test vectors, designed ZK relation with every bound input, hiding event-log commitment, canary limits, risk register, proving-system decision record (ZK remains Designed).
+- Threat model (37 threats with owners and verification methods) and privacy and re-identification analysis with data inventory and release-policy framework.
+- Generic verification toolkit (`vpr.toolkit`, API v1), `unit_id` releases, second synthetic use case (public-service interruptions), CLI `evaluate`, `prove-row`, `verify-row`, `--json` and exit codes 0/1/2 (ADR-0009).
+- Demonstrator: zone evaluation of allowed and blocked domains, two use cases on one verifier, read-back of roots, rejection of tampered rows, wrong roots and modified documents, appeal rejection and resubmission, expiry, explicit ZK boundary, machine-readable evidence manifest; CI uploads it with a benchmark.
+- Benchmarks with environments; Giga pilot-readiness package; ESP evidence package; DPG nine-indicator evidence matrix (self-assessment, checked against the DPGA's published versions).
+- ADR-0010 (category and unit sets on-chain for the ZK relation, proposed); policy-governance safeguards (scope charter, never-blocked categories, emergency changes, external recourse, monitoring of signer changes).
+
+### Fixed
+- A release-validation error message could echo suppressed cells; it no longer contains values.
+- Malformed YAML policies crashed the CLI with a traceback; they now fail with exit code 2.
+- The tools package could not be installed in editable mode once a second top-level directory existed.
+
+### Changed
+- README status box separating implemented, demonstrated, designed, audit and deployment status; tagline no longer says "privacy-preserving" without qualification. White paper v0.5 defers to the evidence documents.
+
 ## [0.2.0] - 2026-11-09
 
 Hardened contracts and data formats, an end-to-end demo, the team, and a two-phase pilot plan, following external review. Contracts are still not audited. This release breaks compatibility with 0.1.0: the `MetricsAnchor` constructor and publisher model, `verifyRow` in place of `verifyLeaf`, dataset format 2 and appeal format 2.

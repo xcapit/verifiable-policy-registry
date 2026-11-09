@@ -3,9 +3,9 @@
 **Fernando Boiero** · Xcapit (CryptoLab S.A.S.), Córdoba, Argentina
 Correspondence: dpg@xcapit.com
 
-*White paper · Version 0.4 (draft for review) · November 2026 · Licensed under CC BY 4.0*
+*White paper · Version 0.5 (draft for review) · November 2026 · Licensed under CC BY 4.0*
 
-> **Status.** This document describes a design and a proof-of-concept implementation. The smart contracts have not been audited and are not deployed on any production network. Claims about security and privacy are stated together with the assumptions under which they hold.
+> **Status.** This document describes a design and a proof-of-concept implementation. The exact status of every claim (implemented, demonstrated, designed or planned) is maintained in `docs/CLAIMS_AND_EVIDENCE.md`, and the normative encodings and the designed zero-knowledge relation are in `docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md`; where this paper and those documents differ, those documents prevail. The smart contracts have not been audited and are not deployed on any production network. Claims about security and privacy are stated together with the assumptions under which they hold.
 
 ---
 

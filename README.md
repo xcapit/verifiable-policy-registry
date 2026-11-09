@@ -1,16 +1,24 @@
 # Verifiable Policy Registry
 
-[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.3-informational.svg)](docs/WHITEPAPER.md)
+[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.5-informational.svg)](docs/WHITEPAPER.md)
 
-**Accountable, privacy-preserving content filtering for school connectivity.**
+**Accountable content filtering for school connectivity, designed to minimise and never publish data about children.**
 
 Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is usually delivered by network-level filtering. The same mechanism is among the most common instruments of internet censorship. A filter is legitimate only when people outside the operator can see what it blocks, who decided it and for how long, and can be sure that it does not record what children do. Conventional filters provide none of these guarantees.
 
 The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. No personal data, and no caller-supplied free text, is written on-chain: appeals are recorded as hashes of documents validated off-chain.
 
-The first deployment is a proposed pilot with **UNICEF Giga** in Latin America: a controlled alpha in two to five schools, then, if its gates are met, a cohort of 20 to 50 ([roadmap](docs/ROADMAP.md)). The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
+The project team proposes a first deployment in schools connected by **UNICEF Giga** in Latin America: a controlled alpha in two to five schools, then, if its gates are met, a cohort of 20 to 50 ([roadmap](docs/ROADMAP.md), [pilot proposal](docs/giga/PILOT_READINESS.md)). No pilot, funding or endorsement has been agreed with Giga, UNICEF, the Ethereum Foundation or any other party. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
 
-> **Status: research prototype.** The contracts and off-chain tools are implemented and tested, but they are not audited and not deployed on any production network. See the [roadmap](docs/ROADMAP.md) and the [security policy](SECURITY.md).
+> **Status: v0.3 preparation (research prototype).** Every claim is tracked in the [claims and evidence ledger](docs/CLAIMS_AND_EVIDENCE.md).
+>
+> | | |
+> | --- | --- |
+> | **Implemented** (code + passing tests) | Policy registry with expiry, appeals by hash and on-chain issuer roles; metrics anchor with on-chain row verification; policy hashing, fail-closed zone compilation and zone evaluation; aggregation with small-cell suppression; generic verification toolkit and CLI |
+> | **Demonstrated** (CI, synthetic data, local chain) | Policy → zone → releases for two use cases → anchored roots → accepted and rejected proofs → appeal → expiry, with a machine-readable evidence manifest ([demo](examples/e2e/run.sh), [benchmarks](docs/benchmarks/BENCHMARKS.md)) |
+> | **Designed, not implemented** | Zero-knowledge proof of aggregation, hiding event-log commitment, canary checks ([specification](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md)); resolver container; deployment manifest |
+> | **Audit and review** | None. Not audited, not formally verified, no independent review yet ([reviewer guide](docs/review/V03_REVIEWER_GUIDE.md)) |
+> | **Deployment and pilot** | Local test chains only. No public deployment, no school, no partner commitment |
 
 <p align="center"><img src="docs/figures/fig1-architecture.svg" alt="Architecture: enforcement plane in-country, accountability plane on Ethereum L2" width="100%"></p>
 
@@ -34,11 +42,13 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 
 | If you are… | Start with |
 | --- | --- |
-| evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG readiness](docs/DPG.md) · [Sustainability and cost](docs/SUSTAINABILITY.md) |
+| evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Claims and evidence](docs/CLAIMS_AND_EVIDENCE.md) · [Reviewer guide](docs/review/V03_REVIEWER_GUIDE.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG evidence matrix](docs/DPG_EVIDENCE_MATRIX.md) |
+| assessing a pilot (Giga, ministries, providers) | [Pilot readiness](docs/giga/PILOT_READINESS.md) · [Operating model](docs/giga/OPERATING_MODEL.md) · [Cost model](docs/giga/COST_MODEL_TEMPLATE.md) · [Sustainability](docs/SUSTAINABILITY.md) |
+| assessing ecosystem value (Ethereum builders, ESP) | [Public-goods case](docs/esp/PUBLIC_GOODS_CASE.md) · [Toolkit guide](docs/toolkit/INTEGRATION_GUIDE.md) · [Second use case](examples/public-service/README.md) |
 | building a component | [Architecture](docs/ARCHITECTURE.md) · [Interfaces](docs/INTERFACES.md) · [Decision records](docs/adr) · [Backlog](docs/BACKLOG.md) |
 | operating or governing a deployment | [Policy governance](docs/GOVERNANCE.md) · [Privacy statement (RFC 8932)](docs/PRIVACY_STATEMENT.md) · [Roadmap](docs/ROADMAP.md) |
 | contributing | [Contributing](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Project governance](GOVERNANCE.md) |
-| reviewing security | [Security policy](SECURITY.md) · [Threat model](docs/WHITEPAPER.md#6-threat-model-and-security-analysis) |
+| reviewing security and privacy | [Security policy](SECURITY.md) · [Threat model](docs/security/THREAT_MODEL.md) · [Cryptographic evidence](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md) · [Privacy analysis](docs/privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md) |
 
 ## Repository layout
 
@@ -54,15 +64,21 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 
 ## Try it in five minutes
 
-One command runs the whole accountability path on a local Hardhat network: hash the example policy, publish it as version 1 under a scope, compile the RPZ zone, aggregate one day of synthetic events with *k* = 10, anchor the daily root, and verify one published row (accepted) and one tampered row (rejected).
+One command runs the implemented path on a local Hardhat network, using synthetic data only:
+- hash the example policy, compile its zone and evaluate allowed and blocked domains against it (a zone evaluation, not DNS resolution);
+- aggregate a school release and a public-service release with *k* = 10, anchor both roots and read them back from chain state;
+- verify published rows, and check that a tampered row, another day, a wrong root and a modified policy document are rejected;
+- reject an appeal with reasons and resubmit it, then show the policy expiring.
+
+The ZK stage stops at an explicit "not implemented" boundary. The run writes `evidence-manifest.json`, which records the commit, the tool versions, the chain id, hashes, roots, stage results and gas.
 
 ```bash
 cd contracts && npm ci && cd ..
 pip install -e tools
-./examples/e2e/run.sh
+E2E_OUT=out ./examples/e2e/run.sh       # evidence in out/evidence-manifest.json
 ```
 
-The same script runs in CI on every push. Its source is in [`examples/e2e/`](examples/e2e) and [`contracts/scripts/e2e.js`](contracts/scripts/e2e.js).
+The same script runs in CI on every push, and the evidence is uploaded as the artifact `demo-evidence`. Its source is in [`examples/e2e/`](examples/e2e) and [`contracts/scripts/e2e.js`](contracts/scripts/e2e.js).
 
 ## Quick start
 

@@ -16,3 +16,5 @@ Template: [0000-template.md](0000-template.md).
 | [0006](0006-scope-school-networks-only.md) | Scope limited to bounded networks such as schools | Accepted |
 | [0007](0007-k-anonymous-metrics-merkle.md) | Threshold-suppressed metrics (k = 10) with a daily Merkle root | Accepted |
 | [0008](0008-restricted-lists-hash-only.md) | Restricted lists by hash commitment only | Accepted |
+| [0009](0009-generic-verification-toolkit.md) | A use-case-independent verification toolkit | Accepted |
+| [0010](0010-category-and-unit-sets-on-chain.md) | Category and unit sets committed on-chain for the ZK relation | Proposed |

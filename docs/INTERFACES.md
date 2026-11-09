@@ -122,13 +122,13 @@ Produced by `vpr compile-rpz`. Standard Response Policy Zone usable by Unbound o
 
 Exporter is planned ([VPR-016](BACKLOG.md)); the aggregator is implemented.
 
-CSV with header `school_id,day,category`, one row per blocked query. These three fields are the **only** ones allowed: no IP address, no device identifier, no queried name, no timestamp finer than a day. The exporter derives `school_id` from the source network mapping and drops everything else in memory. Example: [`examples/events.csv`](../examples/events.csv).
+CSV with header `<unit>,day,category` (`<unit>` is `school_id` or `unit_id`), one row per event; `metrics.read_events` rejects any other column. These three fields are the **only** ones allowed: no IP address, no device identifier, no queried name, no timestamp finer than a day. The exporter derives `school_id` from the source network mapping and drops everything else in memory. Example: [`examples/events.csv`](../examples/events.csv).
 
 ## I6 · Public dataset (aggregator → public)
 
 Produced by `vpr aggregate`. Format `vpr-dataset/2`, described by [`schemas/dataset.schema.json`](../schemas/dataset.schema.json).
 
-- A release covers exactly one UTC day. CSV with header `school_id,day,category,count`, rows sorted by `(school_id, day, category, count)`, `\n` line endings, UTF-8. Cells `(school_id, day, category)` are unique.
+- A release covers exactly one UTC day. CSV with header `<unit>,day,category,count`, where `<unit>` is `school_id` (school use case) or `unit_id` (any other use case); the encoding is the same, rows sorted by `(school_id, day, category, count)`, `\n` line endings, UTF-8. Cells `(school_id, day, category)` are unique.
 - Rows with `count < k` are suppressed (default k = 10). The JSON summary reports `format`, `k`, `root` and `rows`. The number of suppressed cells is not published.
 - Leaf: `keccak256(0x00 ‖ day:uint32 ‖ count:uint256 ‖ len(school_id):uint16 ‖ school_id ‖ len(category):uint16 ‖ category)`, big-endian, where `day` is the on-chain day number. Length prefixes make the encoding unambiguous, and the day binds a row to one anchored date.
 - Internal node: `keccak256(0x01 ‖ min(a,b) ‖ max(a,b))`; leaves in row order; an odd node is promoted unchanged. Leaves and nodes are domain-separated as in RFC 9162. An empty release has no root and is not anchored.
@@ -183,13 +183,16 @@ The governor answers each appeal with a reasoned decision. A rejection records t
 
 ## I10 · Command-line interface
 
-Installed with `pip install -e tools/`. Exit code `0` on success, non-zero on validation errors or mismatches.
+Installed with `pip install -e tools/`. Exit codes: `0` success, `1` verification mismatch, `2` invalid input or usage. `--json` prints one JSON object; errors go to stderr and never echo dataset values. The stable Python API is `vpr.toolkit` ([integration guide](toolkit/INTEGRATION_GUIDE.md)).
 
 | Command | Input | Output |
 | --- | --- | --- |
 | `vpr policy-hash <policy>` | Policy document (I1) | `scope`, `scopeId`, `version`, `contentHash` |
 | `vpr compile-rpz <policy> [--feeds-dir DIR] [--restricted FILE] [--block-page HOST] [--out FILE]` | Policy, feeds (`<category>.txt`, one domain per line, `#` comments), optional restricted list | RPZ zone (I4). Fails closed: a category without a feed, or a restricted list whose hash differs from the policy's, is an error |
 | `vpr aggregate <events.csv> [--day YYYY-MM-DD] [--k N] [--out-csv FILE]` | Block events (I5); `--day` is required when they span several days | JSON summary on stdout, dataset CSV (I6) |
+| `vpr evaluate <zone> <domain>… [--json]` | Compiled zone (I4) and domains | Action per domain (`passthru`, `redirect`, `nxdomain`, `allow`) and matching rule; a zone evaluation, not DNS resolution |
+| `vpr prove-row <release.csv> --index N` | Release (I6) | JSON with the row, day number, leaf, proof and root |
+| `vpr verify-row <proof.json> [--root R] [--json]` | Output of `prove-row`; optionally the anchored root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
 | `vpr restricted-hash <list>` | Restricted list, one domain per line | Its commitment (I1); the list itself is never published |
 | `vpr verify-root <dataset.csv> <root>` | Dataset (I6) and expected root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
 
