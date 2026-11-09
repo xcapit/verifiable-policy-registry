@@ -12,6 +12,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUT="${E2E_OUT:-$(mktemp -d)}"
 DAY="${E2E_DAY:-2026-11-01}"
 mkdir -p "$OUT"
+OUT="$(cd "$OUT" && pwd)"   # absolute: the on-chain stage runs from contracts/
 cd "$ROOT"
 
 command -v node >/dev/null || { echo "error: Node.js 20+ is required" >&2; exit 2; }
