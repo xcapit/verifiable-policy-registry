@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+- White paper rewritten as v0.3: formal system model with properties P1–P7, adversary model, related work, analysis of k-suppression limits, research agenda (TEE, ZK aggregation, verifiable DP), seven figures and references.
+- README restructured around guarantees and their limits, with evidence for prior work.
+- Independent test reports are committed by hash and shared with the governor; the on-chain summary stays public.
+
 ### Added
 - Interface specification for every component boundary (`docs/INTERFACES.md`) and JSON schemas for policy documents and datasets.
 - Architecture decision records (`docs/adr/`).

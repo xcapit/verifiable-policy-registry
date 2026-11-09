@@ -28,7 +28,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-015 | Resolver sync daemon: watches `PolicyPublished`, fetches and verifies the document, recompiles RPZ, reloads Unbound | Refuses documents whose hash mismatches; logs only version numbers; integration test with a local chain |
 | VPR-016 | Metrics exporter for Unbound RPZ hits → `(school_id, day, category)` | No IPs or qnames leave the process (unit test asserts emitted fields); school_id derived from source network mapping |
 | VPR-017 | Block page with appeal form that calls `fileAppeal` through a relayer | Appeal text limited to domain + reason; no personal data fields; rate-limited |
-| VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; outputs a report and its hash |
+| VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
 ## M3 · Metrics and audit
@@ -41,12 +41,15 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-023 | UK Safer Internet Centre self-certification checklist | Completed and published in `docs/compliance/` |
 | VPR-024 | Security analysis with MIESC + external audit preparation | Findings triaged; no open high-severity issues |
 | VPR-025 | DPG application package | Every item in the *Still to do* list of `docs/DPG.md` closed; all 9 DPG Standard indicators evidenced with links; application submitted by the authorised representative |
+| VPR-027 | Domain-separate Merkle leaves and internal nodes (RFC 9162-style tags) in Solidity, JS and Python, with a new shared test vector | `verifyLeaf` rejects an internal node presented as a leaf; dataset format version bumped; INTERFACES updated |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
 ## M4 · Research
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
+| VPR-031 | Study verifiable differential privacy for overlapping releases (noise from committed public randomness or proven sampling) | Write-up with privacy budget, utility on synthetic data and verification cost |
+| VPR-032 | Evaluate TEE remote attestation (TDX, SEV-SNP or Nitro) for resolver and exporter | Prototype binding a measured binary and the zone hash to an attestation; threat analysis of the TEE trust assumptions |
 | VPR-030 | ZK prototype: prove the published aggregate equals the sum of committed per-block events under policy vN | Prototype circuit + benchmark + write-up |
 
 ## Hygiene

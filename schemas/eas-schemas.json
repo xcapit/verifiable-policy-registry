@@ -14,7 +14,7 @@
       "issuer_role": "independent_reviewer",
       "revocable": true,
       "schema": "string schoolId,bytes32 scopeId,uint256 policyVersion,bool categoriesBlocked,bool exceptionsReachable,bool dnssecValidated,bool bypassResisted,bytes32 reportHash,uint64 testedAt,uint64 validUntil",
-      "meaning": "The independent reviewer ran black-box tests from the school network: blocked categories are blocked, exceptions are reachable (no over-blocking), DNSSEC validates, and known bypasses (external DoH/DoT, alternative DNS) fail. reportHash commits to the public test report."
+      "meaning": "The independent reviewer ran black-box tests from the school network: blocked categories are blocked, exceptions are reachable (no over-blocking), DNSSEC validates, and known bypasses (external DoH/DoT, alternative DNS) fail. The summary (four booleans) is public; reportHash commits to the full report, which is shared with the governor signers rather than published because it can reveal exploitable weaknesses of a specific school network."
     },
     {
       "name": "VPR.Conformance.v1",

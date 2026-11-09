@@ -1,121 +1,112 @@
 # Verifiable Policy Registry
 
-[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md)
+[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.3-informational.svg)](docs/WHITEPAPER.md)
 
-**Accountable, privacy-preserving content filtering for child-safe school connectivity.**
+**Accountable, privacy-preserving content filtering for school connectivity.**
 
-Public bodies increasingly filter internet access for children. Today nobody outside the operator can check *what* is blocked, *who* decided it, or *whether* children's browsing is being recorded. The Verifiable Policy Registry (VPR) is open-source tooling that makes any content-filtering policy:
+Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is usually delivered by network-level filtering. Filtering is also the most widely deployed instrument of censorship. A filter is legitimate only when people outside the operator can see what it blocks, who decided it and for how long, and can be sure that it does not record what children do. Today's filters offer none of these guarantees.
 
-- **public**: every policy version is published in full, each block and exception with its reason;
-- **multisig-governed**: a change needs, for example, 2 of 3 signatures (UNICEF Giga, the Ministry of Education and an independent reviewer);
-- **time-limited**: every version expires unless it is signed again, so no block becomes permanent by default;
-- **contestable**: anyone can file an appeal, and the decision is recorded on-chain;
-- **independently verified**: an independent reviewer, never the operator, attests that each school is actually protected;
-- **privacy-preserving**: no personal data on-chain, no query logs, and impact metrics published only as k-anonymous aggregates with a daily Merkle commitment anyone can recompute.
+The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full and authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as k-anonymous aggregates bound to a daily Merkle root that anyone can recompute. No personal data is ever written on-chain.
 
-The first deployment is a proposed pilot with **UNICEF Giga** in 20–50 connected schools in Latin America, using a filtering DNS resolver. The registry itself is generic: municipal Wi-Fi, libraries or NGO networks can use it the same way.
+The first deployment is a proposed pilot with **UNICEF Giga** in 20 to 50 connected schools in Latin America. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
 
-> **Status: proof of concept.** Contracts and off-chain tools work and are tested. Nothing here is production-ready or audited. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status: research prototype.** The contracts and off-chain tools are implemented and tested, but they are not audited and not deployed on any production network. See the [roadmap](docs/ROADMAP.md) and the [security policy](SECURITY.md).
 
-## How it works
+<p align="center"><img src="docs/figures/fig1-architecture.svg" alt="Architecture: enforcement plane in-country, accountability plane on Ethereum L2" width="100%"></p>
 
-```mermaid
-flowchart LR
-  subgraph country["In-country operation (off-chain)"]
-    S[Giga school<br/>student and teacher devices] -->|DNS query| R[Filtering DNS resolver<br/>DoH/DoT · DNSSEC · RPZ]
-    R --> I[Internet<br/>allowed sites / block page]
-  end
-  subgraph chain["Ethereum L2 (on-chain)"]
-    P[VerifiablePolicyRegistry<br/>versions · reasons · expiry · appeals]
-    A[EAS attestations<br/>deployment · independent tests]
-    M[MetricsAnchor<br/>daily Merkle roots]
-  end
-  G[Safe multisig 2-of-3<br/>UNICEF · Ministry · Reviewer] -->|publishPolicy| P
-  P -->|policy in force| R
-  R -->|aggregated counts only| M
-  REV[Independent reviewer] -->|black-box tests| A
-  P & A & M --> D[Public dashboard<br/>donors · auditors · ministries]
-```
+## Guarantees, and their limits
 
-What Ethereum proves, and what it does not:
+The system is built around seven properties, stated formally in the [white paper](docs/WHITEPAPER.md#33-properties). Some hold cryptographically and others rest on a named institution, and we keep the two apart.
 
-| Ethereum proves | Ethereum does not prove | How the gap is covered |
+| Property | What it means | Rests on |
 | --- | --- | --- |
-| Which policy is in force, who signed it and why | That the resolver actually applies it | Black-box tests from each school, attested by the independent reviewer |
-| That published impact figures were not altered later | That the resolver keeps no logs | Public privacy statement (RFC 8932), external audit, published minimal-retention configuration |
-| That a school was certified on a given date | That the network was not changed afterwards | Attestations expire; periodic re-testing; revocation on failure |
+| Transparency | Anyone can see which policy is in force and check its full document against the on-chain hash | Cryptography |
+| Non-equivocation | Everyone sees the same append-only history of versions | Ledger consensus |
+| Threshold authorisation | A policy changes only with *m* of *n* signatures (pilot: UNICEF Giga, Ministry of Education, independent reviewer) | Multisignature |
+| Bounded duration | Every version expires (pilot: at most 90 days) unless it is signed again | Contract |
+| Contestability | Anyone can appeal; acceptance or rejection is recorded on-chain | Contract + governor |
+| Attested enforcement | A school counts as protected only with a valid attestation from the independent reviewer | Reviewer |
+| Aggregate integrity | Published impact figures cannot be changed after anchoring, and contain only k-anonymous counts | Cryptography (after aggregation) + operator (inputs) |
+
+What the ledger cannot prove is that a resolver behaves as declared at runtime. That gap is covered today by independent black-box testing and audit. The [research agenda](docs/WHITEPAPER.md#11-research-agenda-narrowing-the-enforcementaccountability-gap) explores trusted execution and zero-knowledge proofs of aggregation to narrow it.
+
+## Documentation
+
+| If you are… | Start with |
+| --- | --- |
+| evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG readiness](docs/DPG.md) |
+| building a component | [Architecture](docs/ARCHITECTURE.md) · [Interfaces](docs/INTERFACES.md) · [Decision records](docs/adr) · [Backlog](docs/BACKLOG.md) |
+| operating or governing a deployment | [Policy governance](docs/GOVERNANCE.md) · [Privacy statement (RFC 8932)](docs/PRIVACY_STATEMENT.md) · [Roadmap](docs/ROADMAP.md) |
+| contributing | [Contributing](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Project governance](GOVERNANCE.md) |
+| reviewing security | [Security policy](SECURITY.md) · [Threat model](docs/WHITEPAPER.md#6-threat-model-and-security-analysis) |
 
 ## Repository layout
 
-| Path | What it contains |
+| Path | Contents |
 | --- | --- |
-| [`contracts/`](contracts) | Solidity contracts (`VerifiablePolicyRegistry`, `MetricsAnchor`) and Hardhat tests |
-| [`tools/`](tools) | Python package `vpr`: policy validation and hashing, RPZ compilation, k-anonymous metrics, Merkle proofs, CLI |
+| [`contracts/`](contracts) | `VerifiablePolicyRegistry` and `MetricsAnchor` (Solidity 0.8.24) with Hardhat tests |
+| [`tools/`](tools) | Python package and CLI `vpr`: policy validation and canonical hashing, RPZ compilation, k-anonymous aggregation, Merkle proofs |
+| [`schemas/`](schemas) | EAS attestation schemas and JSON Schemas for policy documents and datasets (CC0) |
 | [`policies/`](policies) | Example public policy document |
-| [`schemas/`](schemas) | EAS attestation schemas and JSON schemas for policy documents and datasets (CC0) |
-| [`deploy/`](deploy) | Reference resolver configuration (Unbound + RPZ) |
-| [`examples/`](examples) | Example category feeds and synthetic events |
-| [`docs/`](docs) | [White paper](docs/WHITEPAPER.md), [architecture](docs/ARCHITECTURE.md), [interfaces](docs/INTERFACES.md), [decision records](docs/adr), [roadmap](docs/ROADMAP.md), [policy governance](docs/GOVERNANCE.md), [privacy statement](docs/PRIVACY_STATEMENT.md), [do no harm](docs/DO_NO_HARM.md), [DPG readiness](docs/DPG.md), [backlog](docs/BACKLOG.md) |
+| [`deploy/`](deploy) | Reference resolver configuration (Unbound with RPZ) |
+| [`examples/`](examples) | Synthetic feeds and events (`.example` domains only) |
+| [`docs/`](docs) | White paper, architecture, interfaces, ADRs, governance, privacy, DPG material |
 
 ## Quick start
 
-Requirements: Node.js 20+, Python 3.10+.
+Requirements: Node.js 20+ and Python 3.10+.
 
 ```bash
 # Contracts
 cd contracts
-npm install
-npx hardhat test                  # set OFFLINE_SOLC=1 to compile with solc-js if the native compiler cannot be downloaded
+npm ci
+npx hardhat test          # OFFLINE_SOLC=1 npx hardhat test if the native compiler cannot be downloaded
 
 # Off-chain tools
 cd ../tools
 pip install -e ".[dev]"
 pytest
-
-# Try the CLI from the repository root
-vpr policy-hash policies/example-primary.yaml
-vpr compile-rpz policies/example-primary.yaml --feeds-dir examples/feeds --block-page block.example.org
-vpr aggregate examples/events.csv --k 10 --out-csv dataset.csv
-vpr verify-root dataset.csv 0x<root printed by the previous command>
 ```
 
-## Where to start
+From the repository root:
 
-| If you are… | Read |
-| --- | --- |
-| deciding whether to fund or adopt it | [White paper](docs/WHITEPAPER.md), [do no harm](docs/DO_NO_HARM.md), [DPG readiness](docs/DPG.md) |
-| building a component | [Architecture](docs/ARCHITECTURE.md), [interfaces](docs/INTERFACES.md), [decision records](docs/adr), [backlog](docs/BACKLOG.md) |
-| contributing a fix | [Contributing](CONTRIBUTING.md), [good first issues](https://github.com/xcapit/verifiable-policy-registry/labels/good%20first%20issue) |
-| reviewing security | [Security policy](SECURITY.md), [threat model summary](docs/WHITEPAPER.md#7-threat-model-summary) |
+```bash
+vpr policy-hash policies/example-primary.yaml        # scopeId and contentHash to publish on-chain
+vpr compile-rpz policies/example-primary.yaml --feeds-dir examples/feeds --block-page block.example.org
+vpr aggregate examples/events.csv --k 10 --out-csv dataset.csv   # prints the daily Merkle root
+vpr verify-root dataset.csv 0x<root>                 # anyone can recompute a published root
+```
 
 ## Design principles
 
-1. **Commit, don't store.** The chain holds hashes, signatures and aggregate roots. Policy documents and datasets live off-chain and are verified against their on-chain commitments.
-2. **Never certify yourself.** The operator attests deployments; the independent reviewer attests tests; auditors attest conformance.
-3. **Privacy by collection, not by deletion.** The metrics pipeline only ever receives `(school_id, day, category)`. No IPs, device identifiers or queried names.
-4. **Narrow scope.** School networks for children only. The project does not support ISP-wide or national blocking.
-5. **Restricted lists stay restricted.** Lists that cannot legally be published (such as the IWF list) are represented only by a hash commitment, and are never labelled in compiled zones.
+1. **Commit, do not store.** The chain holds hashes, signatures, expiries and aggregate roots. Documents and datasets live off-chain and are verified against those commitments.
+2. **Never certify yourself.** The operator attests deployments, the independent reviewer attests tests and the auditor attests conformance.
+3. **Privacy by collection, not by deletion.** The metrics pipeline only ever receives `(school_id, day, category)`. IP addresses, device identifiers and queried names never leave the resolver process.
+4. **Accountability over prevention.** No single party can change a policy. A majority can, but every change is public, has a stated reason, is temporary and can be contested.
+5. **Restricted lists stay restricted.** Lists that cannot legally be published, such as the IWF list, are represented only by a hash commitment.
+6. **Narrow scope.** Bounded networks with an accountable governor. The project does not support ISP-wide or national blocking.
 
 ## Standards
 
-[NIST SP 800-81r3](https://csrc.nist.gov/pubs/sp/800/81/r3/final) (secure and protective DNS) · [RFC 8932](https://www.rfc-editor.org/rfc/rfc8932.html) (DNS privacy operator statement) · UK Safer Internet Centre school-filtering criteria · ITU Child Online Protection guidelines · [EAS](https://attest.org/) · W3C Verifiable Credentials 2.0 · UNICEF Policy on Personal Data Protection. Development follows Xcapit's ISO/IEC 27001-certified process. Rationale for each choice, and what was left out: [docs/WHITEPAPER.md](docs/WHITEPAPER.md#8-standards).
-
-## Contributing and community
-
-Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [backlog](docs/BACKLOG.md). Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md). How decisions are made: [GOVERNANCE.md](GOVERNANCE.md); who maintains the project: [MAINTAINERS.md](MAINTAINERS.md); getting help: [SUPPORT.md](SUPPORT.md). Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
-
-## Digital Public Good
-
-The project is being prepared for registration as a [Digital Public Good](https://digitalpublicgoods.net/). [docs/DPG.md](docs/DPG.md) maps each indicator of the DPG Standard to its evidence in this repository and lists what is still missing.
-
-## Licence
-
-- Code: [GNU AGPL-3.0-only](LICENSE). Anyone who runs a modified version as a network service must publish their changes.
-- EAS schemas (`schemas/`): CC0-1.0.
-- Documentation (`docs/` and the Markdown files at the root): CC BY 4.0.
-
-Licence texts are in [`LICENSES/`](LICENSES); ownership and attribution are in [NOTICE](NOTICE). If you cite the project, see [CITATION.cff](CITATION.cff).
+[NIST SP 800-81r3](https://csrc.nist.gov/pubs/sp/800/81/r3/final) (protective DNS) · [RFC 8932](https://www.rfc-editor.org/rfc/rfc8932.html) (resolver privacy statement) · [UK Safer Internet Centre filtering criteria](https://saferinternet.org.uk/guide-and-resource/teachers-and-school-staff/appropriate-filtering-and-monitoring/appropriate-filtering/filtering-accreditation-scheme-for-uk-schools) with the [IWF URL List](https://www.iwf.org.uk/our-technology/our-services/url-list) · [ITU Child Online Protection](https://www.itu.int/en/ITU-D/Cybersecurity/Documents/COP/20-00802_COP-Policy_Brief.pdf) · [UNICEF Policy on Personal Data Protection](https://www.unicef.org/documents/policy-personal-data-protection) · [EAS](https://attest.org/) · W3C Verifiable Credentials 2.0. The rationale for each choice, and for what was left out, is in [§7 of the white paper](docs/WHITEPAPER.md#7-standards-and-compliance).
 
 ## Who is behind it
 
-[Xcapit](https://xcapit.com) (Córdoba, Argentina), an ISO/IEC 27001-certified software factory that has built Digital Public Goods with UNICEF: the [Xcapit Wallet](https://digitalpublicgoods.net/registry/xcapit.html), the AidLink SMS wallet, and the technical build of the [Primero DAO](https://www.unicefventurefund.org/story/primero-dao-pilot-introduction-progress-learnings-outlook). Contact: Fernando Boiero, CTO.
+The project is developed by [Xcapit](https://xcapit.com) (CryptoLab S.A.S., Córdoba, Argentina), an ISO/IEC 27001-certified software company that has built Digital Public Goods with UNICEF.
+
+| Prior work | Public evidence |
+| --- | --- |
+| **Xcapit Wallet**: open-source, self-custodial wallet, built with UNICEF Venture Fund investment and registered as a Digital Public Good | [UNICEF Venture Fund](https://www.unicefventurefund.org/story/xcapit-smart-crypto-wallet-social-impact-and-financial-literacy-and-inclusion) · [mid-investment update](https://www.unicefventurefund.org/story/mid-investment-update-how-xcapit-revolutionizing-financial-inclusion-growth-funding) · [DPG Registry](https://digitalpublicgoods.net/registry/xcapit.html) · [UNICEF Innovation Fund cohort](https://www.unicef.org/innovation/InnovationFund/blockchain-financial-inclusion-cohort) |
+| **Primero DAO**: an 18-month pilot with UNICEF Ventures and Primero to govern and fund Primero, UNICEF's child-protection DPG; Xcapit delivered and managed the technical build | [UNICEF Venture Fund: pilot](https://www.unicefventurefund.org/story/primero-dao-pilot-introduction-progress-learnings-outlook) · [DAOs at UNICEF](https://www.unicefventurefund.org/story/daos-decentralized-autonomous-organizations-do-they-make-sense-unicef) · [Primero](https://www.primero.org/blog/dao) |
+| **Shelter / AidLink**: humanitarian cash-transfer wallet that works over SMS without a smartphone or internet; DPG certification in progress with UNICEF (no public record yet) | [UNICEF: humanitarian cash transfers](https://www.unicef.org/innovation/stories/how-blockchain-can-transform-humanitarian-cash-transfers-scale) · [UNICEF: digital disbursement](https://www.unicef.org/innovation/stories/cash-transfers-digital-disbursement) · [growth cohort](https://www.unicef.org/innovation/stories/investing-blockchain-web3-and-ai-social-impact) |
+| **QuarkID**: self-sovereign identity system, co-created by Xcapit, registered as a DPG and running on ZKsync Era | [DPG Registry](https://digitalpublicgoods.net/r/quarkid) · [ZKsync announcement](https://zksync.mirror.xyz/kWRhD81C7il4YWGrkDplfhIZcmViisRe3lnsmbvOEmg) |
+
+Maintainers are listed in [MAINTAINERS.md](MAINTAINERS.md). Contact: dpg@xcapit.com.
+
+## Licence and citation
+
+- Code: [GNU AGPL-3.0-only](LICENSE). Anyone who runs a modified version as a network service must offer its source.
+- Schemas (`schemas/`): [CC0-1.0](LICENSES/CC0-1.0.txt).
+- Documentation (`docs/` and the Markdown files at the root): [CC BY 4.0](LICENSES/CC-BY-4.0.txt).
+
+Ownership and attribution are described in [NOTICE](NOTICE). If you refer to this work, please cite it using [CITATION.cff](CITATION.cff). The project is being prepared for registration as a [Digital Public Good](https://digitalpublicgoods.net/); see [docs/DPG.md](docs/DPG.md).

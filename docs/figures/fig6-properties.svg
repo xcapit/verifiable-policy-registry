@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" width="960" height="380" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<rect width="960" height="380" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a" text-anchor="start">Figure 6. What each property rests on</text>
+<text x="390" y="66" font-size="12" font-weight="600" fill="#1d4ed8" text-anchor="middle">Cryptography / ledger</text>
+<text x="620" y="66" font-size="12" font-weight="600" fill="#92400e" text-anchor="middle">Institutional party</text>
+<text x="830" y="66" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">Mechanism</text>
+<rect x="30" y="76" width="900" height="36" fill="#f8fafc"/>
+<text x="46" y="99" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">P1</text>
+<text x="84" y="99" font-size="13" font-weight="400" fill="#0f172a" text-anchor="start">Transparency</text>
+<rect x="300" y="85" width="180" height="18" rx="9" fill="#2563eb"/>
+<rect x="530" y="85" width="180" height="18" rx="9" fill="none" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<text x="830" y="99" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">content hash + public document</text>
+<text x="46" y="135" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">P2</text>
+<text x="84" y="135" font-size="13" font-weight="400" fill="#0f172a" text-anchor="start">Non-equivocation</text>
+<rect x="300" y="121" width="180" height="18" rx="9" fill="#2563eb"/>
+<rect x="530" y="121" width="180" height="18" rx="9" fill="none" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<text x="830" y="135" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">ledger consensus</text>
+<rect x="30" y="148" width="900" height="36" fill="#f8fafc"/>
+<text x="46" y="171" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">P3</text>
+<text x="84" y="171" font-size="13" font-weight="400" fill="#0f172a" text-anchor="start">Threshold authorisation</text>
+<rect x="300" y="157" width="180" height="18" rx="9" fill="#2563eb"/>
+<rect x="530" y="157" width="180" height="18" rx="9" fill="none" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<text x="830" y="171" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">Safe m-of-n</text>
+<text x="46" y="207" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">P4</text>
+<text x="84" y="207" font-size="13" font-weight="400" fill="#0f172a" text-anchor="start">Bounded duration</text>
+<rect x="300" y="193" width="180" height="18" rx="9" fill="#2563eb"/>
+<rect x="530" y="193" width="180" height="18" rx="9" fill="none" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<text x="830" y="207" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">contract enforces Δmax</text>
+<rect x="30" y="220" width="900" height="36" fill="#f8fafc"/>
+<text x="46" y="243" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">P5</text>
+<text x="84" y="243" font-size="13" font-weight="400" fill="#0f172a" text-anchor="start">Contestability</text>
+<rect x="300" y="229" width="180" height="18" rx="9" fill="#2563eb"/>
+<rect x="530" y="229" width="180" height="18" rx="9" fill="#d97706"/>
+<text x="830" y="243" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">record on-chain · timeliness agreed</text>
+<text x="46" y="279" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">P6</text>
+<text x="84" y="279" font-size="13" font-weight="400" fill="#0f172a" text-anchor="start">Attested enforcement</text>
+<rect x="300" y="265" width="180" height="18" rx="9" fill="none" stroke="#cbd5e1" stroke-dasharray="3 3"/>
+<rect x="530" y="265" width="180" height="18" rx="9" fill="#d97706"/>
+<text x="830" y="279" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">independent reviewer</text>
+<rect x="30" y="292" width="900" height="36" fill="#f8fafc"/>
+<text x="46" y="315" font-size="13" font-weight="700" fill="#0f172a" text-anchor="start">P7</text>
+<text x="84" y="315" font-size="13" font-weight="400" fill="#0f172a" text-anchor="start">Aggregate integrity</text>
+<rect x="300" y="301" width="180" height="18" rx="9" fill="#2563eb"/>
+<rect x="530" y="301" width="180" height="18" rx="9" fill="#d97706"/>
+<text x="830" y="315" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">root binding · inputs from operator</text>
+<text x="480" y="358" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">P1–P4 are enforced by the contracts. P6 and part of P7 can only be recorded on-chain; §11 proposes ways to move them to the left column.</text>
+</svg>

@@ -13,7 +13,7 @@ We intend to submit the Verifiable Policy Registry to the [Digital Public Goods 
 | 5 | Documentation | Ready for the PoC | [README](../README.md), [ARCHITECTURE](ARCHITECTURE.md), [INTERFACES](INTERFACES.md), [CONTRIBUTING](../CONTRIBUTING.md) |
 | 6 | Mechanism for extracting data and content | Ready | [§6 below](#6-extracting-data-and-content) |
 | 7 | Privacy and applicable laws | In progress (DPIA due in M1) | [PRIVACY_STATEMENT](PRIVACY_STATEMENT.md), [§7 below](#7-privacy-and-applicable-laws) |
-| 8 | Standards and best practices | Ready | [WHITEPAPER §8](WHITEPAPER.md#8-standards), [§8 below](#8-standards-and-best-practices) |
+| 8 | Standards and best practices | Ready | [WHITEPAPER §7](WHITEPAPER.md#7-standards-and-compliance), [§8 below](#8-standards-and-best-practices) |
 | 9 | Do no harm by design | Ready for the PoC | [DO_NO_HARM](DO_NO_HARM.md), [CODE_OF_CONDUCT](../CODE_OF_CONDUCT.md), [SECURITY](../SECURITY.md) |
 
 ## 1. Relevance to the SDGs
