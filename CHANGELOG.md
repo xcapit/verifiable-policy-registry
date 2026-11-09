@@ -12,6 +12,10 @@ All notable changes to this project are documented here. The format follows [Kee
 - Deployment conditions (satellite links, provider configuration, unreachable resolver) and integration with Giga Maps identifiers and Giga Meter, in the architecture and the white paper; Giga Maps identifiers as `school_id` (VPR-047).
 
 ### Changed
+- Team listed in MAINTAINERS.md and the README, with areas of responsibility.
+- Privacy wording corrected: the resolver processes client addresses and queried names transiently; nothing identifying is retained, exported or published.
+- DPG self-assessment re-checked against DPG Standard v1.1.6, with evidence-based status words; indicators 7 and 9 marked as gaps.
+- Appeal storage redesign tracked as VPR-048; white paper reference to VPR-027 fixed.
 - White paper v0.4: zero-knowledge proofs of aggregation described as planned for M4; the event-log commitment must be hiding; canary events as a partial check on log completeness.
 - Roadmap: M1 renamed *Design and sign-off*, without the funding application; M4 acceptance window aligned with prover integration (from week 14); fallback acceptance if the circuit audit slips.
 - Backlog: canary events (VPR-038); Spanish and Portuguese block page and appeal form (VPR-017).

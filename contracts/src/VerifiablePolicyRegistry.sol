@@ -7,7 +7,8 @@ pragma solidity ^0.8.24;
 ///      expected to be a Safe multisig (for example 2-of-3: UNICEF Giga, Ministry of Education and an
 ///      independent reviewer). The registry stores commitments only: the full policy document lives
 ///      off-chain at `uri` and is identified by `contentHash`. Legally restricted lists (such as the IWF
-///      list) are represented only by `restrictedListHash`. No personal data is ever stored.
+///      list) are represented only by `restrictedListHash`. The registry's own logic stores no personal data;
+///      appeal URIs are caller-supplied, and their storage is being redesigned (VPR-048).
 contract VerifiablePolicyRegistry {
     struct Scope {
         address governor;

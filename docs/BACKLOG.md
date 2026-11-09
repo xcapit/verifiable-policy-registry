@@ -32,6 +32,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-017 | Block page with appeal form that calls `fileAppeal` through a relayer | Appeal text limited to domain + reason; no personal data fields; rate-limited; block page and form available in Spanish and Portuguese, with strings in a translation file |
 | VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
 | VPR-047 | Use Giga Maps school identifiers as `school_id` in the exporter mapping, attestations and datasets | Every attested school resolves to a Giga Maps record; the dashboard joins metrics with Giga Maps data by identifier |
+| VPR-048 | Redesign appeal storage: the contract stores only a versioned, size-bounded commitment to an appeal document validated off-chain, never a caller-supplied free-text URI; reasoned resolutions and resubmission after rejection | Direct calls cannot place arbitrary text on-chain; tests cover oversize, wrong scheme and resubmission; INTERFACES I9 and DO_NO_HARM H6 updated |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
 ## M3 · Metrics, dashboard and audit (weeks 8–16)

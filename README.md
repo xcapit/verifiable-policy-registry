@@ -6,7 +6,7 @@
 
 Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is usually delivered by network-level filtering. The same mechanism is among the most common instruments of internet censorship. A filter is legitimate only when people outside the operator can see what it blocks, who decided it and for how long, and can be sure that it does not record what children do. Conventional filters provide none of these guarantees.
 
-The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. No personal data is ever written on-chain.
+The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. The protocol never needs personal data on-chain; appeals submitted directly to the contract can still carry arbitrary text today, and their storage is being redesigned (VPR-048).
 
 The first deployment is a proposed pilot with **UNICEF Giga** in 20 to 50 connected schools in Latin America. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
 
@@ -116,6 +116,19 @@ The design applies to any bounded network with an accountable governor: librarie
 
 [NIST SP 800-81r3](https://csrc.nist.gov/pubs/sp/800/81/r3/final) (protective DNS) · [RFC 8932](https://www.rfc-editor.org/rfc/rfc8932.html) (resolver privacy statement) · [UK Safer Internet Centre filtering criteria](https://saferinternet.org.uk/guide-and-resource/teachers-and-school-staff/appropriate-filtering-and-monitoring/appropriate-filtering/filtering-accreditation-scheme-for-uk-schools) with the [IWF URL List](https://www.iwf.org.uk/our-technology/our-services/url-list) · [ITU Child Online Protection](https://www.itu.int/en/ITU-D/Cybersecurity/Documents/COP/20-00802_COP-Policy_Brief.pdf) · [UNICEF Policy on Personal Data Protection](https://www.unicef.org/documents/policy-personal-data-protection) · [EAS](https://attest.org/) · W3C Verifiable Credentials 2.0. The rationale for each choice, and for what was left out, is in [§7 of the white paper](docs/WHITEPAPER.md#7-standards-and-compliance).
 
+## Team
+
+| Name | Role |
+| --- | --- |
+| Fernando Boiero | Lead maintainer, security, authorised representative for the DPG application |
+| Maximiliano Nivoli | Technical lead and blockchain architect |
+| Franco Schillage | Zero-knowledge engineering, DevOps and resolver infrastructure |
+| Matías Bruno | Developer |
+| Francisco Arduh | Developer |
+| Diana Truyol | Impact coordination and research |
+
+GitHub handles and areas of responsibility are in [MAINTAINERS.md](MAINTAINERS.md). Contact: dpg@xcapit.com.
+
 ## Who is behind it
 
 The project is developed by [Xcapit](https://xcapit.com) (CryptoLab S.A.S., Córdoba, Argentina), an ISO/IEC 27001-certified software company that has built Digital Public Goods with UNICEF.
@@ -127,7 +140,6 @@ The project is developed by [Xcapit](https://xcapit.com) (CryptoLab S.A.S., Cór
 | **Shelter / AidLink**: humanitarian cash-transfer wallet that works over SMS without a smartphone or internet; DPG certification in progress with UNICEF (no public record yet) | [UNICEF: humanitarian cash transfers](https://www.unicef.org/innovation/stories/how-blockchain-can-transform-humanitarian-cash-transfers-scale) · [UNICEF: digital disbursement](https://www.unicef.org/innovation/stories/cash-transfers-digital-disbursement) · [growth cohort](https://www.unicef.org/innovation/stories/investing-blockchain-web3-and-ai-social-impact) |
 | **QuarkID**: self-sovereign identity system, co-created by Xcapit, registered as a DPG and running on ZKsync Era | [DPG Registry](https://digitalpublicgoods.net/r/quarkid) · [ZKsync announcement](https://zksync.mirror.xyz/kWRhD81C7il4YWGrkDplfhIZcmViisRe3lnsmbvOEmg) |
 
-Maintainers are listed in [MAINTAINERS.md](MAINTAINERS.md). Contact: dpg@xcapit.com.
 
 ## Licence and citation
 
