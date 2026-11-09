@@ -11,7 +11,7 @@ Donors and partners need impact figures. Children must not be identifiable from 
 
 - The resolver emits only `(school_id, day, category)` per block. No IPs, device identifiers or queried names leave it.
 - Cells with fewer than k = 10 events are suppressed before publication.
-- Each daily dataset is committed with a Merkle root (sorted-pair keccak256, OpenZeppelin-compatible), anchored in `MetricsAnchor`. Solidity and Python share the same test vector.
+- Each daily dataset is committed with a Merkle root (sorted-pair keccak256; OpenZeppelin-compatible in v0.1, domain-separated since dataset format 2 and therefore no longer verifiable with OpenZeppelin's `MerkleProof`), anchored in `MetricsAnchor`. Solidity and Python share the same test vector.
 
 ## Note (2026-11-09)
 

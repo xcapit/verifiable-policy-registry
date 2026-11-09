@@ -19,7 +19,7 @@ Costs fall into three groups. The first two grow with the number of schools; the
 | Proof generation (ZK, from M4) | One proof per scope per day | prover machine cost per hour × proving hours per day × 30 ÷ schools in the scope | [M4 benchmarks, VPR-036] |
 | Proof verification gas | One verification per scope per day | verifier gas × gas price × 30 ÷ schools in the scope | [M4 benchmarks, VPR-036] |
 
-Fixed costs per country, not per school: dashboard hosting, document and dataset mirroring, annual external review of the resolver configuration, and staff time for policy renewal and appeals. These are listed in the playbook (VPR-026) with the same method.
+Fixed costs per country, not per school: dashboard hosting, document and dataset mirroring, annual external review of the resolver configuration, and staff time for policy renewal and appeals. These are listed in the playbook for new countries (VPR-064) with the same method.
 
 Two properties of the design keep the marginal cost low. On-chain activity per scope is constant per day, so its share per school falls as a scope grows. Filtering itself runs on ordinary resolver infrastructure, with no per-query fee to any third party.
 
@@ -39,7 +39,7 @@ In every option, the separation of roles in [ADR-0005](adr/0005-issuer-separatio
 At the end of the pilot, the operator taking over receives:
 
 - runbooks for the resolver pair, the synchronisation daemon, the exporter, the daily job and the prover;
-- the playbook for new countries (VPR-026), including scope charters and profile templates;
+- the playbook for new countries (VPR-064), including scope charters and profile templates;
 - a key ceremony for each institutional signer of the governor Safe, with documented recovery and rotation;
 - the published datasets, policy documents and attestations to date, all of which remain public;
 - a briefing for the independent reviewer on the test kit (VPR-018).

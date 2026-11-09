@@ -42,7 +42,11 @@ jobs:
         run: |
           vpr policy-hash policies/example-primary.yaml
           vpr compile-rpz policies/example-primary.yaml --feeds-dir examples/feeds --block-page block.example.org > /dev/null
-          ROOT=$(vpr aggregate examples/events.csv --day 2026-11-01 --k 10 --out-csv dataset.csv | python -c "import sys, json; print(json.load(sys.stdin)['root'])")
+          vpr aggregate examples/events.csv --day 2026-11-01 --k 10 --out-csv dataset.csv > summary.json
+          python -c "import json, jsonschema; jsonschema.Draft202012Validator(json.load(open('schemas/dataset.schema.json'))).validate(json.load(open('summary.json'))); print('dataset schema ok')"
+          vpr aggregate examples/public-service/events.csv --k 10 --unit-column unit_id > service-summary.json
+          python -c "import json, jsonschema; jsonschema.Draft202012Validator(json.load(open('schemas/dataset.schema.json'))).validate(json.load(open('service-summary.json'))); print('dataset schema ok (unit_id)')"
+          ROOT=$(python -c "import json; print(json.load(open('summary.json'))['root'])")
           vpr verify-root dataset.csv "$ROOT"
 
   e2e:
@@ -61,7 +65,16 @@ jobs:
         working-directory: contracts
       - run: pip install -e tools
       - name: End-to-end demo
-        run: ./examples/e2e/run.sh
+        run: E2E_OUT=e2e-out ./examples/e2e/run.sh
+      - name: Release benchmark (synthetic rows)
+        run: python tools/bench/bench_merkle.py | tee e2e-out/bench-merkle.json
+      - name: Upload demo evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-evidence
+          path: e2e-out/
+          if-no-files-found: warn
 
   links:
     runs-on: ubuntu-latest

@@ -3,9 +3,9 @@
 **Fernando Boiero** · Xcapit (CryptoLab S.A.S.), Córdoba, Argentina
 Correspondence: dpg@xcapit.com
 
-*White paper · Version 0.4 (draft for review) · November 2026 · Licensed under CC BY 4.0*
+*White paper · Version 0.5 (draft for review) · November 2026 · Licensed under CC BY 4.0*
 
-> **Status.** This document describes a design and a proof-of-concept implementation. The smart contracts have not been audited and are not deployed on any production network. Claims about security and privacy are stated together with the assumptions under which they hold.
+> **Status.** This document describes a design and a proof-of-concept implementation. "Privacy-preserving" in the title means data minimisation, transient processing of client addresses and queried names without retention, and small-cell suppression of published counts. It does not mean *k*-anonymity or differential privacy (§5). The exact status of every claim (implemented, demonstrated, designed or planned) is maintained in `docs/CLAIMS_AND_EVIDENCE.md`, and the normative encodings and the designed zero-knowledge relation are in `docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md`; where this paper and those documents differ, those documents prevail. The smart contracts have not been audited and are not deployed on any production network. Claims about security and privacy are stated together with the assumptions under which they hold.
 
 ---
 
@@ -13,7 +13,7 @@ Correspondence: dpg@xcapit.com
 
 Programmes that connect schools to the internet must protect children from malware, phishing and harmful content, and in practice they do so with network-level content filtering. The same mechanism is among the most common instruments of internet censorship. Its legitimacy therefore depends on properties that today's filters do not provide: the public cannot learn what is blocked, who decided it, for how long, or whether the infrastructure records children's browsing. We present the *Verifiable Policy Registry* (VPR), a system that separates the **enforcement plane** of filtering, a conventional protective DNS resolver operated in-country, from an **accountability plane** built on a public blockchain. In the accountability plane, every policy version is committed to by hash, authorised by a threshold of independent institutions, bounded in time and open to appeal. The correct deployment of a policy is attested by a party other than the operator. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle commitment that anyone can recompute.
 
-We state the security properties the system offers, separate those that hold cryptographically from those that rest on institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We narrow that gap with zero-knowledge proofs that bind the published figures to a committed event log and to the policy in force, specified here and scheduled as a reference implementation on testnet in the first phase of the pilot, and identify trusted execution as further work. The first deployment targets UNICEF Giga schools in Latin America: a controlled alpha in a few schools, followed, if its gates are met, by a cohort of 20 to 50. The design is generic to any bounded network with an accountable governor.
+We state the security properties the system is intended to offer, separate those that hold in the implemented contracts from those that depend on future components or institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We specify a zero-knowledge relation intended to narrow part of that gap; no prover or verifier is implemented. A proposed first deployment would be a controlled alpha in two to five Giga-connected schools in Latin America, followed, only if its gates are met and partners agree, by a separately funded cohort of 20 to 50. No commitment or endorsement exists from Giga, UNICEF, ITU, a ministry or a funder. The design is generic to any bounded network with an accountable governor.
 
 ---
 
@@ -27,9 +27,9 @@ Commercial protective DNS services address the first two risks reasonably well. 
 
 1. A system model for accountable content filtering in bounded networks, with seven explicitly stated properties (§3.3). For each, we identify whether it rests on cryptographic assumptions, on the honesty of a named institutional party, or on both.
 2. A minimal on-chain design consisting of a policy registry and a metrics anchor. Only commitments are stored on-chain, so the ledger never holds personal data or the contents of legally restricted lists (§4).
-3. An attestation scheme with three non-overlapping issuer roles, so that the operator of the resolver never certifies its own deployment (§4.4).
-4. A privacy-preserving impact pipeline with data minimisation at the source, k-suppression and Merkle commitments. We also analyse its residual leakage and the conditions under which differential privacy would be preferable (§5).
-5. A threat model with concrete adversaries and mitigations (§6), a mapping to existing standards (§7), and a zero-knowledge proof of correct aggregation that closes part of the enforcement–accountability gap, with trusted execution as further work (§11).
+3. Three attestation schema definitions and a registry role mapping, with a Planned EAS schema resolver to enforce issuer separation at issuance (§4.4).
+4. An implemented aggregation and commitment pipeline, plus a Designed resolver-export boundary for source minimisation. We analyse residual leakage and the conditions under which differential privacy would be preferable (§5).
+5. A threat model with concrete adversaries and mitigations (§6), a mapping to relevant standards (§7), and a specification for a Planned zero-knowledge proof intended to close part of the enforcement–accountability gap, with trusted execution as further work (§11).
 
 An open-source implementation of the contracts and the off-chain tooling accompanies this paper under the AGPL-3.0 licence [4].
 
@@ -55,9 +55,9 @@ An open-source implementation of the contracts and the off-chain tooling accompa
 
 ### 3.1 Actors
 
-- **Governor.** A Safe multisignature account bound to a *scope*. In the pilot it is a 2-of-3 configuration whose signers are UNICEF Giga, the national Ministry of Education and an independent reviewer. The governor is the only party able to change a policy.
-- **Operator.** Runs the resolver, compiles policies into zones, publishes aggregate datasets and anchors their commitments. During the pilot the operator is Xcapit.
-- **Independent reviewer.** An organisation with no operational role, for example a child-protection NGO or a university. It signs as the third member of the governor, tests deployments from inside school networks and reviews appeals.
+- **Governor.** A multisignature account bound to a *scope*. The proposed pilot model is a 2-of-3 Safe whose signers would be a Giga counterpart, the national Ministry of Education and an independent reviewer. No signer has been confirmed. The registry trusts the governor address and does not itself enforce threshold signing.
+- **Operator.** Would run the resolver, compile policies into zones, publish aggregate datasets and anchor their commitments. Xcapit is the proposed pilot operator; no operating agreement exists.
+- **Independent reviewer.** An organisation with no operational role, for example a child-protection NGO or a university. In the proposed model it would be a governor signer, test deployments from inside school networks and review appeals. No reviewer has been engaged.
 - **Auditor.** Assesses the resolver service against named frameworks and attests conformance.
 - **Schools.** Change a single network setting and report wrongly blocked sites. School staff are never required to hold keys or tokens.
 - **Public.** Donors, researchers, journalists, families and any other party who verifies.
@@ -75,10 +75,10 @@ Let a scope *s* have a sequence of policy versions ⟨*p*₁, …, *p*ₙ⟩. Ea
 - **P1 · Transparency.** At any time τ, any party can determine which version of *s* is in force, retrieve its document and check that it hashes to *h*ᵢ. *Holds cryptographically,* given availability of the document.
 - **P2 · Non-equivocation.** All parties observe the same sequence ⟨*p*₁, …, *p*ₙ⟩, which is append-only. *Holds under the safety of the ledger.*
 - **P3 · Threshold authorisation.** A new version can be appended only with the approval of at least *m* of the *n* governor signers. *Holds cryptographically,* given the multisignature and key custody.
-- **P4 · Bounded duration.** For every *i*, *e*ᵢ − *t*ᵢ ≤ Δ_max(*s*). The contract enforces this. In the pilot, Δ_max is 90 days.
+- **P4 · Bounded duration.** For every *i*, *e*ᵢ − *t*ᵢ ≤ Δ_max(*s*). The contract enforces this. The proposed pilot parameter is 90 days, subject to the Gate A charter.
 - **P5 · Contestability.** Any party can file an appeal against a scope. Its resolution, acceptance through a new version or rejection, is publicly recorded and attributable to the governor. *Holds cryptographically for the record*; timeliness is an institutional commitment.
 - **P6 · Attested enforcement.** A school is reported as protected under version *p*ᵢ only if a valid, unrevoked test attestation for *p*ᵢ exists, issued by the independent reviewer. *Rests on the honesty of the reviewer.* The ledger records the claim and its issuer; it cannot verify the claim.
-- **P7 · Aggregate integrity with minimisation.** Published impact figures are bound to a commitment that cannot be altered after anchoring, and they are derived only from events of the form (*school*, *day*, *category*) with cells below a threshold *k* suppressed. *Integrity holds cryptographically after anchoring. With the proof of §11, the figures are also bound to a committed event log and to the policy in force; the completeness of that log rests on the reviewer and the audit* (§5.4, §11).
+- **P7 · Aggregate integrity with minimisation.** Published impact figures are bound to a commitment that cannot be altered after anchoring, and they are derived only from events of the form (*school*, *day*, *category*) with cells below a threshold *k* suppressed. *Integrity holds cryptographically after anchoring. Once the planned proof of §11 is implemented (milestone M4; designed, not implemented today), the figures will also be bound to a committed event log and to the policy in force. Even then, the completeness of that log rests on the reviewer and the audit* (§5.4, §11).
 
 The distinction between P1–P5, which a ledger can enforce (for P5, the record but not its timeliness), and P6–P7, which a ledger can only record, is central to this work. We return to it in §6.1 and summarise it in Figure 6.
 
@@ -88,7 +88,7 @@ The system does not attempt to prove on-chain that a resolver behaves correctly 
 
 ### 3.5 Relevance to the Sustainable Development Goals
 
-The system addresses SDG target 4.a, safe and effective learning environments, and target 16.2, ending abuse and exploitation of children. It is equally motivated by targets 16.6, accountable and transparent institutions, and 16.10, public access to information and protection of fundamental freedoms. Protection that cannot be audited is hard to distinguish from censorship. For that reason the design publishes every block that can lawfully be published, commits to the remainder by hash (§4.2), and makes every block expire.
+The system addresses SDG target 4.a, safe and effective learning environments, and target 16.2, ending abuse and exploitation of children. It is equally motivated by targets 16.6, accountable and transparent institutions, and 16.10, public access to information and protection of fundamental freedoms. Protection that cannot be audited is hard to distinguish from censorship. For that reason the design publishes each local blocking rule that can lawfully be published, commits to restricted-list contents by hash (§4.2), and makes every policy version expire.
 
 ---
 
@@ -96,7 +96,7 @@ The system addresses SDG target 4.a, safe and effective learning environments, a
 
 ### 4.1 Overview
 
-The architecture has two planes. The **enforcement plane** runs in-country and consists of a pair of recursive resolvers with RPZ, DNSSEC validation and encrypted transport, a metrics exporter co-located with the resolvers, and a block page. Schools point their DNS to these resolvers; nothing is installed on devices. The **accountability plane** runs on an Ethereum layer-2 network. It consists of two contracts, the `VerifiablePolicyRegistry` and the `MetricsAnchor`, together with three EAS schemas. A public dashboard reads both planes. Only two kinds of information flow from the enforcement plane to the chain: attestations and aggregate commitments. Individual queries never do.
+The target architecture has two planes. The **enforcement plane** would run in-country and consist of a pair of recursive resolvers with RPZ, DNSSEC validation and encrypted transport, a metrics exporter co-located with the resolvers, and a block page. None of those runtime components is implemented in this repository beyond tooling and a reference configuration fragment. The **accountability plane** has two implemented, unaudited contracts, `VerifiablePolicyRegistry` and `MetricsAnchor`, plus three Defined but unregistered EAS schemas. The dashboard, schema resolver and public-network deployment are Planned. The design permits only attestations and aggregate commitments to reach the chain; this boundary has not been validated in a deployment.
 <p align="center"><img src="figures/fig1-architecture.svg" alt="Architecture with an enforcement plane and an accountability plane" width="100%"></p>
 
 *Figure 1. The enforcement plane (top) filters traffic in-country with a conventional resolver. The accountability plane (bottom) holds only commitments: policy versions, attestations and daily roots. The governor is the only party that can change a policy.*
@@ -108,7 +108,7 @@ Table 1 summarises the function of each part and its intended effect for student
 | --- | --- | --- | --- |
 | DNS filtering | Resolves each query against the zone compiled from the policy in force and blocks malware, phishing, adult content and CSAM at domain level | Protection from the first day of connectivity, including on shared devices without endpoint security | DNS from the school network is forced to the resolver (§4.5, A7) |
 | Minimisation | Queries, client addresses and device identifiers are not retained; only (*school*, *day*, *category*) tuples leave the resolver process, and small cells are suppressed | Browsing is not recorded and cannot be linked to an individual from the published data | The operator honours its RFC 8932 statement (A3), checked by audit; group-level limits in §5.2 |
-| Accountability plane | Records each policy version with its signatures, each school's attestations and a daily commitment to the aggregate counts; no personal data is written on-chain | Blocks of legitimate content become public, attributable and temporary, and published impact figures cannot be revised after the fact | P1–P5 and P7 under §3.2; P6 under reviewer honesty |
+| Accountability plane | Implemented contracts record policy commitments, appeal hashes and daily roots; Planned EAS records would carry attestation summaries. No end-user fields are accepted by these interfaces | Policy changes become attributable and temporary, and a changed release no longer matches its anchored root | P1–P5 and P7 under §3.2; P6 after attestation enforcement exists and under reviewer honesty |
 
 *Table 1. Components, their function and the conditions under which their effect for students holds.*
 
@@ -122,7 +122,7 @@ Some lists cannot be published. The IWF list of URLs hosting CSAM is distributed
 
 <p align="center"><img src="figures/fig2-authorisation.svg" alt="Policy authorisation flow" width="100%"></p>
 
-*Figure 2. Authorisation flow. Without a threshold of signatures the policy in force does not change. Each appended version is public, is loaded by the resolver only after its document is checked against the on-chain hash, and ends in an independent attestation per school.*
+*Figure 2. Authorisation flow. Without a threshold of signatures the policy in force does not change. Each appended version is public, is designed to be loaded by the resolver only after its document is checked against the on-chain hash (sync daemon planned, VPR-015), and ends in an independent attestation per school.*
 
 The governor appends a version by calling `publishPolicy(scopeId, h, ρ, u, c, validity, a)`. The contract rejects an empty hash and any validity outside (0, Δ_max]. If *a* is non-zero, the contract requires that *a* refers to an open appeal in the same scope and marks it accepted in the same transaction. In other words, accepting an appeal is not a separate administrative act: it consists of publishing the policy that resolves it.
 
@@ -132,7 +132,7 @@ Expiry is mandatory. When the latest version expires without renewal, `currentPo
 *Figure 3. One scope over 180 days. Version 2 renews version 1 before it expires. Version 3 resolves an appeal and replaces version 2. When version 3 expires without renewal, no version is in force and the scope falls back to protective categories. Superseded versions remain public.*
 
 
-An appeal is a short document naming the domain, the requested change and its reason. The registry stores only its hash, `fileAppeal(scopeId, documentHash)`, so no caller can place free text on-chain through an appeal, whether through the relayer or directly. The relayer behind the block page validates the document against the appeal format (INTERFACES.md, I9 [4]), rejects anything resembling personal data, publishes it off-chain keyed by its hash and files the hash, so the person appealing needs no wallet. The governor answers with a reasoned decision: a rejection records the hash of the published reasoning, and an acceptance records the content hash of the version that resolves the appeal. A rejected document can be filed again in a new round, while a document with an open or accepted round cannot.
+An appeal is designed as a short document naming the domain, the requested change and its reason. The implemented registry stores only its hash, `fileAppeal(scopeId, documentHash)`, so no caller can place free text on-chain through an appeal. The block-page relayer is Planned (VPR-017); it is intended to validate the document, reject personal data and file the hash so the appellant needs no wallet. Whether validated documents and reasoned decisions are public or access-controlled, and for how long, must be fixed in the Gate A DPIA. A rejection records a reason hash, and an acceptance records the content hash of the resolving policy version. A rejected document can be filed again in a new round, while a document with an open or accepted round cannot.
 
 ### 4.4 Attestations and issuer separation
 
@@ -144,7 +144,7 @@ Three EAS schemas, published under CC0, record claims about deployments. Each ha
 | `VPR.IndependentTest.v1` | Independent reviewer | From inside the school network: blocked categories are blocked, exceptions are reachable, DNSSEC validates, and known bypasses fail; valid until a stated time |
 | `VPR.Conformance.v1` | Auditor | The resolver service conforms to a named framework and version, for example NIST SP 800-81r3 or an RFC 8932 privacy statement |
 
-A school counts as protected only with a valid `VPR.IndependentTest.v1` for the version in force. Verifiers check that the attester belongs to the reviewer role for the scope. Roles are bound to addresses on-chain: the governor assigns each issuer a single role per scope with `setIssuer`, so the same address cannot be both operator and reviewer, and verifiers read the role from the registry rather than from an off-chain list. Enforcing the role inside EAS itself, through a schema resolver that consults the registry, is planned with the schema registration (VPR-012). The test result is published on-chain as a summary of four booleans. The full report is shared with the governor signers and committed to by its hash rather than published, because a detailed account of how a specific school's network resisted or failed bypass attempts is itself useful to an attacker. Attestations expire and are revoked if a re-test fails.
+Under the proposed reporting rule, a school would count as protected only with a valid `VPR.IndependentTest.v1` for the version in force. The implemented registry assigns each address one role per scope, but this does not yet constrain EAS issuance. Schema registration and a resolver that checks the registry are Planned (VPR-012). The Defined test schema contains a public summary of four booleans and a report hash. Report access, attestation validity and revocation procedures must be agreed at Gate A and implemented in M2.
 <p align="center"><img src="figures/fig4-issuers.svg" alt="Issuer separation across three attestation schemas" width="100%"></p>
 
 *Figure 4. Each schema has exactly one issuer role. The operator can state that a school is deployed, but only the independent reviewer can state that it is protected.*
@@ -168,16 +168,16 @@ A school counts as protected only with a valid `VPR.IndependentTest.v1` for the 
 
 *Figure 5. Identifying fields are discarded inside the resolver process. The exporter emits three fields per blocked query, the aggregator suppresses cells below k, and the release is committed to by a daily Merkle root that anyone can recompute.*
 
-The design principle is that privacy is enforced by what is collected, not by what is deleted afterwards. The resolver processes queries in memory and does not log them; the only exception is a short operational buffer whose duration is declared in the RFC 8932 statement. For each blocked query, the exporter emits a single tuple (*school_id*, *day*, *category*). *school_id* is the public identifier of the school, derived from the source network. *day* is a calendar date in UTC, and *category* is the policy category that caused the block. Client addresses, device identifiers, queried names and timestamps finer than a day are discarded inside the exporter's process and never reach the aggregator. The aggregator's interface accepts these three fields and nothing else.
+The design principle is that privacy should be enforced by what is collected, not by deletion after collection. The reference resolver configuration disables query logging. The Planned exporter would emit a single tuple (*school_id*, *day*, *category*) for each blocked query; client addresses, device identifiers, queried names and finer timestamps would not cross that boundary. This has not been validated against a running resolver or exporter. The implemented aggregator accepts exactly those three fields and rejects inputs with additional columns.
 
 ### 5.2 Release and suppression
 
-The aggregator counts tuples per cell (*school*, *day*, *category*) and suppresses every cell whose count is below *k*. In the pilot, *k* = 10. The released table is sorted and published as CSV and JSON, together with the number of suppressed cells.
+The aggregator counts tuples per cell (*school*, *day*, *category*) and suppresses every cell whose count is below *k*. The example and proposed starting value use *k* = 10; the DPIA must set the deployment parameter. The released table is sorted and published as CSV or JSON. The number of suppressed cells is deliberately not published.
 
 This mechanism defends against the most direct risk in a school setting. A count of 1 or 2 in a sensitive category at a small school could, combined with local knowledge, point to an individual child. Its guarantees are nonetheless limited, and we state the limits explicitly.
 
 - *Group disclosure.* A released cell of 25 blocks in an adult-content category at a school with a single class says something about that class. k-suppression bounds disclosure about individuals, not about small groups. This is the reason the release is restricted to the category level and never includes domains.
-- *Suppression is itself informative.* Publishing the number of suppressed cells reveals how many cells had between 1 and *k* − 1 events. We consider this acceptable at the aggregate level of a daily release, but it is a leak, and a variant that omits the count is trivial.
+- *Suppression is itself informative.* Publishing the number of suppressed cells reveals how many cells had between 1 and *k* − 1 events. The implementation therefore no longer publishes that number; a regression test checks that it does not appear in any output.
 - *Events are not individuals.* The threshold applies to the number of blocked queries in a cell, not to the number of distinct children who produced them. A single device that retries, prefetches or repeatedly reloads a blocked page can fill a cell on its own. The mechanism therefore suppresses small counts; it does not give k-anonymity in the sense of [17], where each released record is indistinguishable from at least *k* − 1 others. A threshold on distinct contributors would require the resolver to count clients, for instance with per-day salted identifiers held only in memory and discarded before export. That is compatible with minimisation at the source but adds state to the enforcement plane, and we leave it as a design option to be evaluated in the impact assessment.
 - *Composition.* Because each cell is released exactly once and cells do not overlap, differencing attacks across releases do not apply to the current design. They would apply as soon as overlapping aggregates were published, for example weekly totals alongside daily cells. Any such extension must be designed with a composable notion of privacy.
 
@@ -185,7 +185,7 @@ For deployments where overlapping or finer-grained releases are wanted, differen
 
 ### 5.3 Commitments
 
-Each daily release is committed to by a Merkle root. A leaf is keccak-256 of the UTF-8 string `school_id|day|category|count`. Internal nodes hash the sorted concatenation of their children, so proofs need no position bits, compatible with OpenZeppelin's `MerkleProof`. An odd node is promoted unchanged. The operator anchors the root with `commitRoot(scopeId, day, root, datasetUri)` in the `MetricsAnchor` contract, which accepts each (scope, day) only once. Anyone can download the release, recompute the root and compare it; anyone can also verify a single row against the anchored root with a logarithmic-size proof. The Solidity verifier, the JavaScript tests and the Python implementation share a test vector.
+Each daily release is committed to by a Merkle root. A leaf is `keccak256(0x00 || day:uint32 || count:uint256 || len(unit):uint16 || unit || len(category):uint16 || category)`, with big-endian integers and UTF-8 strings. Internal nodes hash `0x01 || min(a,b) || max(a,b)`, so proofs need no position bits. An odd node is promoted unchanged. The operator anchors the root with `commitRoot(scopeId, day, root, datasetUri)` in the `MetricsAnchor` contract, which accepts each (scope, day) only once. Anyone with the release can recompute the root or verify a single row. The Solidity tests and Python implementation share a test vector.
 
 Leaves and internal nodes are domain-separated, with tags 0x00 and 0x01 as in RFC 9162 [11]. A leaf encodes the on-chain day number, the count and the length-prefixed school identifier and category, so the encoding is unambiguous and a row cannot be verified against another day's root. Prefixes alone would not suffice if the contract accepted arbitrary leaves, since an internal node would still verify with a shortened proof. The anchor therefore exposes `verifyRow`, which computes the leaf from the row itself. The publisher of each scope is appointed by the scope's governor in the registry, and there is no first-caller configuration. This is dataset format 2.
 
@@ -205,7 +205,7 @@ A Merkle root anchored on-chain proves that a release has not been altered since
 | The document for version *i* is the one the governor approved | keccak-256 of the canonical document equals *h*ᵢ | Collision resistance; document availability |
 | School *x* applied version *i* at test time | Reviewer attestation, preceded by an operator attestation | Reviewer honesty; tests repeated before expiry |
 | Impact figures for day *d* were not changed after publication | Anchored root; public release | Collision resistance |
-| Impact figures for day *d* are the correct aggregation of the committed event log, under the policy in force | Zero-knowledge proof verified on-chain (§11) | Soundness of the proof system |
+| Impact figures for day *d* are the correct aggregation of the committed event log, under the policy in force | Planned: zero-knowledge proof verified on-chain (§11; designed, not implemented) | Soundness of the proof system, once implemented; today, operator honesty and audit |
 | The committed event log reflects actual blocks | Reviewer tests; audit | Reviewer and auditor honesty (§5.4) |
 | The resolver keeps no query logs | RFC 8932 statement, published configuration, conformance attestation | Operator and auditor honesty |
 
@@ -217,15 +217,15 @@ A Merkle root anchored on-chain proves that a release has not been altered since
 
 We consider the following adversaries.
 
-- **A1, a single governor signer acting alone,** for instance a ministry that wishes to block political content. Defeated by P3: a single signature cannot publish a version.
+- **A1, a single governor signer acting alone,** for instance a ministry that wishes to block political content. Under the proposed multisignature deployment, P3 prevents one signer from publishing a version. The registry alone does not provide this property: it trusts the configured governor address.
 - **A2, a colluding majority of signers.** Two of three signers could publish a version that blocks legitimate content. The design does not prevent this; it makes it *visible and temporary*. The version is public with its reason (P1), it expires (P4), the minority signer and the public can appeal (P5), and the record of the event is permanent (P2). We regard accountability without prevention as the correct guarantee here. Giving any single party a veto over a filtering policy would itself be a concentration of power. The same majority could also replace the third signer through the Safe's owner-management functions. That change is equally visible on-chain, and verifiers should treat any change to the signer set of a governor as an event that requires public justification.
-- **A3, a dishonest operator.** It might enforce a policy other than the one in force, keep query logs, or fabricate metrics. Divergent enforcement is detected by the reviewer's tests (P6), and logging is constrained by the RFC 8932 statement and by audit. Altering figures between the committed log and the publication is ruled out by the proof of §11; fabricating the log itself is not detected cryptographically and is left to the reviewer and the audit (§5.4).
+- **A3, a dishonest operator.** It might enforce a policy other than the one in force, keep query logs, or fabricate metrics. Divergent enforcement is detected by the reviewer's tests (P6), and logging is constrained by the RFC 8932 statement and by audit. Today, altering figures before publication is not detected cryptographically. The planned proof of §11 would rule out alteration between a committed log and the publication. Fabricating the log itself would still not be detected cryptographically and is left to the reviewer and the audit (§5.4).
 - **A4, a split-view resolver.** It behaves correctly for traffic it recognises as test traffic and differently for students. Tests are run from inside the school network, and the reviewer's test client must be indistinguishable from ordinary clients. Tests should be sampled at unannounced times and from ordinary devices. This is a known limitation of black-box measurement [14] and the main reason P6 rests on the reviewer rather than on cryptography.
 - **A5, an external attacker targeting signer keys.** Mitigated by threshold signing, hardware-backed or passkey-based custody, signer rotation through Safe and `setGovernor`, and by the fact that any malicious version is public and expiring.
 - **A6, a re-identification attacker using released metrics.** Mitigated by minimisation at the source and by k-suppression, within the limits stated in §5.2.
 - **A7, a user bypassing the filter** with external DoH, a VPN or an alternative resolver. Mitigated by blocking known public resolvers and DoH endpoints at the provider and by bypass testing in every review cycle. VPN and tunnelling bypasses cannot be fully prevented at the DNS layer; the attestation reports their status honestly rather than claiming otherwise.
 - **A8, an appeal spammer.** Appeals submitted through the relayer are rate-limited; appeals submitted directly to the contract cost the submitter gas. Since appeal identifiers are content-derived, duplicates are rejected.
-- **A9, the ledger itself.** A layer-2 sequencer could delay or censor transactions. Filtering does not depend on the ledger's liveness: the resolver continues to enforce the last verified version, and governance transactions can be forced through Ethereum L1 if the sequencer censors them.
+- **A9, the ledger itself.** A layer-2 sequencer could delay or censor transactions. Filtering does not depend on the ledger's liveness: the resolver continues to enforce the last verified version until it expires, after which the charter's fallback applies (§4.3), and governance transactions can be forced through Ethereum L1 if the sequencer censors them.
 - **A10, a party withholding or substituting documents.** Substituting a policy document or a released dataset is detected, since its hash no longer matches the on-chain commitment. Withholding one defeats P1 for that version without being detectable from the chain alone; it is mitigated by mirroring documents and releases on independent hosts (§8).
 
 ### 6.3 Contract-level considerations
@@ -240,7 +240,7 @@ We include a framework only when it adds something that can be evidenced in the 
 
 | Framework | Why it is included | Evidence |
 | --- | --- | --- |
-| UNICEF Policy on Personal Data Protection [22] and the data-protection law of the pilot country | These are the rules that bind UNICEF and its suppliers | Data protection impact assessment before the pilot |
+| Applicable law and institutional privacy requirements, to be identified at Gate A | No country or institutional arrangement is confirmed. The UNICEF Policy on Personal Data Protection is relevant only if the confirmed arrangement makes it applicable | Jurisdiction-specific legal review and data protection impact assessment before any school pilot |
 | NIST SP 800-81r3 [6] | Current reference for protective DNS, covering RPZ, encrypted DNS and DNSSEC; it references the relevant protocol specifications, which therefore need no separate entry | Resolver compliance matrix, reviewed in the external audit |
 | RFC 8932 [9] | Turns what the resolver logs, for how long and with whom into a public, auditable statement | Published statement; each version's hash committed on-chain |
 | UK Safer Internet Centre school-filtering criteria [23] with the IWF list [10] | The most developed public framework specific to school filtering that we are aware of | Published self-certification checklist |
@@ -248,7 +248,7 @@ We include a framework only when it adds something that can be evidenced in the 
 | EAS [15] and W3C Verifiable Credentials 2.0 [16] | School certificates verifiable on and off Ethereum | Published schemas |
 | ISO/IEC 27001 | Development and operation take place within Xcapit's certified information security management system; this is a property of the operator, not a new standard for the system | Current certificate |
 
-We deliberately exclude the following: the UK Department for Education filtering standards, which bind UK schools rather than providers; CISA Protective DNS and DNS4EU, which are services rather than certification schemes; ISO/IEC 27701 and 29100, whose concerns are covered by the UNICEF policy and the impact assessment; and the GDPR and COPPA, which do not apply to a pilot in Latin America. A deployment in another jurisdiction would revisit this list.
+We do not claim compliance with the UK Department for Education filtering standards, CISA Protective DNS, DNS4EU, ISO/IEC 27701 or ISO/IEC 29100. Applicability of GDPR, COPPA and national law cannot be decided from the proposed region alone; the Gate A jurisdiction-specific legal review must determine the applicable instruments and the evidence required for each.
 
 ---
 
@@ -267,9 +267,9 @@ The pilot has two phases (see the roadmap [4]). Phase 1 lasts four months: one m
 | Schools protected and holding a valid independent test attestation | Phase 1: at least 2 of 2–5 alpha schools; phase 2: 20–50 |
 | Policy changes authorised by the multisignature and published with their reason | 100% |
 | Personal data on-chain or in published datasets | None, confirmed by the external audit |
-| Reports of wrongly blocked sites answered | Within 5 working days |
+| Reports of wrongly blocked sites answered | Target set in the Gate A scope charter |
 | Attested schools passing the periodic bypass test | All |
-| Resolver availability | 99.9% |
+| Resolver availability | Target set at Gate A from selected hosting and school-link conditions |
 | Published roots recomputed by a party outside the project | At least one |
 | Digital Public Good registration | Application submitted with signed evidence for indicators 7–9 (phase 1); approval is an outcome, not a deliverable |
 
@@ -283,25 +283,27 @@ DNS filtering operates on domain names. IWF entries that are individual URLs on 
 
 ## 11. Closing the enforcement–accountability gap
 
-The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. The pilot closes the middle link with zero-knowledge proofs of aggregation. They are planned as a reference implementation on testnet in phase 1 (milestone M4), with the circuit audit and mainnet verifier in phase 2, and are not yet implemented in the proof of concept. Trusted execution and verifiable differential privacy remain further work.
+The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. Milestone M4 proposes to narrow the middle link with a zero-knowledge aggregation proof on testnet; the circuit audit and mainnet verifier are deferred to a separately agreed phase 2. No proof implementation exists in the proof of concept. Trusted execution and verifiable differential privacy remain further work.
 
 <p align="center"><img src="figures/fig7-gap.svg" alt="Enforcement-accountability gap link by link" width="100%"></p>
 
-*Figure 7. From resolver behaviour to on-chain root. The link from release to root is cryptographic. The link from log to release rests on the operator today and is closed in the pilot by a zero-knowledge proof of aggregation (§11.1). The link from behaviour to log rests on the reviewer and the auditor, and could be strengthened with remote attestation of a trusted execution environment (§11.3).*
+*Figure 7. From resolver behaviour to on-chain root. The link from release to root is cryptographic. The link from log to release rests on the operator today and is to be closed by a zero-knowledge proof of aggregation, designed in §11.1 and planned for milestone M4. The link from behaviour to log rests on the reviewer and the auditor, and could be strengthened with remote attestation of a trusted execution environment (§11.3).*
 
 ### 11.1 Statement
 
-For a scope *s* and a day *d*, let *L* = ⟨*e*₁, …, *e*ₘ⟩ be the event log, where each *e*ⱼ = (*school*ⱼ, *d*, *category*ⱼ), and let *C*_L = Commit(*L*; ρ) be a binding and hiding commitment to *L* under fresh randomness ρ, anchored together with the daily root. Hiding is required, not incidental: the counts in a day are small integers and the unsuppressed cells are public, so an unsalted hash of *L* would let anyone recover the suppressed cells by enumeration. Let Cat(*h*) be the set of categories of the policy in force, whose document hashes to *h*. Let Agg_k(*L*) be the table of counts per (*school*, *d*, *category*) with every cell below *k* removed, and let MR(·) be the Merkle root of §5.3. The operator proves knowledge of a witness (*L*, ρ) for the relation
+The normative relation, with every encoding, is specified in `docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md` (§5–§6) and ADR-0010. In outline, for a scope *s* and a day *d*, the event log *L* = ⟨*e*₁, …, *e*ₘ⟩ is committed by *C*_L. The commitment is a salted hash of a Merkle root over salted, domain-separated event leaves, so it is binding and hiding. The number of events *m* stays private, because publishing it would reveal the total of the suppressed cells. Hiding is required: counts are small and the published cells are public, so an unsalted commitment would let anyone recover the suppressed cells by enumeration. The operator proves knowledge of the events and salts such that:
 
-  R(*h*, Cat, *k*, *C*_L, *root*; *L*, ρ) ⟺ Commit(*L*; ρ) = *C*_L ∧ ∀*j*: *category*ⱼ ∈ Cat ∧ MR(Agg_k(*L*)) = *root*.
+- (a) they open *C*_L;
+- (b) every event belongs to scope *s*, day *d*, an admitted unit and a category of the policy version in force;
+- (c) the published root equals the Merkle root of Agg_k(*L*).
 
-The public inputs are the policy hash *h*, its category set Cat, the threshold *k*, the log commitment *C*_L and the daily root. The binding between Cat and *h* is checked either in the circuit or by any verifier holding the public document; the specification (VPR-033) fixes which, based on proving cost. The proof is zero-knowledge in *L*, so the counts of suppressed cells stay hidden. As a side effect, the number of suppressed cells no longer needs to be published (§5.2).
+The public inputs are a deployment domain (chain id, verifier and anchor addresses), *s*, *d*, the policy version and its content hash, the commitments `catRoot` and `unitRoot`, *k*, *C*_L, the root and the format version. The verifier contract reads `catRoot` and `unitRoot` from the registry; the prover never supplies them. That makes the category-to-policy binding part of the verified statement rather than an optional off-chain check. Tools and the dashboard confirm that `catRoot` matches the published document. The proof is zero-knowledge in *L*, so suppressed cells stay hidden.
 
 ### 11.2 What the proof guarantees, and implementation
 
 Given a valid proof, the published figures are exactly the suppressed aggregation of a log the operator committed to, and no event in that log falls outside the policy in force. The operator can no longer adjust the figures after the fact, or report blocks in categories the governor never approved. The proof does not establish that *L* is complete or that its events occurred. That property belongs to the first link of Figure 7 and still rests on the reviewer's measurements and on audit. A partial tie is available at low cost: the independent reviewer issues test queries from known schools on undisclosed days, records them as canary events, and after each release asks the operator for a proof that every canary is included in *L*. An operator who drops or rewrites events cannot tell canaries from real traffic, so omission is detected with a probability that grows with the number of canaries (VPR-038).
 
-Two implementation routes are evaluated in the first month: a general-purpose zero-knowledge virtual machine running a reference implementation of R, or a dedicated circuit for counting, threshold comparison and membership. zkVM proofs are usually wrapped into a succinct proof such as Groth16 [25] or PLONK [26] for verification on the EVM. A dedicated circuit is cheaper to prove but must implement keccak-256, which is expensive in arithmetic circuits. One option is to commit to *L* with a SNARK-friendly hash such as Poseidon [27] and keep keccak-256 only for the public Merkle root. The anchoring contract accepts a daily root only together with a proof that verifies on-chain. The circuit and the verifier fall within the scope of the external audit. If proving a full day exceeds the daily budget on commodity hardware, the fallback is one proof per school, aggregated off-chain.
+Two implementation routes are to be evaluated in milestone M1: a general-purpose zero-knowledge virtual machine running a reference implementation of R, or a dedicated circuit for counting, threshold comparison and membership. zkVM proofs are usually wrapped into a succinct proof such as Groth16 [25] or PLONK [26] for verification on the EVM. A dedicated circuit is cheaper to prove but must implement keccak-256, which is expensive in arithmetic circuits. One option is to commit to *L* with a SNARK-friendly hash such as Poseidon [27] and keep keccak-256 only for the public Merkle root. In the planned design, the anchoring contract accepts a daily root only together with a proof that verifies on-chain; the circuit and the verifier are audited in phase 2, before any mainnet use. If proving a full day exceeds the daily budget on commodity hardware, the fallback is one proof per school, aggregated off-chain.
 
 ### 11.3 Further work
 
@@ -323,14 +325,14 @@ Design rule: the ledger holds data about institutions (schools, agencies), never
 
 | Data | Location | Visibility | Purpose |
 | --- | --- | --- | --- |
-| Policy content hash, reason code, expiry, signatures | On-chain | Public | Audit what is blocked, by whom and why; detect over-blocking |
+| Policy content hash, reason code, expiry; the authorising governor address (signatures stay in the governor contract, e.g. the Safe) | On-chain | Public | Audit what is blocked, by whom and why; detect over-blocking |
 | Full policy document (categories, feeds, local blocks, exceptions with reasons) | Off-chain, mirrored | Public | Audit the content of each version |
 | Restricted list (e.g. IWF) | Operator only | Commitment public; contents never published | Block CSAM without disclosing the list |
-| Deployment, test and conformance attestations | On-chain (EAS) | Public; full test reports shared with the governor and committed by hash | Certify schools to donors and governments |
+| Deployment, test and conformance attestations (Planned; schemas Defined) | Proposed on-chain EAS records | Public summary and report hash; report access set by the Gate A charter | Record deployment and review claims without implying that the ledger verifies them |
 | Daily aggregate release (school, day, category, count ≥ *k*) | Off-chain, mirrored | Public | Measure impact |
 | Daily Merkle root of the release | On-chain | Public | Prevent later alteration of impact figures |
-| Appeals (domain, request, reason) | On-chain reference, off-chain document | Public | Contest blocks |
-| Individual queries, IP addresses, device identifiers | Not stored beyond a declared operational buffer | Nobody | Resolver operation only |
+| Appeals (domain, request, reason) | Public on-chain hash and status; off-chain document | Off-chain access and retention set by the Gate A DPIA | Contest blocks without placing free text on-chain |
+| Individual queries and client IP addresses (Designed handling) | Transient resolver processing; retention prohibited except any buffer explicitly approved in the DPIA | Resolver operator during processing | Resolver operation only; no deployed evidence yet |
 
 ## Appendix B. Specification pointers
 

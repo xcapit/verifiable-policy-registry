@@ -2,7 +2,7 @@
 
 ## Status
 
-The project is a proof of concept. The contracts are **not audited** and are not deployed to any mainnet. An external audit is planned before mainnet deployment (see [ROADMAP](docs/ROADMAP.md), milestone M3).
+The project is a research prototype (v0.3 preparation). The contracts are **not audited**, have not been formally verified and are not deployed to any network other than local test chains. No independent security review has taken place. An external audit of the registry, the anchor and the resolver configuration is planned before mainnet deployment ([ROADMAP](docs/ROADMAP.md), milestone M3, Gate C). The threat model is in [docs/security/THREAT_MODEL.md](docs/security/THREAT_MODEL.md).
 
 ## Reporting a vulnerability
 
@@ -25,7 +25,8 @@ We will:
 In scope:
 
 - `contracts/`: access control, appeal state machine, expiry checks, Merkle verification;
-- `tools/`: policy hashing and validation, RPZ compilation, aggregation and k-suppression, Merkle proofs;
+- `tools/`: policy hashing and validation, RPZ compilation and zone evaluation, aggregation with small-cell suppression (including any leak of suppressed cells), Merkle proofs, the toolkit API and CLI;
+- `examples/e2e/`: the demonstrator, including any way it could publish data it should not;
 - `deploy/`: reference resolver configuration (for example settings that would leak query data);
 - `schemas/`: issues that would let one role issue an attestation reserved for another.
 

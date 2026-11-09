@@ -48,6 +48,8 @@ def proof(leaves: list[bytes], index: int) -> list[bytes]:
 
 
 def verify(leaf: bytes, path: list[bytes], expected_root: bytes) -> bool:
+    if len(leaf) != 32 or len(expected_root) != 32 or any(len(p) != 32 for p in path):
+        return False
     computed = leaf
     for p in path:
         computed = hash_pair(computed, p)

@@ -1,13 +1,20 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "vpr-tools"
 version = "0.2.0"
 description = "Off-chain tooling for the Verifiable Policy Registry: policy hashing, RPZ compilation and threshold-suppressed metrics"
-license = { text = "AGPL-3.0-only" }
+license = "AGPL-3.0-only"
 requires-python = ">=3.10"
 dependencies = ["pycryptodome>=3.20", "pyyaml>=6"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+
+[tool.setuptools]
+packages = ["vpr"]
 
 [project.scripts]
 vpr = "vpr.cli:main"

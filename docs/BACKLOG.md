@@ -2,6 +2,34 @@
 
 Issue-ready tasks after the proof of concept. Each has acceptance criteria so it can be implemented spec-first. IDs are stable; reference them in commits (`VPR-012: ...`).
 
+## v0.3 · Readiness for external review
+
+Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANALYSIS.md). Items marked **Done in v0.3** are implemented or written in the v0.3 branch; the others carry their milestone.
+
+| ID | Task | Depends on | Status |
+| --- | --- | --- | --- |
+| VPR-050 | Baseline, gap analysis and claims-and-evidence ledger | — | **Done in v0.3** |
+| VPR-051 | Cryptographic evidence pack: encodings, designed ZK relation, risk register, proving-system decision record | VPR-050 | **Done in v0.3** (decision itself due in M1, VPR-033) |
+| VPR-003 | Threat model | VPR-050 | **Done in v0.3** for existing and designed components; review at Gate A |
+| VPR-052 | Privacy and re-identification analysis, data inventory, privacy regression tests | VPR-050 | **Done in v0.3**; release-policy parameters need pilot data (DPIA, M1) |
+| VPR-053 | Generic verification toolkit, second use case, CLI JSON and exit codes (ADR-0009) | — | **Done in v0.3** |
+| VPR-054 | Demonstrator with zone evaluation, expiry, appeal rejection, negative cases and evidence manifest | VPR-053 | **Done in v0.3** |
+| VPR-055 | Pinned resolver container in the demonstrator (real DNS queries, no query logging asserted) | VPR-019 | Planned (M2) |
+| VPR-056 | Giga pilot-readiness package; ESP package; DPG evidence matrix | VPR-050 | **Done in v0.3** (proposal documents; inputs marked) |
+| VPR-057 | Reviewer guide mapped to the 14 review questions | VPR-050–056 | **Done in v0.3** |
+| VPR-058 | Registry fields `catRoot` and `unitRoot` (ADR-0010) and ZK verifier anchoring | VPR-033 | Designed; Planned (M4) |
+| VPR-059 | Declare the licence of published datasets (ODC-PDDL or CC0) | Maintainer decision | Blocked: maintainer decision |
+| VPR-061 | Child-rights and human-rights impact assessment, including a misuse review, with the deploying partner (DPG indicator 9) | Depends on a confirmed partner | Planned (M1–M2); blocked without a partner |
+| VPR-062 | Run the demonstrator on a second EVM network and with a second resolver implementation (DPG indicator 4) | VPR-010, VPR-055 | Planned (M2) |
+| VPR-063 | Bulk export of on-chain history (versions, appeals, roots) to CSV/JSON (DPG indicator 6) | — | Planned (M3) |
+| VPR-064 | Playbook for new countries (charters, profiles, onboarding) | VPR-026 | Planned (M3) |
+| VPR-065 | Bind feed contents (hash per feed in `threat_feeds`) and the produced zone (`resolverConfigHash`) to the policy version | Compiler refuses a feed whose hash differs; the attestation carries the zone hash | Planned (M2) |
+| VPR-066 | Anchor hardening: bound `day` to a window around the current date, explicit publisher revocation, governor-gated correction record, length cap on `datasetUri`/`uri`, daily release-or-empty marker | Tests for future/past days, revocation, correction and caps | Planned before the audit freeze (M3) |
+| VPR-067 | Registry hardening: two-step `setGovernor`, protocol cap on `maxValidity`, on-chain validation of reason codes | Tests for each; INTERFACES updated | Planned before the audit freeze (M3) |
+| VPR-068 | Derive the scope id on-chain from the governor and the scope name, so canonical names cannot be front-run | Front-running test; manifest format updated | Planned (M2, with VPR-049) |
+| VPR-069 | Appeal format 3 with a document salt; documentation that rounds are not an escalation count; optional time-out of open appeals | Pre-filing of a guessable document no longer possible; tests | Planned (M2) |
+| VPR-060 | Check of `valid_days` and document version against the on-chain call in tools and dashboard | — | Planned (M2, with VPR-015) |
+
 ## M1 · Design and sign-off (weeks 1–4)
 
 See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--weeks-14--15). VPR-033 (ZK specification) is also delivered in this milestone.
@@ -10,7 +38,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | --- | --- | --- |
 | VPR-001 | Write `docs/specs/registry.md`: formal spec of both contracts (state, events, errors, invariants) | Every external function documented with pre/post-conditions; invariants listed (versions append-only, expiry mandatory, appeal state machine) |
 | VPR-002 | Write `docs/specs/eas.md`: schema fields, issuer roles, revocation rules, validity windows | Matches `schemas/eas-schemas.json`; defines who may issue/revoke each schema |
-| VPR-003 | Threat model `docs/THREAT_MODEL.md` (STRIDE per component) | Covers registry, governor keys, resolver, exporter, aggregator, block page; each threat mapped to a mitigation or accepted risk |
+| VPR-003 | Threat model `docs/security/THREAT_MODEL.md` (STRIDE per component; first version in v0.3, review at Gate A) | Covers registry, governor keys, resolver, exporter, aggregator, block page; each threat mapped to a mitigation or accepted risk |
 | VPR-004 | DPIA template `docs/DPIA.md` aligned with UNICEF Policy on Personal Data Protection | Sections for data inventory, necessity, risks, mitigations; reviewed by Giga |
 | VPR-005 | Finalise `docs/PRIVACY_STATEMENT.md` (RFC 8932 RPS) | Placeholders resolved; `vpr` command prints its keccak256 |
 | VPR-006 | Filtering profiles: `policies/profiles/{primary,secondary,teachers}.yaml` mapped to ITU COP categories | Each validates with `vpr policy-hash`; mapping table in `docs/PROFILES.md` |
@@ -44,8 +72,8 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-021 | Public dashboard (static site) reading registry, EAS and anchor | Shows policy in force + history with reasons, schools with valid attestations, daily metrics with verification button |
 | VPR-022 | NIST SP 800-81r3 compliance matrix `docs/compliance/nist-800-81r3.md` | Each applicable recommendation mapped to config or control, with evidence |
 | VPR-023 | UK Safer Internet Centre self-certification checklist | Completed and published in `docs/compliance/` |
-| VPR-024 | Security analysis with MIESC + external audit preparation | Findings triaged; no open high-severity issues |
-| VPR-025 | DPG application package | Every item in the *Still to do* list of `docs/DPG.md` closed; all 9 DPG Standard indicators evidenced with links; application submitted by the authorised representative |
+| VPR-024 | Static analysis (MIESC, Slither) and external audit of the registry, anchor and resolver configuration, with fixes and a re-check | Public audit report; no open high-severity finding after re-check |
+| VPR-025 | DPG application package | Every Gap and Credible-path row in `docs/DPG_EVIDENCE_MATRIX.md` closed or re-assessed; all 9 DPG Standard indicators evidenced with links; application submitted by the authorised representative |
 | VPR-027 | **Done in 0.2.0.** Domain-separate Merkle leaves and internal nodes (RFC 9162-style `0x00`/`0x01` prefixes) in `MetricsAnchor.verifyLeaf`, `tools/vpr/merkle.py` and the JavaScript tests | An internal node presented as a leaf no longer verifies; shared test vector updated in all three implementations; ADR and new dataset format version per INTERFACES.md |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
