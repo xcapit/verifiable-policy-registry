@@ -6,7 +6,7 @@
 
 ## Purpose
 
-This package describes how the Verifiable Policy Registry (VPR) could be piloted in schools connected through Giga, written for programme, education and data-protection staff rather than for blockchain engineers. VPR is a DNS-based filter (it decides, before a page loads, whether a website's name is allowed) combined with a **public record** in which every filtering rule, every change, every appeal and a daily summary of how many threats were blocked are published so that anyone can check them. The public record is a shared ledger that no single party can rewrite; schools, teachers and ministry staff never need to use it directly.
+This package describes how the Verifiable Policy Registry (VPR) could be piloted in schools connected through Giga, written for programme, education and data-protection staff rather than for blockchain engineers. The proposed system combines DNS filtering with a **public record** of policy commitments, policy changes, appeal hashes, attestation summaries and daily aggregate commitments. Full policy documents and validated appeal documents remain off-chain under an availability and retention policy to be agreed at Gate A. The ledger is intended to make the institutional record independently checkable; schools, teachers and ministry staff would not need to use it directly.
 
 ## The package
 
@@ -43,12 +43,12 @@ The pilot follows the two-phase plan in [../ROADMAP.md](../ROADMAP.md), preceded
 | Stage | When | Schools | Data |
 | --- | --- | --- | --- |
 | 0 · Synthetic pre-pilot | Weeks 1–6 | None | Synthetic policy, synthetic domains, synthetic event counts |
-| 1 · Alpha | Weeks 8–16 (phase 1) | 2–5 schools | Real DNS traffic processed in memory; only daily aggregate counts leave the resolver |
+| 1 · Alpha | Weeks 8–16 (phase 1) | 2–5 schools | Designed flow: three-field block events cross the resolver boundary; only thresholded aggregate counts are published |
 | 2 · Cohort | Phase 2, only if gates are met | 20–50 schools | Same as alpha |
 
 ### Stage 0 · Synthetic pre-pilot
 
-Before any school is connected, the full flow runs end to end on a public test network with synthetic data only: a synthetic policy is published, compiled into a filter zone and checked against a list of synthetic allowed and blocked domains; synthetic events are aggregated with small-cell suppression; the daily summary is anchored in the public record and verified independently; an appeal is filed and resolved; a policy is allowed to expire to confirm the fallback. Ministry and Giga staff can watch this run and repeat it from the instructions in the repository. Nothing in Stage 0 touches a school network or a child.
+Before any school is connected, the full flow would run end to end on a public test network with synthetic data only: a synthetic policy would be published, compiled into a filter zone and checked against synthetic allowed and blocked domains; synthetic events would be aggregated with small-cell suppression; the daily summary would be anchored and independently verified; an appeal hash would be filed and resolved; and a policy would be allowed to expire. The repeatable local-chain demonstrator exists today; the public-testnet deployment and partner rehearsal are Planned for M2. Nothing in Stage 0 would touch a school network or a child.
 
 **Exit criteria for Stage 0.** All steps pass on the test network; the reviewer confirms that no output contains queried domain names, IP addresses or device identifiers; the scope charter, DPIA and privacy statement are signed (Gate A in the roadmap).
 
@@ -61,11 +61,11 @@ All of the following must be true before the first school is connected:
 3. The connectivity provider has confirmed in writing that it can direct school DNS to the resolver and block external resolvers for the alpha schools ([../ARCHITECTURE.md](../ARCHITECTURE.md#deployment-conditions)).
 4. The block page with an appeal route exists at least in the main language of the pilot country.
 5. The reviewer test kit can run from a school network.
-6. A rollback has been rehearsed: the school's DNS setting can be returned to its previous state within one working day.
+6. A rollback has been rehearsed: the school's DNS setting can be returned to its previous state within the target agreed in the scope charter.
 
 ### Exit gates for the alpha (Gate B and Gate C)
 
-- Gate B (week 10): at least two alpha schools hold a valid independent test attestation, bypass tests pass, and no personal data appears in any export.
+- Gate B (week 10): at least two alpha schools hold a valid independent test attestation, bypass tests pass, and no end-user personal data appears in any export.
 - Gate C (week 16): the registry and anchor are audited, with no open high-severity finding, before they are used on the main public network.
 
 Phase 2 (Stage 2) is proposed only if both gates are met and the evaluation in [MEASUREMENT_AND_EVALUATION.md](MEASUREMENT_AND_EVALUATION.md) supports it.
@@ -78,7 +78,7 @@ The pilot in a school, or the whole pilot, stops if any of the following occurs:
 - an over-block of educational or health content is not corrected within the agreed response time and the governing institutions cannot agree on a correction;
 - the reviewer cannot test a school for two consecutive cycles;
 - a policy is changed without the required signatures, or a signer key is believed compromised and cannot be rotated;
-- the ministry, the school community or Giga asks to stop.
+- the ministry, the school community or the confirmed Giga counterpart asks to stop.
 
 ### Rollback
 

@@ -2,7 +2,9 @@
 
 *CC BY 4.0 · v0.3 · Owner: Diana Truyol (impact and privacy evidence), with Fernando Boiero. This document is a technical analysis, not a legal opinion. Compliance with data-protection law depends on the country and is assessed in the DPIA with the deploying partner (ROADMAP M1).*
 
-## 1. Data inventory and retention
+## 1. Designed data inventory and retention
+
+This table describes the target deployment, not current runtime evidence. The repository implements the aggregation and commitment path, contains a no-logging resolver configuration fragment, and does not contain a running resolver or exporter. Rows concerning those components remain **Designed** or **Planned** until M2 and require Gate A DPIA decisions.
 
 | Data | Where it exists | Processed for | Retained | Published | Leaves the resolver process? |
 | --- | --- | --- | --- | --- | --- |
@@ -15,11 +17,11 @@
 | Daily release: cells with count ≥ *k* | Public mirrors; root on-chain | Impact reporting | Permanent | Yes | Yes |
 | Suppressed cells and their number | Aggregator memory only | — | Not retained after the release | **Never** | No |
 | Policy documents | Public mirrors; hash on-chain | Transparency | Permanent | Yes | n/a |
-| Appeal documents | Relayer; hash on-chain | Recourse | Retention to be fixed in the DPIA; withdrawable off-chain | Yes, after validation | n/a |
+| Appeal documents | Planned relayer; hash on-chain | Recourse | Retention and access policy to be fixed in the DPIA; removable off-chain | Unknown — Gate A decision; only the hash is necessarily public | n/a |
 | Reviewer test reports | Shared with the governor; hash on-chain | Attestation | Per charter | Summary only | n/a |
 | Operator and signer addresses | On-chain | Accountability | Permanent | Yes | n/a |
 
-**Never collected or processed by the system:** browsing histories, per-device or per-user identifiers, names, contact details of students, page content, URLs below the domain, and location beyond the public school identifier.
+**Excluded by the design:** retained browsing histories, per-device or per-user identifiers, names or contact details of students, page content, URLs below the domain, and location beyond the public school identifier. This is not yet an observed property of a deployed system.
 
 **Processed transiently:** a recursive resolver necessarily sees client IP addresses and queried names. This is personal-data processing even if nothing is retained, and the privacy statement says so ([PRIVACY_STATEMENT](../PRIVACY_STATEMENT.md)).
 
@@ -68,7 +70,7 @@ No single value of *k* is safe everywhere, and this document does not claim one.
 
 ## 6. Small schools and sparse categories
 
-Many Giga schools are small. For them, the daily per-school release is the main risk. In the alpha (2–5 schools), the default should be: protective categories daily, sensitive categories weekly and merged, and no publication for schools below *N_min* until the DPIA sets it. The proposed defaults are in [docs/giga/MEASUREMENT_AND_EVALUATION.md](../giga/MEASUREMENT_AND_EVALUATION.md).
+Small schools are a foreseeable pilot condition. For them, the daily per-school release is the main risk. In the proposed alpha (2–5 schools), the starting design is: protective categories daily, sensitive categories weekly and merged, and no publication for schools below *N_min* until the DPIA sets it. These are design inputs, not approved defaults.
 
 ## 7. Automated privacy regression tests
 

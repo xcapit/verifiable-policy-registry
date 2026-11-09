@@ -4,9 +4,9 @@
 
 **Accountable content filtering for school connectivity, designed to minimise and never publish data about children.**
 
-Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is usually delivered by network-level filtering. The same mechanism is among the most common instruments of internet censorship. A filter is legitimate only when people outside the operator can see what it blocks, who decided it and for how long, and can be sure that it does not record what children do. Conventional filters provide none of these guarantees.
+Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is often delivered by network-level filtering. The same mechanism can also be used for internet censorship. A filter is accountable only when people outside the operator can verify what it blocks, who decided it and for how long, and what data the infrastructure retains. Conventional deployments do not necessarily make those properties publicly verifiable.
 
-The Verifiable Policy Registry (VPR) separates the **enforcement** of filtering from its **accountability**. A standard protective DNS resolver enforces the policy in-country. An Ethereum layer-2 network holds only commitments. Every policy version is published in full, except for legally restricted lists, which are committed to by hash, and is authorised by a threshold of independent institutions. It expires by default and can be contested. An independent reviewer, never the operator, attests that each school is actually protected. Impact is reported as aggregates with small-cell suppression, bound to a daily Merkle root that anyone can recompute. No personal data, and no caller-supplied free text, is written on-chain: appeals are recorded as hashes of documents validated off-chain.
+The Verifiable Policy Registry (VPR) is designed to separate the **enforcement** of filtering from its **accountability**. In a deployment, a standard protective DNS resolver would enforce the policy in-country, while an Ethereum layer-2 network would hold only commitments. Policy documents would be published in full except for legally restricted lists, which would be committed to by hash, and a threshold governor would authorise each version. Versions expire by default and can be contested. A reviewer independent of the operator would attest deployment tests. Impact releases use small-cell suppression and a daily Merkle root that anyone can recompute. The implemented contracts write no end-user personal data or caller-supplied free text on-chain: appeals are represented by hashes of documents handled off-chain.
 
 The project team proposes a first deployment in schools connected by **UNICEF Giga** in Latin America: a controlled alpha in two to five schools, then, if its gates are met, a cohort of 20 to 50 ([roadmap](docs/ROADMAP.md), [pilot proposal](docs/giga/PILOT_READINESS.md)). No pilot, funding or endorsement has been agreed with Giga, UNICEF, the Ethereum Foundation or any other party. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
 
@@ -30,13 +30,13 @@ The system is built around seven properties, stated formally in the [white paper
 | --- | --- | --- |
 | Transparency | Anyone can see which policy is in force and check its full document against the on-chain hash | Cryptography |
 | Non-equivocation | Everyone sees the same append-only history of versions | Ledger consensus |
-| Threshold authorisation | A policy changes only with *m* of *n* signatures (pilot: UNICEF Giga, Ministry of Education, independent reviewer) | Multisignature |
+| Threshold authorisation | A policy changes only with *m* of *n* signatures (proposed pilot composition, subject to agreement: a Giga counterpart, the Ministry of Education and an independent reviewer) | Multisignature |
 | Bounded duration | Every version expires (pilot: at most 90 days) unless it is signed again | Contract |
 | Contestability | Anyone can appeal; acceptance or rejection is recorded on-chain | Contract + governor |
 | Attested enforcement | A school counts as protected only with a valid attestation from the independent reviewer | Reviewer |
 | Aggregate integrity | Published impact figures cannot be changed after anchoring, contain only counts at or above a suppression threshold, and, from milestone M4 (testnet, phase 1), come with a zero-knowledge proof that they aggregate the committed event log under the policy in force | Cryptography; ZK proof planned (M4); completeness of the log rests on the reviewer |
 
-What the ledger cannot prove is that a resolver behaves as declared at runtime. It is covered by independent black-box testing and audit. In addition, the pilot plans [zero-knowledge proofs of aggregation](docs/WHITEPAPER.md#11-closing-the-enforcementaccountability-gap): by the end of the pilot, every daily release is to carry a proof, verified on-chain, that it is the correct k-suppressed aggregation of a committed event log under the policy in force.
+What the ledger cannot prove is that a resolver behaves as declared at runtime. A deployment would therefore require independent black-box testing and audit. The proposed phase 1 also plans [zero-knowledge proofs of aggregation](docs/WHITEPAPER.md#11-closing-the-enforcementaccountability-gap): the M4 acceptance criterion is that each alpha release from week 14 carries a proof on OP Sepolia that it is the correct k-suppressed aggregation of a committed event log under the policy in force. This proof system is not implemented today.
 
 ## Documentation
 
@@ -111,7 +111,7 @@ The pilot targets school networks, but the components are generic and released f
 
 | Component | Status | What it gives you |
 | --- | --- | --- |
-| EAS schemas `VPR.Deployment.v1`, `VPR.IndependentTest.v1`, `VPR.Conformance.v1` ([`schemas/`](schemas), CC0) | Defined | Attestations for "deployed", "independently tested" and "conforms to framework X", with one issuer role per schema so that an operator never certifies itself |
+| EAS schemas `VPR.Deployment.v1`, `VPR.IndependentTest.v1`, `VPR.Conformance.v1` ([`schemas/`](schemas), CC0) | Defined; role enforcement Planned | Attestation formats for "deployed", "independently tested" and "conforms to framework X". The registry records one issuer role per address; a Planned schema resolver will enforce those roles at issuance (VPR-012) |
 | Policy registry pattern (`VerifiablePolicyRegistry`) | Implemented, not audited | Versioned commitments with a stated reason, mandatory expiry bounded per scope, on-chain appeals and a governor that can be any Safe |
 | `MetricsAnchor` | Implemented, not audited | Write-once daily Merkle roots per scope, publisher appointed by the governor, and on-chain verification of a single row with domain-separated hashing |
 | `vpr` tools | Implemented | Canonical hashing of policy documents, RPZ compilation, aggregation with small-cell suppression and Merkle proofs |

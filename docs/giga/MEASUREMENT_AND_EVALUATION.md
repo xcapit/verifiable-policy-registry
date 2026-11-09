@@ -6,9 +6,9 @@ How the pilot is evaluated, and what is deliberately not measured.
 
 ## What is never collected
 
-**Individual browsing histories are not collected for evaluation or for any other purpose.** No evaluation question in this pilot requires knowing which student or device visited which site, and none may be answered that way. This rules out, among other things: logging queried domain names, keeping IP addresses, sampling traffic for "quality checks", or asking schools to export router logs. A request to collect such data, from any party, is a stop condition (see [PILOT_READINESS.md](PILOT_READINESS.md)).
+**The proposed pilot prohibits collecting individual browsing histories for evaluation or any other purpose.** No evaluation question requires knowing which student or device visited which site, and none may be answered that way. This rules out logging queried domain names, retaining IP addresses, sampling traffic for "quality checks", or asking schools to export router logs. The current repository contains a no-logging reference configuration but no running resolver or exporter; conformance must be established before Stage 1. A request to collect such data is a stop condition (see [PILOT_READINESS.md](PILOT_READINESS.md)).
 
-The only data that leaves the resolver is a count per school, day and category, with small counts suppressed before publication. See [../PRIVACY_STATEMENT.md](../PRIVACY_STATEMENT.md) and [../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md).
+The designed exporter would emit only `(school_id, day, category)` events; the implemented aggregation tool turns them into counts and suppresses small cells before publication. The exporter is Planned (VPR-016). See [../PRIVACY_STATEMENT.md](../PRIVACY_STATEMENT.md) and [../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md).
 
 ## Indicators
 
@@ -20,10 +20,10 @@ The only data that leaves the resolver is a count per school, day and category, 
 | Over-blocking | Exceptions reachable | Reviewer checks every excepted domain in the policy | All reachable |
 | Over-blocking (false positives) | Wrongly blocked reports | Appeals filed, accepted and rejected, from the public record | Reported, with response time |
 | Under-blocking (false negatives) | Known-bad test domains not blocked | Only measurable on the reviewer's test sets; not measured on real traffic | Reported per test cycle |
-| Availability | Resolver availability | External monitoring of the resolver endpoints (no query content) | 99.9% (proposed) |
+| Availability | Resolver availability | External monitoring of the resolver endpoints (no query content) | Unknown — target set at Gate A from hosting and link conditions |
 | Performance | Added DNS latency per school | Measured at onboarding and per test cycle by the reviewer kit | Unknown — input required (operator, M2) |
 | Governance | Policy changes with required signatures and stated reason | Public record | 100% |
-| Appeals | Time to a reasoned decision | Public record timestamps | Within 5 working days (proposed) |
+| Appeals | Time to a reasoned decision | Public record timestamps | Unknown — target set in the scope charter |
 | Accessibility | Block page usable in the pilot language and with a screen reader; appeal possible without an account | Checklist in [LOCALISATION_AND_ACCESSIBILITY.md](LOCALISATION_AND_ACCESSIBILITY.md) | All items met |
 | Privacy | Personal data in any export or public record | Reviewer and auditor checks | None |
 | Verifiability | Daily summaries recomputed by a party outside the project | Independent run of `vpr verify-root` | At least once |

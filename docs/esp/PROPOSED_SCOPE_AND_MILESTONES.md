@@ -1,8 +1,8 @@
 # Proposed scope and milestones
 
-*CC BY 4.0 · Part of the ESP evidence package ([index](APPLICATION_EVIDENCE_INDEX.md)). Proposed work only: nothing here is funded, approved or scheduled with any funder. Verify the current ESP route and requirements at <https://esp.ethereum.foundation/applicants> before submission.*
+*CC BY 4.0 · Part of the ESP evidence package ([index](APPLICATION_EVIDENCE_INDEX.md)). Proposed work only: nothing here is funded, approved or scheduled with any funder. As checked on 2026-11-09, ESP has no active Wishlist, RFP or open round; this scope is not submit-ready and must be adapted to a future published opportunity.*
 
-## 1. Existing work, not part of the request
+## 1. Existing work, not part of a future request
 
 The following exist at v0.2 ([v0.2.0 release](https://github.com/xcapit/verifiable-policy-registry/releases/tag/v0.2.0)) and are offered as the starting point, not as deliverables of a grant:
 
@@ -17,7 +17,7 @@ The following exist at v0.2 ([v0.2.0 release](https://github.com/xcapit/verifiab
 
 v0.3 adds evidence material and a generic toolkit boundary. Its exact status is in [CLAIMS_AND_EVIDENCE](../CLAIMS_AND_EVIDENCE.md).
 
-## 2. Proposed grant-funded scope
+## 2. Candidate scope for a future relevant funding opportunity
 
 The proposal follows phase 1 of the [roadmap](../ROADMAP.md): four months, three gates. Tasks reference stable backlog IDs ([BACKLOG](../BACKLOG.md)). Shares are the roadmap's indicative split. Amounts are not set.
 
@@ -30,7 +30,7 @@ The proposal follows phase 1 of the [roadmap](../ROADMAP.md): four months, three
 
 In phase 1 the ZK circuit is **not** audited and **not** deployed on mainnet. A circuit audit and mainnet verifier belong to a separately agreed phase 2.
 
-## 3. Out of scope for the ESP request
+## 3. Out of scope for a candidate future request
 
 - Operation of resolvers and onboarding of schools, which is country deployment work ([Giga package](../giga/PILOT_READINESS.md)).
 - Any pilot outcome that depends on a ministry, a connectivity provider or UNICEF decisions. The roadmap's Gate B alpha is a validation step, not a grant deliverable.
@@ -42,4 +42,4 @@ Current maintainers are listed in [MAINTAINERS.md](../../MAINTAINERS.md). Time a
 
 ## 5. Reporting
 
-Each milestone closes with a tagged release, a CHANGELOG entry, the acceptance evidence linked from [APPLICATION_EVIDENCE_INDEX](APPLICATION_EVIDENCE_INDEX.md), and an update of the [claims ledger](../CLAIMS_AND_EVIDENCE.md).
+If funded under a compatible opportunity, each milestone would close with a tagged release, a CHANGELOG entry, acceptance evidence linked from [APPLICATION_EVIDENCE_INDEX](APPLICATION_EVIDENCE_INDEX.md), and an update of the [claims ledger](../CLAIMS_AND_EVIDENCE.md).

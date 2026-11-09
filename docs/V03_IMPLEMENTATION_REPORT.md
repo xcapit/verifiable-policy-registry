@@ -4,11 +4,12 @@
 
 ## 1. Recommendation
 
-**Conditionally ready for external review.** A qualified reviewer can now reproduce every implemented claim, read the specification of every designed one, and see every limitation in one place ([claims ledger](CLAIMS_AND_EVIDENCE.md), [reviewer guide](review/V03_REVIEWER_GUIDE.md)). Three conditions remain before the material is used in an ESP application or a Giga conversation:
+**Conditionally ready for external review.** A qualified reviewer can now reproduce every implemented claim, read the specification of every designed one, and see every limitation in one place ([claims ledger](CLAIMS_AND_EVIDENCE.md), [reviewer guide](review/V03_REVIEWER_GUIDE.md)). Four conditions remain before the material is used in a funding application or a Giga conversation:
 
 1. **ZK is Designed, not implemented.** Reviewers must assess a specification, not code.
 2. **No licence is declared for published datasets** (VPR-059, a maintainer decision).
 3. **Partner inputs are absent:** costs, country, signers and reviewer. The packages mark them as unknown rather than estimating them.
+4. **No ESP funding route is currently open.** On 2026-11-09 the official ESP pages listed no active Wishlist, RFP or open round. The package is preparatory and must be matched to a future published opportunity; Office Hours are not a funding application.
 
 ## 2. Implemented (code and passing tests)
 
@@ -96,7 +97,7 @@ There are no failing or skipped tests. Hardhat and the demonstrator were not run
 - ZK delivered as a specification, a decision record and a risk register, as the brief requires when an implementation is not feasible.
 - Policy governance extended in `docs/GOVERNANCE.md` instead of a new `POLICY_GOVERNANCE.md`, to keep existing anchors stable.
 - The eight-week plan was compressed into one iteration. Items that need partners, data or funding are marked Blocked or Planned.
-- The Giga, ESP and DPG packages were drafted in parallel and then checked against the code, the roadmap and this ledger before commit.
+- The Giga, ESP and DPG packages use the status vocabulary in the claims ledger and defer partner-dependent decisions to the phase 1 gates.
 
 ## 11. Residual risks
 

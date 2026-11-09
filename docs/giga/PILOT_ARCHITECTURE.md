@@ -14,25 +14,26 @@ This page describes what runs where during the pilot and how the system behaves 
 | Same site | Exporter | Turns each block into a count per school, day and category; discards everything else in memory | Planned (VPR-016) |
 | Same site | Daily job | Aggregates counts, removes small cells, publishes the dataset and its fingerprint | Implemented (tools); scheduling Planned |
 | Web | Block page and appeal relayer | Explains why a site is blocked and accepts appeals without requiring any account | Planned (VPR-017) |
-| Public record | Policy registry, daily-summary anchor, attestations | Holds policy versions, appeals, school attestations and daily fingerprints | Implemented, not audited |
+| Public record | Policy registry and daily-summary anchor | Holds policy commitments, appeal hashes and daily roots | Implemented, not audited; local test chains only |
+| Public record | EAS attestations | Would hold deployment, test and conformance attestation summaries | Schemas Defined; registration and role-enforcing resolver Planned (VPR-012) |
 | Web | Public dashboard | Shows the policy in force, attested schools and daily summaries | Planned (VPR-021) |
 
-## Information flow
+## Intended information flow
 
 1. The governing institutions approve a policy version; its fingerprint, reason and expiry date are written to the public record.
 2. The resolver loads the filter zone compiled from that exact document, and refuses a document whose fingerprint does not match.
-3. For each blocked question, the exporter keeps only (school, day, category). Domain names, IP addresses and device identifiers stay in the resolver's memory and are not written to disk or exported.
+3. For each blocked question, the Planned exporter would emit only `(school, day, category)`. Domain names, IP addresses and device identifiers would remain transient in the resolver process and would not be written to disk or exported; this has not been validated against a running resolver.
 4. Each day, counts below the threshold are suppressed, the remaining counts are published, and their fingerprint is written to the public record.
 5. The independent reviewer tests each school from inside its network and records the result in the public record.
 
 ## Connectivity and power assumptions
 
-Many Giga schools have intermittent, low-bandwidth, satellite or power-limited connections. The design assumes:
+Candidate schools may have intermittent, low-bandwidth, satellite or power-limited connections. The design therefore assumes:
 
 - **School side:** nothing stateful runs at the school. When the school is offline, nothing is filtered because nothing is reachable; when it is back, filtering resumes immediately. No data is queued at the school.
 - **Latency:** resolvers are placed as close as possible to the schools' internet exit (the provider's point of presence or the nearest cloud region), cache answers within their validity, and serve stale answers when an upstream is slow (RFC 8767). The added latency per school is measured during onboarding.
-- **Bandwidth:** DNS traffic is small compared with web traffic; the pilot adds no measurable bandwidth at the school. Exact figures are measured in the alpha (Unknown — input required, operator, M2).
-- **Power:** a school losing power affects only that school. The resolver site needs standard data-centre power; the pilot does not depend on power at the school.
+- **Bandwidth:** the design redirects DNS and may add block-page traffic; its school-side overhead has not been measured. Exact figures are measured in the alpha (Unknown — input required, operator, M2).
+- **Power:** a school losing power affects that school's router, local network and connectivity. The regional resolver site has a separate availability dependency on its hosting infrastructure.
 - **The public record:** filtering never depends on it. If the public network is slow or unavailable, the resolver keeps enforcing the last verified policy and publication resumes later.
 
 ## Degraded modes
@@ -52,7 +53,7 @@ No degraded mode silently removes child protection or the ability to appeal. Eac
 ## Policy and restricted lists
 
 - Policies are written per scope (for example primary schools in one country), reviewed by the governing institutions and published in full, each blocked or excepted domain with a reason. See [../GOVERNANCE.md](../GOVERNANCE.md).
-- Lists that cannot legally be published, such as the IWF list, are obtained by the operator directly from the provider under its terms. Only a fingerprint of the list is public, so anyone can see that a list is in use and when it changes, but not its contents. The compiler refuses to build a zone if the list supplied does not match the declared fingerprint.
+- Lists that cannot legally be published, such as the IWF list, would be obtained by the operator directly from the provider under its terms. Only a fingerprint is public, so anyone can see which list commitment was declared and when it changes, but not the list contents or whether the resolver actually used it. The compiler refuses to build a zone if the supplied list does not match the declared fingerprint.
 - A fingerprint shows which list was declared; it does not by itself prove that the resolver applied it. That is checked by the reviewer's tests and the audit.
 
 ## Explicit boundaries

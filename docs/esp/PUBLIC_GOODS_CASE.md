@@ -2,7 +2,7 @@
 
 *CC BY 4.0 · Part of the ESP evidence package ([index](APPLICATION_EVIDENCE_INDEX.md)). This package describes the project for an Ethereum Foundation Ecosystem Support Program (ESP) application. It is not an application, it does not claim eligibility, and it implies no ESP review or endorsement.*
 
-> **Before submitting:** maintainers must verify the current official ESP route (open application, Wishlist item or RFP) and its requirements at <https://esp.ethereum.foundation/applicants>. Routes, eligibility rules and formats change; nothing in this package substitutes for that check.
+> **Current route boundary (checked 2026-11-09):** ESP lists no active Wishlist, RFP or open round. Office Hours provide non-financial guidance and are not a funding application. This case must be matched to a future published funding opportunity before it can support a submission.
 
 ## 1. Problem
 
@@ -11,7 +11,7 @@ Institutions increasingly enforce policies on networks they do not fully control
 The problem has two technical halves:
 
 1. **Policy accountability.** A public, append-only record of policy versions that a threshold of independent parties must authorise, that expire by default and that can be contested.
-2. **Aggregate accountability without surveillance.** Impact figures that cannot be rewritten after publication, that anyone can recompute, and that never contain individual-level data.
+2. **Aggregate accountability with data minimisation.** Impact releases that cannot be changed without detection after anchoring, that anyone can recompute, and whose implemented schema contains no individual-level fields.
 
 Neither half is specific to schools. The connected-school use case with UNICEF Giga is one reference deployment of a more general pattern.
 
@@ -20,10 +20,10 @@ Neither half is specific to schools. The connected-school use case with UNICEF G
 | Property needed | What Ethereum (via an L2) contributes | Evidence |
 | --- | --- | --- |
 | A history no single party can rewrite | Append-only contract state with public events; global agreement on order | [`contracts/src/VerifiablePolicyRegistry.sol`](../../contracts/src/VerifiablePolicyRegistry.sol) |
-| Threshold authorisation across institutions | The governor is any address, typically a Safe multisig; the contract does not re-implement multisig logic | [ADR-0004](../adr/0004-multisig-governor-expiry-appeals.md) |
-| Separation of who operates and who certifies | EAS attestations under three schemas, with issuer roles recorded per scope on-chain | [`schemas/eas-schemas.json`](../../schemas/eas-schemas.json), [ADR-0005](../adr/0005-issuer-separation.md) |
+| Designed threshold authorisation across institutions | The registry trusts one governor address. The proposed deployment uses a Safe multisig; threshold enforcement is external to this contract and Unverified until deployment | [ADR-0004](../adr/0004-multisig-governor-expiry-appeals.md) |
+| Designed separation of who operates and who certifies | Three EAS schemas are defined and issuer roles are recorded in the registry; enforcement at EAS issuance is Planned through a schema resolver (VPR-012) | [`schemas/eas-schemas.json`](../../schemas/eas-schemas.json), [ADR-0005](../adr/0005-issuer-separation.md) |
 | Publicly checkable aggregates | Write-once daily roots and on-chain verification of a single published row | [`contracts/src/MetricsAnchor.sol`](../../contracts/src/MetricsAnchor.sol) |
-| Contestability without wallets for end users | Appeals recorded as document hashes; a relayer can file them | [INTERFACES I9](../INTERFACES.md) |
+| Contestability without wallets for end users | Appeal hashes and resolution status are Implemented; the walletless relayer is Planned (VPR-017) | [INTERFACES I9](../INTERFACES.md) |
 
 The ledger does **not** prove that an enforcement point behaves as declared, that an event log is complete, or that a restricted list was actually applied. These limits are stated in the [white paper](../WHITEPAPER.md) (§6.1 and §11) and in the [threat model](../security/THREAT_MODEL.md), and they are the reason the design keeps an independent reviewer and an audit in the loop.
 
@@ -33,7 +33,7 @@ The ledger does **not** prove that an enforcement point behaves as declared, tha
 
 All outputs are open and reusable without permission: code under AGPL-3.0-only, schemas under CC0-1.0, documentation under CC BY 4.0 ([NOTICE](../../NOTICE), [ADR-0002](../adr/0002-licensing.md)).
 
-| Output | Status at v0.2 | Who can reuse it |
+| Output | Status on the v0.3 candidate branch | Who can reuse it |
 | --- | --- | --- |
 | Policy registry pattern: versions, reasons, mandatory expiry, appeals by document hash, on-chain issuer roles | Implemented, tested, not audited | Any governed policy with a bounded audience |
 | `MetricsAnchor`: write-once daily roots, row verification with domain-separated, day-bound leaves | Implemented, tested, not audited | Any programme publishing aggregate counts |
@@ -48,9 +48,9 @@ The second reference use case, which is not about schools, is in [`examples/publ
 
 The ESP describes its priorities in terms of censorship resistance, open source, privacy and security (CROPS). The project relates to them as follows. This is a description of intent and evidence, not a claim that the ESP shares this reading:
 
-- **Censorship resistance.** The design does not make filtering impossible to abuse. It makes every policy change public, signed, temporary and contestable, so that over-blocking becomes visible and reversible ([white paper](../WHITEPAPER.md) §6.2, adversary A2).
+- **Censorship resistance.** The design does not make filtering impossible to abuse. The implemented registry makes policy commitments, reasons, appeal status and contractual expiry public. Threshold signing, resolver behaviour after expiry and external recourse depend on the proposed deployment model ([white paper](../WHITEPAPER.md) §6.2, adversary A2).
 - **Open source.** All code, schemas and documents are public under OSI-approved or Creative Commons licences.
-- **Privacy.** Nothing identifying leaves the resolver process. Published data is limited to suppressed aggregates, and its residual risks are analysed rather than denied ([privacy analysis](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md)).
+- **Privacy.** The design permits only `(unit_id, day, category)` events to leave the resolver process, and the implemented aggregator rejects extra input fields and publishes only thresholded aggregates. The resolver and exporter are not implemented or audited, so the end-to-end property remains Designed ([privacy analysis](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md)).
 - **Security.** The contracts are kept minimal, an external audit is planned before mainnet, and negative tests cover tampering ([claims and evidence](../CLAIMS_AND_EVIDENCE.md)).
 
 ## 5. What is not proposed

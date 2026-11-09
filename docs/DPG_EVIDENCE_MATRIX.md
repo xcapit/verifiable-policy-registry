@@ -4,8 +4,8 @@
 
 ## Source of truth and version
 
-- The DPG Standard is maintained at <https://github.com/DPGAlliance/DPG-Standard>. At the date of review, its latest tag is `v1.1.6`. Its `CHANGELOG.md` already lists **v1.1.7 (2025-06-26)**: mandatory components for AI systems, a requirement that content collections and data sets be fully open-licensed, and the removal of a specific example from indicator 8. Its `standard.md` still shows the 1.1.4 header text.
-- This matrix uses the indicator wording of `standard.md` and takes the v1.1.7 changes into account. The DPGA's live application questionnaire takes precedence over this page. Maintainers must check the current version again before submitting.
+- The DPG Standard is maintained at <https://github.com/DPGAlliance/DPG-Standard>. Verified on 2026-11-09: the latest repository tag is `v1.1.6`; `CHANGELOG.md` lists **v1.1.7 (2025-06-26)**, but no `v1.1.7` tag exists; and `standard.md` still carries a 1.1.4 header. The live DPGA standard page presents the nine indicators without a version number.
+- This matrix uses the requirement text in `standard.md`, the current application questions in `standard-questions.md`, and the recorded v1.1.7 changes. The official application form and review policy take precedence. Maintainers must pin the version or source commit used for any submission and re-check the live questions.
 
 Statuses: **Met with public evidence**, **Credible path**, **Gap**, **Not applicable** (with justification), **External validation required**. Evidence quality: *High*, meaning inspectable and tested or machine-checkable; *Medium*, meaning an inspectable document without independent validation; *Low*, meaning a stated intent only.
 

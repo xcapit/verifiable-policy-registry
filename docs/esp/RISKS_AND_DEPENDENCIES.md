@@ -23,6 +23,7 @@
 | External auditor | Gate C | Not engaged | Mainnet deployment waits |
 | Outside cryptographic reviewer | M1 ZK specification | Not engaged | M4 proceeds at higher risk; recorded as unreviewed |
 | Pilot partners (Giga, ministry, provider) | Validation alpha only | No commitment exists | The reusable outputs remain deliverable on a synthetic deployment (roadmap Gate A) |
+| Relevant ESP funding opportunity | Any ESP application | No active Wishlist, RFP or open round as checked on 2026-11-09 | Seek non-financial project feedback through Office Hours; adapt this package only when a relevant opportunity is published |
 
 ## 3. L2-specific assumptions
 

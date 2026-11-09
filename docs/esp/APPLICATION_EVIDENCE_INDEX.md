@@ -2,7 +2,7 @@
 
 *CC BY 4.0 · Entry point of the ESP evidence package. Each assertion an application might make is mapped to the file that supports it and to its status. The package is a preparation aid; it is not an application and implies no review or endorsement by the Ethereum Foundation.*
 
-> **Before submitting:** verify the current ESP application route (open application, Wishlist or RFP) and its requirements at <https://esp.ethereum.foundation/applicants>. Fill every field marked *TBD — maintainer input required*.
+> **Route status checked 2026-11-09:** the official ESP site lists no active Wishlist, RFP or open round. Office Hours remain available for non-financial guidance but are not a funding application. This package is therefore **Blocked** as an application until ESP publishes a relevant funding opportunity. Before any submission, match the scope to that opportunity and fill every field marked *TBD — maintainer input required*.
 
 ## Package contents
 
@@ -38,4 +38,6 @@
 - Budget in USD per milestone, including the external audit: **TBD — maintainer input required**.
 - Time allocation per team member: **TBD — maintainer input required**.
 - Adoption targets: **TBD — maintainer input required**.
-- Application route chosen after checking the ESP site: **TBD — maintainer input required**.
+- Application route: **Blocked — no active Wishlist, RFP or open round on 2026-11-09; choose only after a relevant opportunity is published**.
+
+The route is not merely an administrative field: eligibility and requested scope depend on the published Wishlist, RFP or round. No document in this directory should be submitted as a general or unsolicited funding application.
