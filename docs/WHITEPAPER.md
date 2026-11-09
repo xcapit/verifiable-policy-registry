@@ -13,7 +13,7 @@ Correspondence: dpg@xcapit.com
 
 Programmes that connect schools to the internet must protect children from malware, phishing and harmful content, and in practice they do so with network-level content filtering. Filtering is also the most widely deployed instrument of censorship. Its legitimacy therefore depends on properties that today's filters do not provide: the public cannot learn what is blocked, who decided it, for how long, or whether the infrastructure records children's browsing. We present the *Verifiable Policy Registry* (VPR), a system that separates the **enforcement plane** of filtering, a conventional protective DNS resolver operated in-country, from an **accountability plane** built on a public blockchain. In the accountability plane, every policy version is committed to by hash, authorised by a threshold of independent institutions, bounded in time and open to appeal. The correct deployment of a policy is attested by a party other than the operator. Impact is reported as k-anonymous aggregates bound to a daily Merkle commitment that anyone can recompute.
 
-We state the security properties the system offers, separate those that hold cryptographically from those that rest on institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We propose trusted execution and zero-knowledge proofs as research directions to narrow that gap. The first deployment targets a pilot in 20 to 50 schools connected by UNICEF Giga in Latin America. The design is generic to any bounded network with an accountable governor.
+We state the security properties the system offers, separate those that hold cryptographically from those that rest on institutional trust, and identify the gap between what a ledger can prove and how a resolver actually behaves. We narrow that gap with zero-knowledge proofs that bind the published figures to a committed event log and to the policy in force, implemented as part of the pilot, and identify trusted execution as further work. The first deployment targets a pilot in 20 to 50 schools connected by UNICEF Giga in Latin America. The design is generic to any bounded network with an accountable governor.
 
 ---
 
@@ -29,7 +29,7 @@ Commercial protective DNS services address the first two risks reasonably well. 
 2. A minimal on-chain design consisting of a policy registry and a metrics anchor. Only commitments are stored on-chain, so the ledger never holds personal data or the contents of legally restricted lists (§4).
 3. An attestation scheme with three non-overlapping issuer roles, so that the operator of the resolver never certifies its own deployment (§4.4).
 4. A privacy-preserving impact pipeline with data minimisation at the source, k-suppression and Merkle commitments. We also analyse its residual leakage and the conditions under which differential privacy would be preferable (§5).
-5. A threat model with concrete adversaries and mitigations (§6), a mapping to existing standards (§7), and a research agenda for narrowing the enforcement–accountability gap using trusted execution and zero-knowledge proofs (§11).
+5. A threat model with concrete adversaries and mitigations (§6), a mapping to existing standards (§7), and a zero-knowledge proof of correct aggregation that closes part of the enforcement–accountability gap, with trusted execution as further work (§11).
 
 An open-source implementation of the contracts and the off-chain tooling accompanies this paper under the AGPL-3.0 licence [4].
 
@@ -78,7 +78,7 @@ Let a scope *s* have a sequence of policy versions ⟨*p*₁, …, *p*ₙ⟩. Ea
 - **P4 · Bounded duration.** For every *i*, *e*ᵢ − *t*ᵢ ≤ Δ_max(*s*). The contract enforces this. In the pilot, Δ_max is 90 days.
 - **P5 · Contestability.** Any party can file an appeal against a scope. Its resolution, acceptance through a new version or rejection, is publicly recorded and attributable to the governor. *Holds cryptographically for the record*; timeliness is an institutional commitment.
 - **P6 · Attested enforcement.** A school is reported as protected under version *p*ᵢ only if a valid, unrevoked test attestation for *p*ᵢ exists, issued by the independent reviewer. *Rests on the honesty of the reviewer.* The ledger records the claim and its issuer; it cannot verify the claim.
-- **P7 · Aggregate integrity with minimisation.** Published impact figures are bound to a commitment that cannot be altered after anchoring, and they are derived only from events of the form (*school*, *day*, *category*) with cells below a threshold *k* suppressed. *Integrity holds cryptographically after anchoring. Correctness of the inputs rests on the operator* (§5.4, §11).
+- **P7 · Aggregate integrity with minimisation.** Published impact figures are bound to a commitment that cannot be altered after anchoring, and they are derived only from events of the form (*school*, *day*, *category*) with cells below a threshold *k* suppressed. *Integrity holds cryptographically after anchoring. With the proof of §11, the figures are also bound to a committed event log and to the policy in force; the completeness of that log rests on the reviewer and the audit* (§5.4, §11).
 
 The distinction between P1–P5, which a ledger can enforce, and P6–P7, which a ledger can only record, is central to this work. We return to it in §6.1 and summarise it in Figure 6.
 
@@ -186,7 +186,7 @@ Two refinements are planned before audit. First, leaves and internal nodes are c
 
 ### 5.4 What the commitment does not prove
 
-A Merkle root anchored on-chain proves that a release has not been altered since anchoring. It does not prove that the release reflects what the resolver actually blocked, nor that the resolver enforced the policy in force while producing those events. An operator that wished to inflate its impact, or to hide over-blocking, could fabricate tuples before aggregation. Within the current design, this is mitigated by the reviewer's tests and by audit, not by cryptography. Closing this gap is the main objective of the research agenda in §11.
+A Merkle root anchored on-chain proves that a release has not been altered since anchoring. It does not prove that the release reflects what the resolver actually blocked, nor that the resolver enforced the policy in force while producing those events. An operator that wished to inflate its impact, or to hide over-blocking, could fabricate tuples before aggregation. Without further mechanisms this is mitigated only by the reviewer's tests and by audit. §11 closes the step from log to release with a zero-knowledge proof and discusses the remaining step from resolver to log.
 
 ---
 
@@ -200,7 +200,8 @@ A Merkle root anchored on-chain proves that a release has not been altered since
 | The document for version *i* is the one the governor approved | keccak-256 of the canonical document equals *h*ᵢ | Collision resistance; document availability |
 | School *x* applied version *i* at test time | Reviewer attestation, preceded by an operator attestation | Reviewer honesty; tests repeated before expiry |
 | Impact figures for day *d* were not changed after publication | Anchored root; public release | Collision resistance |
-| Impact figures for day *d* reflect actual blocks | — | Operator honesty, partially checked by audit (§5.4) |
+| Impact figures for day *d* are the correct aggregation of the committed event log, under the policy in force | Zero-knowledge proof verified on-chain (§11) | Soundness of the proof system |
+| The committed event log reflects actual blocks | Reviewer tests; audit | Reviewer and auditor honesty (§5.4) |
 | The resolver keeps no query logs | RFC 8932 statement, published configuration, conformance attestation | Operator and auditor honesty |
 
 <p align="center"><img src="figures/fig6-properties.svg" alt="Classification of properties P1 to P7 by what they rest on" width="100%"></p>
@@ -213,7 +214,7 @@ We consider the following adversaries.
 
 - **A1, a single governor signer acting alone,** for instance a ministry that wishes to block political content. Defeated by P3: a single signature cannot publish a version.
 - **A2, a colluding majority of signers.** Two of three signers could publish a version that blocks legitimate content. The design does not prevent this; it makes it *visible and temporary*. The version is public with its reason (P1), it expires (P4), the minority signer and the public can appeal (P5), and the record of the event is permanent (P2). We regard accountability without prevention as the correct guarantee here. Giving any single party a veto over a filtering policy would itself be a concentration of power.
-- **A3, a dishonest operator.** It might enforce a policy other than the one in force, keep query logs, or fabricate metrics. Divergent enforcement is detected by the reviewer's tests (P6), and logging is constrained by the RFC 8932 statement and by audit. Fabricated metrics are not detected cryptographically in the current design (§5.4).
+- **A3, a dishonest operator.** It might enforce a policy other than the one in force, keep query logs, or fabricate metrics. Divergent enforcement is detected by the reviewer's tests (P6), and logging is constrained by the RFC 8932 statement and by audit. Altering figures between the committed log and the publication is ruled out by the proof of §11; fabricating the log itself is not detected cryptographically and is left to the reviewer and the audit (§5.4).
 - **A4, a split-view resolver.** It behaves correctly for traffic it recognises as test traffic and differently for students. Tests are run from inside the school network, and the reviewer's test client must be indistinguishable from ordinary clients. Tests should be sampled at unannounced times and from ordinary devices. This is a known limitation of black-box measurement [14] and the main reason P6 rests on the reviewer rather than on cryptography.
 - **A5, an external attacker targeting signer keys.** Mitigated by threshold signing, hardware-backed or passkey-based custody, signer rotation through Safe and `setGovernor`, and by the fact that any malicious version is public and expiring.
 - **A6, a re-identification attacker using released metrics.** Mitigated by minimisation at the source and by k-suppression, within the limits stated in §5.2.
@@ -274,21 +275,33 @@ DNS filtering operates on domain names. IWF entries that are individual URLs on 
 
 ---
 
-## 11. Research agenda: narrowing the enforcement–accountability gap
+## 11. Closing the enforcement–accountability gap
 
-The weakest link in the current design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Only the last one is cryptographic today. We see three complementary directions, which the project's roadmap groups under an optional research milestone.
+The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 7 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. The pilot closes the middle link with zero-knowledge proofs of aggregation, which are implemented, audited and deployed as a milestone of their own (M4). Trusted execution and verifiable differential privacy remain further work.
+
 <p align="center"><img src="figures/fig7-gap.svg" alt="Enforcement-accountability gap link by link" width="100%"></p>
 
-*Figure 7. From resolver behaviour to on-chain root. The link from release to root is cryptographic. The link from log to release rests on the operator and could be closed with a zero-knowledge proof of aggregation. The link from behaviour to log rests on the reviewer and the auditor, and could be strengthened with remote attestation of a trusted execution environment.*
+*Figure 7. From resolver behaviour to on-chain root. The link from release to root is cryptographic. The link from log to release rests on the operator today and is closed in the pilot by a zero-knowledge proof of aggregation (§11.1). The link from behaviour to log rests on the reviewer and the auditor, and could be strengthened with remote attestation of a trusted execution environment (§11.3).*
 
+### 11.1 Statement
 
-**Trusted execution.** If the resolver and exporter ran inside a trusted execution environment, such as Intel TDX, AMD SEV-SNP or AWS Nitro Enclaves, a remote attestation could bind the published aggregates and the absence of logging to a measured, open-source binary loaded with the zone compiled from *h*ᵢ. This would move P6 and part of P7 from institutional trust to hardware trust. Hardware trust has its own history of side-channel failures, and it concentrates trust in the hardware vendor.
+For a scope *s* and a day *d*, let *L* = ⟨*e*₁, …, *e*ₘ⟩ be the event log, where each *e*ⱼ = (*school*ⱼ, *d*, *category*ⱼ), and let *C*_L be a binding commitment to *L*, anchored together with the daily root. Let Cat(*h*) be the set of categories of the policy in force, whose document hashes to *h*. Let Agg_k(*L*) be the table of counts per (*school*, *d*, *category*) with every cell below *k* removed, and let MR(·) be the Merkle root of §5.3. The operator proves knowledge of a witness *L* for the relation
 
-**Zero-knowledge proofs of aggregation.** A weaker but hardware-independent target is to prove that the released table is the correct k-suppressed aggregation of a committed sequence of per-block events, and that each event's category is consistent with the zone compiled from the policy in force. With a general-purpose zero-knowledge virtual machine, or with a circuit specialised to counting and threshold comparison, the operator could publish such a proof together with the daily root. This does not prove that the event log is complete. It does, however, rule out tampering between the log and the published figures, and it makes the log itself an object that could later be tied to a trusted execution environment or to sampled reviewer measurements.
+  R(*h*, Cat, *k*, *C*_L, *root*; *L*) ⟺ Commit(*L*) = *C*_L ∧ ∀*j*: *category*ⱼ ∈ Cat ∧ MR(Agg_k(*L*)) = *root*.
 
-**Verifiable differential privacy.** Where releases must overlap, the noise added for differential privacy should be verifiably sampled, either from public randomness committed in advance or within a proof. The goal is that neither the operator nor the analyst can bias the noise.
+The public inputs are the policy hash *h*, its category set Cat, the threshold *k*, the log commitment *C*_L and the daily root. The binding between Cat and *h* is checked either in the circuit or by any verifier holding the public document; the specification (VPR-033) fixes which, based on proving cost. The proof is zero-knowledge in *L*, so the counts of suppressed cells stay hidden. As a side effect, the number of suppressed cells no longer needs to be published (§5.2).
 
-We intend to publish a prototype and an evaluation of proving cost on commodity hardware for at least the second direction.
+### 11.2 What the proof guarantees, and implementation
+
+Given a valid proof, the published figures are exactly the suppressed aggregation of a log the operator committed to, and no event in that log falls outside the policy in force. The operator can no longer adjust the figures after the fact, or report blocks in categories the governor never approved. The proof does not establish that *L* is complete or that its events occurred. That property belongs to the first link of Figure 7 and still rests on the reviewer's measurements and on audit.
+
+Two implementation routes are evaluated in the first month: a general-purpose zero-knowledge virtual machine running a reference implementation of R, or a dedicated circuit for counting, threshold comparison and membership. zkVM proofs are usually wrapped into a succinct proof such as Groth16 [25] or PLONK [26] for verification on the EVM. A dedicated circuit is cheaper to prove but must implement keccak-256, which is expensive in arithmetic circuits. One option is to commit to *L* with a SNARK-friendly hash such as Poseidon [27] and keep keccak-256 only for the public Merkle root. The anchoring contract accepts a daily root only together with a proof that verifies on-chain. The circuit and the verifier fall within the scope of the external audit. If proving a full day exceeds the daily budget on commodity hardware, the fallback is one proof per school, aggregated off-chain.
+
+### 11.3 Further work
+
+**Trusted execution.** If the resolver and exporter ran inside a trusted execution environment, such as Intel TDX, AMD SEV-SNP or AWS Nitro Enclaves, a remote attestation could bind *C*_L and the absence of logging to a measured, open-source binary loaded with the zone compiled from *h*ᵢ. This would strengthen the first link of Figure 7, moving part of P6 and P7 from institutional trust to hardware trust. Hardware trust has its own history of side-channel failures, and it concentrates trust in the hardware vendor.
+
+**Verifiable differential privacy.** Where releases must overlap, the noise added for differential privacy should be verifiably sampled, either from public randomness committed in advance or within the same proof as R. The goal is that neither the operator nor the analyst can bias the noise.
 
 ---
 
@@ -368,3 +381,9 @@ The formats exchanged between components (canonical policy encoding, ABIs, RPZ c
 [23] UK Safer Internet Centre. *Appropriate filtering for education settings* and filtering accreditation scheme. https://saferinternet.org.uk/guide-and-resource/teachers-and-school-staff/appropriate-filtering-and-monitoring/appropriate-filtering/filtering-accreditation-scheme-for-uk-schools
 
 [24] Giga and Government of Rwanda. *Proof of concept for Giga's crypto connectivity pilot*. https://giga.global/unicef-and-government-of-rwanda-collaborate-to-demonstrate-proof-of-concept-for-gigas-crypto-connectivity-pilot/
+
+[25] J. Groth. *On the Size of Pairing-Based Non-interactive Arguments*. EUROCRYPT, 2016.
+
+[26] A. Gabizon, Z. J. Williamson, O. Ciobotaru. *PLONK: Permutations over Lagrange-bases for Oecumenical Noninteractive arguments of Knowledge*. IACR ePrint 2019/953.
+
+[27] L. Grassi, D. Khovratovich, C. Rechberger, A. Roy, M. Schofnegger. *Poseidon: A New Hash Function for Zero-Knowledge Proof Systems*. USENIX Security, 2021.

@@ -4,6 +4,8 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 
 ## M1 · Application and initial design (weeks 1–4)
 
+See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--application-and-initial-design--weeks-14--10). VPR-033 (ZK specification) is also delivered in this milestone.
+
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
 | VPR-001 | Write `docs/specs/registry.md`: formal spec of both contracts (state, events, errors, invariants) | Every external function documented with pre/post-conditions; invariants listed (versions append-only, expiry mandatory, appeal state machine) |
@@ -16,7 +18,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-008 | `vpr restricted-hash <file>` command printing the restricted list commitment | Output equals `policy.restricted_list_hash()`; documented in `docs/INTERFACES.md` |
 | VPR-009 | Restrict `MetricsAnchor.configure` so only the registry governor of a scope (or a factory) can configure it | A third party cannot claim a scope; tests cover the front-running case; INTERFACES updated |
 
-## M2 · Build and onboard (weeks 5–10)
+## M2 · Registry, resolver and attestations (weeks 5–10)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -31,7 +33,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-018 | Black-box test kit for reviewers (`tools/reviewer/`) | Checks blocked categories, exceptions reachable, DNSSEC validation, external DoH/DoT/alternative DNS bypass; test traffic indistinguishable from ordinary clients (no fixed source, unannounced schedule); outputs a public summary, a full report and its hash |
 | VPR-019 | Unbound hardening: block outbound DNS to public resolvers, DoH endpoint list | Bypass tests in VPR-018 fail as expected |
 
-## M3 · Measure and audit (weeks 8–16)
+## M3 · Metrics, dashboard and audit (weeks 8–16)
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -44,13 +46,25 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 | VPR-027 | Domain-separate Merkle leaves and internal nodes (RFC 9162-style tags) in Solidity, JS and Python, with a new shared test vector | `verifyLeaf` rejects an internal node presented as a leaf; dataset format version bumped; INTERFACES updated |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
-## M4 · Research (optional, weeks 11–16)
+## M4 · Zero-knowledge proofs of aggregation (weeks 5–16)
+
+Statement to prove for each daily release: the published table is the k-suppressed aggregation of an event log committed by `logCommitment`, and every event's category belongs to the policy in force (content hash *h*). The event log stays private.
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
-| VPR-031 | Study verifiable differential privacy for overlapping releases (noise from committed public randomness or proven sampling) | Write-up with privacy budget, utility on synthetic data and verification cost |
-| VPR-032 | Evaluate TEE remote attestation (TDX, SEV-SNP or Nitro) for resolver and exporter | Prototype binding a measured binary and the zone hash to an attestation; threat analysis of the TEE trust assumptions |
-| VPR-030 | ZK prototype: prove the published aggregate equals the sum of committed per-block events under policy vN | Prototype circuit + benchmark + write-up |
+| VPR-033 | ZK specification (`docs/specs/zk-aggregation.md`), produced in M1: statement, public and private inputs, event-log commitment, proving-system evaluation (zkVM vs. dedicated circuit) | Reviewed in the M1 design review; chosen system justified with estimated proving cost |
+| VPR-034 | Reference implementation of the statement in Python, used as the test oracle | Accepts valid (log, release) pairs and rejects altered counts, wrong suppression and out-of-policy categories |
+| VPR-030 | Circuit or zkVM program for counting, k-suppression and category membership | Matches the oracle on randomised tests, including edge cases (empty day, all cells suppressed, k boundary) |
+| VPR-036 | Benchmarks on commodity hardware | Proving time, memory and on-chain verification gas for 50 schools × 1 day; documented in the spec; per-school fallback decided before the freeze |
+| VPR-035 | On-chain verifier and an anchoring function that accepts a daily root only with a valid proof | Tests for valid proof, altered root, wrong policy hash and replay; INTERFACES and ARCHITECTURE updated; frozen at end of week 12 |
+| VPR-037 | Prover in the daily job; proofs published with each release; `vpr verify-proof` | Every release in the last four weeks of the pilot has a proof accepted on-chain; an outside party verifies one with the CLI |
+
+## Future work
+
+| ID | Task | Acceptance criteria |
+| --- | --- | --- |
+| VPR-031 | Verifiable differential privacy for overlapping releases (noise from committed public randomness or proven sampling) | Write-up with privacy budget, utility on synthetic data and verification cost |
+| VPR-032 | TEE remote attestation (TDX, SEV-SNP or Nitro) for resolver and exporter, to bind the event log to a measured binary | Prototype binding a measured binary and the zone hash to an attestation; threat analysis of the TEE trust assumptions |
 
 ## Hygiene
 
