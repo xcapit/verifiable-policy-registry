@@ -68,6 +68,8 @@ A DPIA is completed with the deploying partner before the pilot (milestone M1). 
 
 ## Still to do before submission
 
+- [ ] Externalise the block page and appeal strings in Spanish and Portuguese (VPR-017), then set `localisationReady: true` and add `es` and `pt` in `publiccode.yml`.
+- [ ] Fill the operating cost figures in [SUSTAINABILITY.md](SUSTAINABILITY.md).
 - [ ] Complete the DPIA and resolve the placeholders in the privacy statement (VPR-004, VPR-005).
 - [ ] Publish the threat model (VPR-003).
 - [ ] Deploy to OP Sepolia and add contract addresses to the README (VPR-010).

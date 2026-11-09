@@ -34,7 +34,7 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 
 | If you are… | Start with |
 | --- | --- |
-| evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG readiness](docs/DPG.md) |
+| evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG readiness](docs/DPG.md) · [Sustainability and cost](docs/SUSTAINABILITY.md) |
 | building a component | [Architecture](docs/ARCHITECTURE.md) · [Interfaces](docs/INTERFACES.md) · [Decision records](docs/adr) · [Backlog](docs/BACKLOG.md) |
 | operating or governing a deployment | [Policy governance](docs/GOVERNANCE.md) · [Privacy statement (RFC 8932)](docs/PRIVACY_STATEMENT.md) · [Roadmap](docs/ROADMAP.md) |
 | contributing | [Contributing](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Project governance](GOVERNANCE.md) |
@@ -49,8 +49,20 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 | [`schemas/`](schemas) | EAS attestation schemas and JSON Schemas for policy documents and datasets (CC0) |
 | [`policies/`](policies) | Example public policy document |
 | [`deploy/`](deploy) | Reference resolver configuration (Unbound with RPZ) |
-| [`examples/`](examples) | Synthetic feeds and events (`.example` domains only) |
+| [`examples/`](examples) | Synthetic feeds and events (`.example` domains only) and the end-to-end demo |
 | [`docs/`](docs) | White paper, architecture, interfaces, ADRs, governance, privacy, DPG material |
+
+## Try it in five minutes
+
+One command runs the whole accountability path on a local Hardhat network: hash the example policy, publish it as version 1 under a scope, compile the RPZ zone, aggregate one day of synthetic events with *k* = 10, anchor the daily root, and verify one published row (accepted) and one tampered row (rejected).
+
+```bash
+cd contracts && npm ci && cd ..
+pip install -e tools
+./examples/e2e/run.sh
+```
+
+The same script runs in CI on every push. Its source is in [`examples/e2e/`](examples/e2e) and [`contracts/scripts/e2e.js`](contracts/scripts/e2e.js).
 
 ## Quick start
 
@@ -76,6 +88,20 @@ vpr compile-rpz policies/example-primary.yaml --feeds-dir examples/feeds --block
 vpr aggregate examples/events.csv --k 10 --out-csv dataset.csv   # prints the daily Merkle root
 vpr verify-root dataset.csv 0x<root>                 # anyone can recompute a published root
 ```
+
+## What other builders can reuse
+
+The pilot targets school networks, but the components are generic and released for reuse:
+
+| Component | Status | What it gives you |
+| --- | --- | --- |
+| EAS schemas `VPR.Deployment.v1`, `VPR.IndependentTest.v1`, `VPR.Conformance.v1` ([`schemas/`](schemas), CC0) | Defined | Attestations for "deployed", "independently tested" and "conforms to framework X", with one issuer role per schema so that an operator never certifies itself |
+| Policy registry pattern (`VerifiablePolicyRegistry`) | Implemented, not audited | Versioned commitments with a stated reason, mandatory expiry bounded per scope, on-chain appeals and a governor that can be any Safe |
+| `MetricsAnchor` | Implemented, not audited | Write-once daily Merkle roots per scope, with an OpenZeppelin-compatible `verifyLeaf` |
+| `vpr` tools | Implemented | Canonical hashing of policy documents, RPZ compilation, aggregation with small-cell suppression and Merkle proofs |
+| ZK aggregation verifier and `vpr verify-proof` | Planned (M4) | On-chain check that a published table is the correct suppressed aggregation of a committed private log |
+
+The design applies to any bounded network with an accountable governor: libraries, public Wi-Fi, health centres or NGO networks. It is not meant for ISP-wide or national blocking ([ADR-0006](docs/adr/0006-scope-school-networks-only.md)).
 
 ## Design principles
 

@@ -44,3 +44,31 @@ jobs:
           vpr compile-rpz policies/example-primary.yaml --feeds-dir examples/feeds --block-page block.example.org > /dev/null
           ROOT=$(vpr aggregate examples/events.csv --k 10 --out-csv dataset.csv | python -c "import sys, json; print(json.load(sys.stdin)['root'])")
           vpr verify-root dataset.csv "$ROOT"
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+        working-directory: contracts
+      - run: pip install -e tools
+      - name: End-to-end demo
+        run: ./examples/e2e/run.sh
+
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check internal links and anchors
+        run: python .github/scripts/check_links.py
