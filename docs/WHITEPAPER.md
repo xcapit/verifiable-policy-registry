@@ -260,7 +260,7 @@ The proposed network is OP Mainnet, where EAS is deployed and transaction costs 
 
 ## 9. Evaluation plan
 
-The pilot lasts four months: one month of application and initial design, followed by three months of build, deployment and measurement (see the roadmap [4]). It will be evaluated against the following indicators, to be agreed with Giga.
+The pilot lasts four months: one month of design and sign-off, followed by three months of build, deployment and measurement (see the roadmap [4]). It will be evaluated against the following indicators, to be agreed with Giga.
 
 | Indicator | Target |
 | --- | --- |

@@ -2,9 +2,9 @@
 
 Issue-ready tasks after the proof of concept. Each has acceptance criteria so it can be implemented spec-first. IDs are stable; reference them in commits (`VPR-012: ...`).
 
-## M1 · Application and initial design (weeks 1–4)
+## M1 · Design and sign-off (weeks 1–4)
 
-See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--application-and-initial-design--weeks-14--10). VPR-033 (ZK specification) is also delivered in this milestone.
+See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--weeks-14--10). VPR-033 (ZK specification) is also delivered in this milestone.
 
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
@@ -57,7 +57,7 @@ Statement to prove for each daily release: the published table is the k-suppress
 | VPR-030 | Circuit or zkVM program for counting, k-suppression and category membership | Matches the oracle on randomised tests, including edge cases (empty day, all cells suppressed, k boundary) |
 | VPR-036 | Benchmarks on commodity hardware | Proving time, memory and on-chain verification gas for 50 schools × 1 day; documented in the spec; per-school fallback decided before the freeze |
 | VPR-035 | On-chain verifier and an anchoring function that accepts a daily root only with a valid proof | Tests for valid proof, altered root, wrong policy hash and replay; INTERFACES and ARCHITECTURE updated; frozen at end of week 12 |
-| VPR-037 | Prover in the daily job; proofs published with each release; `vpr verify-proof` | Every release in the last four weeks of the pilot has a proof accepted on-chain; an outside party verifies one with the CLI |
+| VPR-037 | Prover in the daily job; proofs published with each release; `vpr verify-proof` | Every release from week 14 has a proof accepted on-chain; an outside party verifies one with the CLI |
 
 ## Future work
 

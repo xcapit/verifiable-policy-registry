@@ -14,5 +14,5 @@ Template: [0000-template.md](0000-template.md).
 | [0004](0004-multisig-governor-expiry-appeals.md) | Multisig governor per scope, mandatory expiry, on-chain appeals | Accepted |
 | [0005](0005-issuer-separation.md) | Separate issuers: the operator never certifies itself | Accepted |
 | [0006](0006-scope-school-networks-only.md) | Scope limited to bounded networks such as schools | Accepted |
-| [0007](0007-k-anonymous-metrics-merkle.md) | k-anonymous metrics (k = 10) with a daily Merkle root | Accepted |
+| [0007](0007-k-anonymous-metrics-merkle.md) | Threshold-suppressed metrics (k = 10) with a daily Merkle root | Accepted |
 | [0008](0008-restricted-lists-hash-only.md) | Restricted lists by hash commitment only | Accepted |
