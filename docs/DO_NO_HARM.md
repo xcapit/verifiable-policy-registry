@@ -45,4 +45,4 @@ The project does not host or distribute user content. It does handle the *identi
 
 ## Authorised representative
 
-The DPG application for indicators 7 to 9 is submitted by Fernando Boiero, CTO, Xcapit (CryptoLab S.A.S.), fboiero@frvm.utn.edu.ar.
+The DPG application for indicators 7 to 9 is submitted by Fernando Boiero, CTO, Xcapit (CryptoLab S.A.S.), dpg@xcapit.com.

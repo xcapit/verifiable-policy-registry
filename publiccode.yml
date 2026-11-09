@@ -34,7 +34,7 @@ maintenance:
   type: internal
   contacts:
     - name: Fernando Boiero
-      email: fboiero@frvm.utn.edu.ar
+      email: dpg@xcapit.com
       affiliation: Xcapit
 localisation:
   localisationReady: false

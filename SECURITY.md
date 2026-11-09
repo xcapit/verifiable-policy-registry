@@ -9,7 +9,7 @@ The project is a proof of concept. The contracts are **not audited** and are not
 Please report vulnerabilities privately, never in a public issue or pull request.
 
 - Preferred: GitHub private vulnerability reporting, from the **Security** tab of this repository ("Report a vulnerability").
-- Alternative: email fboiero@frvm.utn.edu.ar with the subject `[VPR security]`.
+- Alternative: email dpg@xcapit.com with the subject `[VPR security]`.
 
 Include what you found, the affected component and version or commit, steps to reproduce and the impact you expect. If the issue could expose personal data or let someone bypass protection for children, say so in the first line so we can prioritise it.
 
