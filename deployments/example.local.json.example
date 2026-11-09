@@ -1,0 +1,26 @@
+{
+  "format": "vpr-manifest/1",
+  "network": "hardhat (local, synthetic example; not a deployment)",
+  "chainId": 31337,
+  "contracts": {
+    "registry": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "anchor": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+  },
+  "confirmations": 1,
+  "scopes": [
+    {
+      "name": "giga:XX:primary",
+      "scopeId": "0x8ed60dd6aab12c6e2f1a8fce4a8e3417f75ce71c0f10705b20241392abef33fb",
+      "governor": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "governorThreshold": "2-of-3",
+      "issuers": {
+        "operator": ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"],
+        "reviewer": ["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"]
+      },
+      "publisher": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "maxLagDays": 7
+    }
+  ],
+  "publishedBy": ["synthetic example"],
+  "note": "Synthetic manifest for the local demonstrator. Real manifests are published by the deploying partners and pinned by verifiers."
+}

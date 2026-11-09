@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+Pre-audit hardening (closes VPR-060, VPR-065 to VPR-069; the resolver part of VPR-012; the format of VPR-049). **Breaking changes** to the contracts and tools.
+
+### Added
+- `IssuerRoleResolver`: EAS schema resolver that accepts an attestation only if the attester holds the schema's role in the scope at issuance time.
+- Deployment manifest format `vpr-manifest/1` (schema and synthetic example), validated in CI.
+- Tools: `list-hash`, `zone-hash`, `check-onchain` (document versus on-chain values), `appeal-hash` (appeal format 3 with a random nonce), `policy-hash --governor`.
+- `feed_hashes` in policy documents: compilation refuses a feed whose contents differ from the declared hash.
+
+### Changed
+- **Breaking.** Scope ids are `keccak256(abi.encode(governor, name))`, derived on-chain; `createScope(name, maxValidity)`.
+- **Breaking.** Governor handover is two-step (`proposeGovernor`, `acceptGovernor`); `setGovernor` is removed. `maxValidity` is capped at 365 days; reason codes are validated (code 3 if and only if an appeal is resolved); policy and dataset URIs are capped at 256 bytes; the governor cannot hold an issuer role.
+- **Breaking.** `MetricsAnchor.setPublisher(scopeId, publisher, maxLagDays)`: publishers can be revoked; future days are refused and back-filling can be limited; `markEmpty` declares days with nothing publishable; `correctRoot` lets the governor correct a root with a reason hash and a revision count.
+- Appeal documents move to format 3 (`nonce`), so they cannot be guessed and pre-filed.
+
+
 ## [0.3.0] - 2026-11-09
 
 Evidence-driven readiness for external review, with a second security and privacy review. Research prototype: contracts not audited, ZK proof of aggregation designed but not implemented, no public deployment.

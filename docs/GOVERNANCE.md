@@ -9,7 +9,7 @@ This page covers who governs each **filtering policy**. How the open-source proj
 | Role | Who (proposed pilot; none confirmed) | Powers | Must not (enforcement noted) |
 | --- | --- | --- | --- |
 | Governor | Safe multisig 2-of-3: UNICEF Giga, Ministry of Education, independent reviewer | Publish policy versions, accept or reject appeals, rotate governor | Act with a single signature (holds only if the governor address is an m-of-n Safe; the registry accepts any address) |
-| Operator | Xcapit | Run resolver, publish datasets and roots, attest deployments | Change policy (enforced by the registry); attest its own tests (by policy: roles are per address and set by the governor; enforcement in EAS is planned, VPR-012) |
+| Operator | Xcapit | Run resolver, publish datasets and roots, attest deployments | Change policy (enforced by the registry); attest its own tests (enforced for attestations by `IssuerRoleResolver` once the schemas are registered; one institution using several addresses remains a governance matter) |
 | Independent reviewer | Child-protection NGO or university | Third signer; test schools; attest tests; review appeals | Operate the resolver (by policy) |
 | Auditor | Third party | Attest conformance to standards | Govern |
 | Public | Anyone | Read everything, file appeals, recompute roots | — |
@@ -34,7 +34,7 @@ Used in `publishPolicy(..., reasonCode, ...)` and in policy documents.
 3. Appeals are answered within 5 working days (pilot target).
 4. Restricted lists are referenced only by hash; their use is stated in the document.
 5. The charter of each scope defines the fallback when a policy expires without renewal (recommended: protective-only categories: malware and phishing).
-6. Key management: hardware wallets or passkey-based smart accounts for institutional signers; documented recovery; signer rotation via Safe and `setGovernor`.
+6. Key management: hardware wallets or passkey-based smart accounts for institutional signers; documented recovery; signer rotation via Safe and the two-step handover (`proposeGovernor`, then `acceptGovernor` by the new governor).
 
 ## Scope charter
 
