@@ -40,7 +40,7 @@ The toolkit lets any publisher of aggregate public-interest figures commit to a 
 from vpr import toolkit
 
 rows = toolkit.aggregate(events, k=10)          # events: iterable of (unit_id, day, category)
-root = toolkit.release_root(rows)               # validates: one day, unique cells, counts >= 1
+root = toolkit.release_root(rows)               # validates: one day, unique cells, positive counts (pass k to metrics.validate_release to check the threshold)
 proof = toolkit.row_proof(rows, 0)
 assert toolkit.verify_row(rows[0], proof, root)
 csv_text = toolkit.write_release(rows, "unit_id")
@@ -48,13 +48,15 @@ rows_again = toolkit.read_release(csv_text)     # accepts unit_id or school_id a
 h = toolkit.document_hash({"any": "json"})      # canonical JSON + keccak256 (policy and appeal documents)
 ```
 
-Errors are raised as `ValueError` and never contain dataset values.
+Errors are raised as `ValueError` (or `PolicyError`). They never contain suppressed cells or restricted-list entries; other input values may appear.
 
 ## CLI conventions
 
 - Exit code `0` means success, `1` a verification mismatch, and `2` invalid input or usage.
 - `--json` prints one JSON object on stdout.
-- Errors are printed to stderr as `error: …`, never with a traceback, and never echo dataset values.
+- Errors are printed to stderr as `error: …`, never with a traceback, and never echo suppressed cells or restricted-list entries. Any unexpected error exits with 2.
+- `verify-row` without `--root` only checks that the proof file is self-consistent and reports `anchored: false`; pass the root read from `MetricsAnchor` to verify publication.
+- The root does not commit to the threshold; use `vpr verify-root --k K` to check it.
 
 ## Compatibility policy
 

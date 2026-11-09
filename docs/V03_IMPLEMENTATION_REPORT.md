@@ -15,7 +15,7 @@
 
 - Generic verification toolkit (`vpr.toolkit`, API v1), with the unit column `school_id` or `unit_id` (ADR-0009).
 - RPZ zone evaluation (`vpr evaluate`), exact rule before wildcard, restricted entries unlabelled.
-- CLI commands `prove-row`, `verify-row`, `--json`, and exit codes 0, 1 and 2; errors never echo values.
+- CLI commands `prove-row`, `verify-row`, `--json`, and exit codes 0, 1 and 2; errors do not echo suppressed cells or restricted-list entries.
 - Second synthetic use case (`examples/public-service/`).
 - Privacy regression tests, toolkit tests and CLI tests.
 - Release-schema validation in CI for both unit columns.
@@ -77,7 +77,7 @@ There are no failing or skipped tests. Hardhat and the demonstrator were not run
 
 ## 8. Security and privacy decisions
 
-- No suppression count is published, and errors never echo values. Both are tested.
+- No suppression count is published, and errors do not echo suppressed cells or restricted-list entries. Both are tested.
 - The threshold is treated as a parameter for the DPIA, not as a guarantee.
 - "Privacy-preserving" is qualified wherever it appears.
 - The ZK category binding is enforced through registry state, not prover input (ADR-0010).
@@ -128,3 +128,40 @@ Changed:
 - README, CHANGELOG, white paper (v0.5), ARCHITECTURE, INTERFACES, BACKLOG, GOVERNANCE (policy), PRIVACY_STATEMENT, DO_NO_HARM, SECURITY, DPG.md
 
 Contracts are unchanged since v0.2.0.
+
+## 14. Second review (independent security, privacy and documentation review)
+
+Two independent reviewers (fresh context, read-only) checked the branch after the first documentation pass. Their findings were reproduced before any change. Outcome:
+
+- **Fixed in code, with 33 regression tests (94 Python tests in total):**
+  - an exception could cancel a restricted entry (fail-open);
+  - empty feeds compiled without protection;
+  - an unvalidated block page allowed zone injection;
+  - restricted entries leaked through error messages;
+  - duplicate YAML keys were accepted;
+  - non-identifier units and categories (domains, IP addresses) could reach a release;
+  - non-strict dates and counts were accepted;
+  - the zone evaluator failed open on records it did not understand;
+  - unexpected errors exited with code 1 and a traceback;
+  - `verify-row` without a root printed `MATCH`;
+  - no threshold check in `verify-root`;
+  - non-deterministic zone serials;
+  - zone files were world-readable;
+  - the reference Unbound fragment did not load (now passes `unbound-checkconf` with deployment files substituted);
+  - a vacuous wrong-root check in the demonstrator.
+- **Fixed in the ZK specification:**
+  - the event count *m* is now private, because publishing it revealed the total of suppressed events;
+  - *k* is read from the registry rather than supplied by the prover;
+  - the scope is bound in each event leaf;
+  - one domain-separation tag per role;
+  - the empty-release rule is aligned.
+- **Recorded, not changed in this PR** (contract changes would alter the audit target and cannot be compiled locally under the owner's rule): unbounded and back-dated anchor days, no publisher revocation or correction path, single-step governor transfer and uncapped validity, front-running of canonical scope ids, unbounded URIs, and appeal pre-filing. Threats T38–T48; backlog VPR-065 to VPR-069, scheduled before the M3 audit freeze.
+- **Documentation corrected:**
+  - the ESP scope is narrower than phase 1 and its shares are unallocated;
+  - no unfiltered fallback in the pilot;
+  - degraded-mode reporting is defined before the dashboard exists;
+  - the DPG requirement text is quoted;
+  - indicator 6 is downgraded to Credible path;
+  - present-tense claims about designed controls are qualified;
+  - backlog IDs are made consistent.
+

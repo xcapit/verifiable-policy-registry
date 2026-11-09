@@ -13,8 +13,9 @@ This table describes the target deployment, not current runtime evidence. The re
 | Device identifiers (MAC, hostname) | Not seen by a recursive resolver behind the school router | — | — | Never | No |
 | Timestamp of a query | Resolver memory | Operation | As above | Never; only the UTC date survives | Only as a date |
 | Block event `(unit_id, day, category)` | Exporter → aggregator | Aggregation | Until the daily release is built and committed (retention period to be fixed in the DPIA) | Never individually | Yes |
-| Event log commitment `C_L` (Designed) | Aggregator; on-chain | Binding the release to the log | Permanent on-chain | Yes (hiding commitment) | Yes |
+| Event log commitment `C_L` (Designed) | Aggregator; on-chain | Binding the release to the log | Permanent on-chain | Yes (salted, hiding commitment; the event count *m* stays private) | Yes |
 | Daily release: cells with count ≥ *k* | Public mirrors; root on-chain | Impact reporting | Permanent | Yes | Yes |
+| Raw event file (`events.csv` or equivalent) | Aggregator host | Aggregation | Must be deleted after the release is committed; retention fixed in the DPIA | Never | No |
 | Suppressed cells and their number | Aggregator memory only | — | Not retained after the release | **Never** | No |
 | Policy documents | Public mirrors; hash on-chain | Transparency | Permanent | Yes | n/a |
 | Appeal documents | Planned relayer; hash on-chain | Recourse | Retention and access policy to be fixed in the DPIA; removable off-chain | Unknown — Gate A decision; only the hash is necessarily public | n/a |
@@ -34,7 +35,7 @@ This table describes the target deployment, not current runtime evidence. The re
 | `category` | Impact by threat type | What kind of content was blocked | Sensitive categories (adult, self-harm) reveal behaviour of a group |
 | `count` (≥ *k*) | Impact | Volume of blocked queries | Correlates with school size and with individual behaviour (§3) |
 | Release root, dataset URI | Integrity | Nothing beyond the release | Low |
-| `C_L` | Binding (Designed) | Number of events *m* in the day | Low; total volume per scope and day |
+| `C_L` | Binding (Designed) | Nothing, if *m* stays private as specified; publishing *m* would reveal the total of suppressed events per scope and day | Low as designed; High if *m* were published |
 
 ## 3. What the threshold does and does not protect
 
@@ -49,6 +50,7 @@ What it does protect against:
 | Attack | Auxiliary data | Effect | Mitigation |
 | --- | --- | --- | --- |
 | Small-school inference | Giga Maps school size, enrolment | A cell at a school with 15 pupils describes a small group | Minimum cohort size for publication (§5) |
+| Day boundary | Local school time versus UTC days | Evening events in the Americas fall on the next UTC day, so a day's cells can mix two school days and sharpen calendar inference | Define the release day in local time in the DPIA, or document the shift |
 | Calendar inference | School calendars, holidays, exam dates | A cell on a day the school is closed points to staff or a specific event | Publish only on school days, or coarsen to weeks |
 | Incident correlation | Local news, public incidents | A spike in a category after a known incident attributes behaviour to a group | Delayed release; category merging |
 | Category rarity | Rarely used categories | A non-zero published cell in a rare category is itself the signal | Merge sensitive categories into a single published "other protective" category |
@@ -78,7 +80,8 @@ Small schools are a foreseeable pilot condition. For them, the daily per-school 
 - the threshold boundary, where *k* is published and *k* − 1 is not;
 - no suppressed cell, category or count appears in the CSV or JSON outputs, nor the word "suppressed";
 - the toolkit does not return the suppression count;
-- error messages never echo values, categories or units;
+- error messages do not echo suppressed cells, restricted-list entries or rejected event fields (other input values may appear);
+- events whose unit or category is not an identifier (for example a domain name or an IP address) are rejected, so such values cannot reach a release;
 - malformed counts fail safely;
 - event input with extra fields (for example an IP column) is rejected;
 - output ordering does not depend on input order;

@@ -6,11 +6,11 @@ This page covers who governs each **filtering policy**. How the open-source proj
 
 ## Roles
 
-| Role | Who (pilot) | Powers | Cannot |
+| Role | Who (proposed pilot; none confirmed) | Powers | Must not (enforcement noted) |
 | --- | --- | --- | --- |
-| Governor | Safe multisig 2-of-3: UNICEF Giga, Ministry of Education, independent reviewer | Publish policy versions, accept or reject appeals, rotate governor | Act with a single signature |
-| Operator | Xcapit | Run resolver, publish datasets and roots, attest deployments | Change policy, attest its own tests |
-| Independent reviewer | Child-protection NGO or university | Third signer; test schools; attest tests; review appeals | Operate the resolver |
+| Governor | Safe multisig 2-of-3: UNICEF Giga, Ministry of Education, independent reviewer | Publish policy versions, accept or reject appeals, rotate governor | Act with a single signature (holds only if the governor address is an m-of-n Safe; the registry accepts any address) |
+| Operator | Xcapit | Run resolver, publish datasets and roots, attest deployments | Change policy (enforced by the registry); attest its own tests (by policy: roles are per address and set by the governor; enforcement in EAS is planned, VPR-012) |
+| Independent reviewer | Child-protection NGO or university | Third signer; test schools; attest tests; review appeals | Operate the resolver (by policy) |
 | Auditor | Third party | Attest conformance to standards | Govern |
 | Public | Anyone | Read everything, file appeals, recompute roots | — |
 

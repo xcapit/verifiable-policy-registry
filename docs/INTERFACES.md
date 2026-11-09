@@ -48,7 +48,7 @@ Producer: policy authors (operator drafts, governor signers approve). Consumers:
 | `profile` | `primary` \| `secondary` \| `teachers` | yes | Filtering profile |
 | `categories` | list of strings | yes | Category feeds applied (mapped to ITU COP categories) |
 | `local_blocks` | list of `{domain, reason}` | yes | Extra blocks for this scope; every entry states why |
-| `exceptions` | list of `{domain, reason}` | yes | Never blocked, even if a feed lists them; every entry states why |
+| `exceptions` | list of `{domain, reason}` | yes | Never blocked when a feed or local block lists the same domain; a feed entry for a subdomain of an exception stays blocked (exact-match RPZ semantics); an exception that equals or covers a restricted entry is refused at compilation; every entry states why |
 | `valid_days` | integer | recommended | Intended validity; must be ≤ the scope `maxValidity` |
 | `reason_code` | integer | recommended | Same value passed to `publishPolicy` |
 | `threat_feeds` | list of `{provider, version}` | optional | Third-party feeds by reference, never copied |
@@ -183,7 +183,7 @@ The governor answers each appeal with a reasoned decision. A rejection records t
 
 ## I10 · Command-line interface
 
-Installed with `pip install -e tools/`. Exit codes: `0` success, `1` verification mismatch, `2` invalid input or usage. `--json` prints one JSON object; errors go to stderr and never echo dataset values. The stable Python API is `vpr.toolkit` ([integration guide](toolkit/INTEGRATION_GUIDE.md)).
+Installed with `pip install -e tools/`. Exit codes: `0` success, `1` verification mismatch, `2` invalid input or usage. `--json` prints one JSON object; errors go to stderr, never with a traceback, and never echo suppressed cells or restricted-list entries; any unexpected error exits with 2. `verify-row` without `--root` reports `anchored: false`; `verify-root --k K` checks the threshold, which the root does not commit to. The stable Python API is `vpr.toolkit` ([integration guide](toolkit/INTEGRATION_GUIDE.md)).
 
 | Command | Input | Output |
 | --- | --- | --- |
@@ -194,7 +194,7 @@ Installed with `pip install -e tools/`. Exit codes: `0` success, `1` verificatio
 | `vpr prove-row <release.csv> --index N` | Release (I6) | JSON with the row, day number, leaf, proof and root |
 | `vpr verify-row <proof.json> [--root R] [--json]` | Output of `prove-row`; optionally the anchored root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
 | `vpr restricted-hash <list>` | Restricted list, one domain per line | Its commitment (I1); the list itself is never published |
-| `vpr verify-root <dataset.csv> <root>` | Dataset (I6) and expected root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
+| `vpr verify-root <dataset.csv> <root> [--k K] [--json]` | Dataset (I6) and expected root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |
 
 ## Versioning of these interfaces
 

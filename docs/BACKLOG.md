@@ -23,6 +23,11 @@ Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANA
 | VPR-062 | Run the demonstrator on a second EVM network and with a second resolver implementation (DPG indicator 4) | VPR-010, VPR-055 | Planned (M2) |
 | VPR-063 | Bulk export of on-chain history (versions, appeals, roots) to CSV/JSON (DPG indicator 6) | — | Planned (M3) |
 | VPR-064 | Playbook for new countries (charters, profiles, onboarding) | VPR-026 | Planned (M3) |
+| VPR-065 | Bind feed contents (hash per feed in `threat_feeds`) and the produced zone (`resolverConfigHash`) to the policy version | Compiler refuses a feed whose hash differs; the attestation carries the zone hash | Planned (M2) |
+| VPR-066 | Anchor hardening: bound `day` to a window around the current date, explicit publisher revocation, governor-gated correction record, length cap on `datasetUri`/`uri`, daily release-or-empty marker | Tests for future/past days, revocation, correction and caps | Planned before the audit freeze (M3) |
+| VPR-067 | Registry hardening: two-step `setGovernor`, protocol cap on `maxValidity`, on-chain validation of reason codes | Tests for each; INTERFACES updated | Planned before the audit freeze (M3) |
+| VPR-068 | Derive the scope id on-chain from the governor and the scope name, so canonical names cannot be front-run | Front-running test; manifest format updated | Planned (M2, with VPR-049) |
+| VPR-069 | Appeal format 3 with a document salt; documentation that rounds are not an escalation count; optional time-out of open appeals | Pre-filing of a guessable document no longer possible; tests | Planned (M2) |
 | VPR-060 | Check of `valid_days` and document version against the on-chain call in tools and dashboard | — | Planned (M2, with VPR-015) |
 
 ## M1 · Design and sign-off (weeks 1–4)
@@ -33,7 +38,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | --- | --- | --- |
 | VPR-001 | Write `docs/specs/registry.md`: formal spec of both contracts (state, events, errors, invariants) | Every external function documented with pre/post-conditions; invariants listed (versions append-only, expiry mandatory, appeal state machine) |
 | VPR-002 | Write `docs/specs/eas.md`: schema fields, issuer roles, revocation rules, validity windows | Matches `schemas/eas-schemas.json`; defines who may issue/revoke each schema |
-| VPR-003 | Threat model `docs/THREAT_MODEL.md` (STRIDE per component) | Covers registry, governor keys, resolver, exporter, aggregator, block page; each threat mapped to a mitigation or accepted risk |
+| VPR-003 | Threat model `docs/security/THREAT_MODEL.md` (STRIDE per component; first version in v0.3, review at Gate A) | Covers registry, governor keys, resolver, exporter, aggregator, block page; each threat mapped to a mitigation or accepted risk |
 | VPR-004 | DPIA template `docs/DPIA.md` aligned with UNICEF Policy on Personal Data Protection | Sections for data inventory, necessity, risks, mitigations; reviewed by Giga |
 | VPR-005 | Finalise `docs/PRIVACY_STATEMENT.md` (RFC 8932 RPS) | Placeholders resolved; `vpr` command prints its keccak256 |
 | VPR-006 | Filtering profiles: `policies/profiles/{primary,secondary,teachers}.yaml` mapped to ITU COP categories | Each validates with `vpr policy-hash`; mapping table in `docs/PROFILES.md` |

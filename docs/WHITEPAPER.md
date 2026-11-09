@@ -122,7 +122,7 @@ Some lists cannot be published. The IWF list of URLs hosting CSAM is distributed
 
 <p align="center"><img src="figures/fig2-authorisation.svg" alt="Policy authorisation flow" width="100%"></p>
 
-*Figure 2. Authorisation flow. Without a threshold of signatures the policy in force does not change. Each appended version is public, is loaded by the resolver only after its document is checked against the on-chain hash, and ends in an independent attestation per school.*
+*Figure 2. Authorisation flow. Without a threshold of signatures the policy in force does not change. Each appended version is public, is designed to be loaded by the resolver only after its document is checked against the on-chain hash (sync daemon planned, VPR-015), and ends in an independent attestation per school.*
 
 The governor appends a version by calling `publishPolicy(scopeId, h, ρ, u, c, validity, a)`. The contract rejects an empty hash and any validity outside (0, Δ_max]. If *a* is non-zero, the contract requires that *a* refers to an open appeal in the same scope and marks it accepted in the same transaction. In other words, accepting an appeal is not a separate administrative act: it consists of publishing the policy that resolves it.
 
@@ -225,7 +225,7 @@ We consider the following adversaries.
 - **A6, a re-identification attacker using released metrics.** Mitigated by minimisation at the source and by k-suppression, within the limits stated in §5.2.
 - **A7, a user bypassing the filter** with external DoH, a VPN or an alternative resolver. Mitigated by blocking known public resolvers and DoH endpoints at the provider and by bypass testing in every review cycle. VPN and tunnelling bypasses cannot be fully prevented at the DNS layer; the attestation reports their status honestly rather than claiming otherwise.
 - **A8, an appeal spammer.** Appeals submitted through the relayer are rate-limited; appeals submitted directly to the contract cost the submitter gas. Since appeal identifiers are content-derived, duplicates are rejected.
-- **A9, the ledger itself.** A layer-2 sequencer could delay or censor transactions. Filtering does not depend on the ledger's liveness: the resolver continues to enforce the last verified version, and governance transactions can be forced through Ethereum L1 if the sequencer censors them.
+- **A9, the ledger itself.** A layer-2 sequencer could delay or censor transactions. Filtering does not depend on the ledger's liveness: the resolver continues to enforce the last verified version until it expires, after which the charter's fallback applies (§4.3), and governance transactions can be forced through Ethereum L1 if the sequencer censors them.
 - **A10, a party withholding or substituting documents.** Substituting a policy document or a released dataset is detected, since its hash no longer matches the on-chain commitment. Withholding one defeats P1 for that version without being detectable from the chain alone; it is mitigated by mirroring documents and releases on independent hosts (§8).
 
 ### 6.3 Contract-level considerations
@@ -291,7 +291,7 @@ The weakest link in the design is the step between the resolver's behaviour and 
 
 ### 11.1 Statement
 
-The normative relation, with every encoding, is specified in `docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md` (§5–§6) and ADR-0010. In outline, for a scope *s* and a day *d*, the event log *L* = ⟨*e*₁, …, *e*ₘ⟩ is committed by *C*_L. The commitment is a Merkle root over salted, domain-separated event leaves, bound to the number of events *m*, so it is binding and hiding. Hiding is required: counts are small and the published cells are public, so an unsalted commitment would let anyone recover the suppressed cells by enumeration. The operator proves knowledge of the events and salts such that:
+The normative relation, with every encoding, is specified in `docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md` (§5–§6) and ADR-0010. In outline, for a scope *s* and a day *d*, the event log *L* = ⟨*e*₁, …, *e*ₘ⟩ is committed by *C*_L. The commitment is a salted hash of a Merkle root over salted, domain-separated event leaves, so it is binding and hiding. The number of events *m* stays private, because publishing it would reveal the total of the suppressed cells. Hiding is required: counts are small and the published cells are public, so an unsalted commitment would let anyone recover the suppressed cells by enumeration. The operator proves knowledge of the events and salts such that:
 
 - (a) they open *C*_L;
 - (b) every event belongs to scope *s*, day *d*, an admitted unit and a category of the policy version in force;
@@ -325,7 +325,7 @@ Design rule: the ledger holds data about institutions (schools, agencies), never
 
 | Data | Location | Visibility | Purpose |
 | --- | --- | --- | --- |
-| Policy content hash, reason code, expiry, signatures | On-chain | Public | Audit what is blocked, by whom and why; detect over-blocking |
+| Policy content hash, reason code, expiry; the authorising governor address (signatures stay in the governor contract, e.g. the Safe) | On-chain | Public | Audit what is blocked, by whom and why; detect over-blocking |
 | Full policy document (categories, feeds, local blocks, exceptions with reasons) | Off-chain, mirrored | Public | Audit the content of each version |
 | Restricted list (e.g. IWF) | Operator only | Commitment public; contents never published | Block CSAM without disclosing the list |
 | Deployment, test and conformance attestations (Planned; schemas Defined) | Proposed on-chain EAS records | Public summary and report hash; report access set by the Gate A charter | Record deployment and review claims without implying that the ledger verifies them |

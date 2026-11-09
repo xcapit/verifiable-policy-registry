@@ -9,7 +9,7 @@
 - `H(x)` is keccak-256 as used by Ethereum (not NIST SHA3-256). `‖` is byte concatenation. Integers are big-endian, unsigned, with the stated width.
 - `utf8(s)` is the UTF-8 encoding of a string, without a terminator.
 - Hex values are written `0x`-prefixed and lowercase.
-- Domain-separation tags: `0x00` release leaf, `0x01` Merkle internal node, `0x02` event leaf (Designed), `0x03` set-commitment leaf (Designed).
+- Domain-separation tags: `0x00` release leaf, `0x01` Merkle internal node, `0x02` event leaf (Designed), `0x03` set-commitment leaf (Designed), `0x04` log commitment (Designed). Each tag has exactly one role.
 
 Assumptions: H is collision-resistant and second-preimage-resistant. Where it is used with a secret 256-bit salt it is treated as a hiding commitment, which assumes H behaves as a random oracle. That is standard, but it is a heuristic, not a proof.
 
@@ -18,7 +18,8 @@ Assumptions: H is collision-resistant and second-preimage-resistant. Where it is
 - Canonical form: JSON with lexicographically sorted keys, separators `,` and `:` without whitespace, UTF-8, non-ASCII kept, after validation (domains lower-cased, trailing dot removed). Implementation: `tools/vpr/policy.py` (`canonical_json`, `content_hash`) and `tools/vpr/toolkit.py` (`canonical_json`, `document_hash`).
 - `contentHash = H(canonical_json(document))`; `scopeId = H(utf8(scope))`.
 - **What the hash binds.** Every field of the document: scope, version, profile, categories, `valid_days`, `reason_code`, threat feeds by provider and version, local blocks and exceptions with reasons, and `restricted_list_hash`.
-- **What binds the document to the chain.** The governor's `publishPolicy(scopeId, contentHash, …, validity, …)` call. **Gap.** Nothing checks on-chain that `validity` equals `valid_days × 86400`, or that the version number in the document equals the on-chain version. `vpr policy-hash` lets anyone check the content hash. The equality checks for validity and version are planned for the sync daemon (VPR-015) and the dashboard (VPR-021).
+- **What binds the document to the chain.** The governor's `publishPolicy(scopeId, contentHash, …, validity, …)` call. **Gap.** Nothing checks on-chain that `validity` equals `valid_days × 86400`, or that the version number in the document equals the on-chain version. `vpr policy-hash` lets anyone check the content hash. The equality checks for validity and version are planned as VPR-060, used by the sync daemon (VPR-015) and the dashboard (VPR-021).
+- **What the hash does not bind.** Threat feeds are referenced by provider and version strings only, so the hash does not bind the feed contents, and therefore not the effective block set. The `; policy content hash` line in a compiled zone is self-asserted by whoever compiled it. Binding feed contents (a hash per feed in `threat_feeds`) and the produced zone (`resolverConfigHash` in the deployment attestation) is Planned (VPR-065).
 - **Restricted list.** `restrictedListHash = H(utf8(join("\n", sorted(unique(normalised domains)))))`. It is a binding commitment, but **not hiding**: the list is low-entropy, and anyone who holds a candidate list can test it. It proves which list was declared, not that it was enforced (§9). `vpr compile-rpz` refuses a restricted file whose hash differs from the declared one (test: `test_restricted_list_must_match_the_declared_hash`).
 
 ## 3. Release encoding and Merkle tree · Implemented (dataset format `vpr-dataset/2`)
@@ -67,13 +68,13 @@ Negative tests, all passing:
 
 The resolver exporter (VPR-016, Planned) emits events `e_j = (unit_id, day, category)`. The log of a day is `L = ⟨e_1, …, e_m⟩` in arrival order.
 
-**Event leaf.** `ev_j = H(0x02 ‖ dayNumber:uint32 ‖ j:uint32 ‖ len ‖ utf8(unit_id) ‖ len ‖ utf8(category) ‖ s_j)`, with a fresh 256-bit salt `s_j` drawn from a CSPRNG by the exporter.
+**Event leaf.** `ev_j = H(0x02 ‖ scopeId:bytes32 ‖ dayNumber:uint32 ‖ j:uint32 ‖ len ‖ utf8(unit_id) ‖ len ‖ utf8(category) ‖ s_j)`, with a fresh 256-bit salt `s_j` drawn from a CSPRNG by the exporter. The scope is part of the leaf so that relation (b) below can check it.
 
-**Log commitment.** `C_L = H(0x02 ‖ m:uint32 ‖ MR(ev_1 … ev_m))`, where `MR` uses the node rule of §3; the length *m* is bound.
+**Log commitment.** `C_L = H(0x04 ‖ MR(ev_1 … ev_m) ‖ r)`, where `MR` uses the node rule of §3 and `r` is a fresh 256-bit salt. The number of events *m* is **not** public: it is part of the witness and bound inside the proof. Publishing *m* would reveal `m − Σ published counts`, the exact number of events in suppressed cells. With one suppressed cell in a scope and day, that is the cell's value.
 
 **Properties.** Binding follows from collision resistance. Hiding follows from the salts, under the random-oracle heuristic. Without salts, `C_L` would be an unsalted hash of a small, structured set whose large cells are public, and the suppressed cells could be recovered by enumeration. Per-event salts also allow a selective opening of a single event (§8) without revealing the others.
 
-**Anchoring.** `C_L` is anchored with the daily root. The current `MetricsAnchor` has no field for it: a contract change is Planned in M4 (VPR-035).
+**Anchoring.** `C_L` is anchored with the daily root. The current `MetricsAnchor` has no field for it: a contract change is Planned in M4 (VPR-058).
 
 ## 6. The zero-knowledge relation · Designed
 
@@ -82,7 +83,7 @@ The resolver exporter (VPR-016, Planned) emits events `e_j = (unit_id, day, cate
 2. `scopeId`, `dayNumber`.
 3. `policyVersion`, `contentHash` of that version, and `catRoot`, a commitment to its category set (below).
 4. `unitRoot`, a commitment to the set of units (schools) admitted to the scope on that day.
-5. `k`.
+5. `k`, read by the verifier contract from the registry for `(scopeId, policyVersion)`, never supplied by the prover. Otherwise a prover could choose *k* = 1 and the proof would still verify.
 6. `C_L` (§5) and `root`, the release root (§3).
 7. `formatVersion` = 2.
 
@@ -93,20 +94,20 @@ The resolver exporter (VPR-016, Planned) emits events `e_j = (unit_id, day, cate
 - (a) `C_L` is the commitment of §5 to `(e_j, s_j)_{j ≤ m}`;
 - (b) every `e_j` has `day = dayNumber` and `scope = scopeId`, its category is a member of `catRoot`, and its unit is a member of `unitRoot`;
 - (c) `root = MR(sorted rows of Agg_k(L))` with the leaf and node rules of §3;
-- (d) the release is non-empty, or `root` equals a fixed constant `EMPTY = H(0x00 ‖ "empty")` that is never anchored as data.
+- (d) the release is non-empty. An empty release has no root and is never anchored (§3); a day without a release is visible as a missing commitment.
 
-**Binding the category set to the policy.** `catRoot = MR_0x03(sorted utf8(category))`. Recomputing `contentHash` over the full canonical JSON inside a circuit is expensive, so the design moves the binding on-chain instead. The governor records `catRoot` (and `unitRoot` per scope) in the registry next to each version. The verifier contract reads both from the registry for `(scopeId, policyVersion)`, so they are never supplied by the prover. A tool (`vpr policy-hash --json`, extended in M4) and the dashboard check that `catRoot` matches the categories of the published document. This makes the binding enforced on-chain and the document check independently verifiable. It requires a registry change (VPR-035).
+**Binding the category set to the policy.** `catRoot = MR_0x03(sorted utf8(category))`. Recomputing `contentHash` over the full canonical JSON inside a circuit is expensive, so the design moves the binding on-chain instead. The governor records `catRoot` (and `unitRoot` per scope) in the registry next to each version. The verifier contract reads both from the registry for `(scopeId, policyVersion)`, so they are never supplied by the prover. A tool (`vpr policy-hash --json`, extended in M4) and the dashboard check that `catRoot` matches the categories of the published document. This makes the binding enforced on-chain and the document check independently verifiable. It requires a registry change (VPR-058), which also records `k` per version.
 
-**Replay and substitution.** `domain`, `scopeId`, `dayNumber` and `policyVersion` are public inputs read by the verifier contract from its own context and the registry. A proof for another day, scope, chain or policy therefore fails.
+**Replay and substitution.** `domain`, `scopeId`, `dayNumber`, `policyVersion` and `k` are public inputs read by the verifier contract from its own context and the registry. A proof for another day, scope, chain or policy therefore fails.
 
 ## 7. What is hidden and what is not
 
 | Item | Hidden from the public? |
 | --- | --- |
-| Cells below *k*, and how many there are | Hidden (not published; hidden in the proof under §5) |
+| Cells below *k*, their values, and how many there are | Hidden, provided *m* stays private (§5) |
 | Order and timing of events within a day | Hidden |
 | Published cells (unit, day, category, count) | Public by design |
-| Number of events *m* in the log | Public: bound in `C_L` |
+| Number of events *m* in the log | Hidden: a private witness bound in the proof (publishing it would reveal the total of suppressed cells) |
 | Whether a unit had any event on a day | Partly revealed by published cells; the absence of a row does not reveal whether the unit had 0 or fewer than *k* events |
 
 ## 8. Canary events · Designed

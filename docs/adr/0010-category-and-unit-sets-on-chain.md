@@ -9,11 +9,11 @@ The planned zero-knowledge proof must show that every event's category belongs t
 
 ## Decision
 
-The governor records, next to each policy version, a commitment `catRoot` to the sorted set of category labels. For each scope it also records a commitment `unitRoot` to the admitted units. The verifier contract reads both from the registry for `(scopeId, policyVersion)`; the prover never supplies them. Tools and the dashboard check that `catRoot` matches the categories of the published document. Full specification: [cryptographic evidence §6](../security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md).
+The governor records, next to each policy version, a commitment `catRoot` to the sorted set of category labels and the threshold `k`. For each scope it also records a commitment `unitRoot` to the admitted units. The verifier contract reads `catRoot`, `unitRoot` and `k` from the registry for `(scopeId, policyVersion)`; the prover never supplies them. Tools and the dashboard check that `catRoot` matches the categories of the published document. Full specification: [cryptographic evidence §6](../security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md).
 
 ## Consequences
 
-The registry interface changes in M4 (VPR-035), which needs a new deployment, since the contracts are not upgradeable. The binding between the document and `catRoot` is checked off-chain by anyone, not by the chain. That is acceptable because the document is public and its hash is on-chain.
+The registry interface changes in M4 (VPR-058), which needs a new deployment, since the contracts are not upgradeable. The binding between the document and `catRoot` is checked off-chain by anyone, not by the chain. That is acceptable because the document is public and its hash is on-chain.
 
 ## Alternatives considered
 
