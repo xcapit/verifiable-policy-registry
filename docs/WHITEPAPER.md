@@ -180,7 +180,7 @@ Under the proposed reporting rule, a school would count as protected only with a
 
 <p align="center"><img src="figures/fig-onboarding.svg" alt="Five steps for a school to join" width="100%"></p>
 
-*Figure 9. Onboarding a school. Nothing is installed on devices. A school counts as protected only after the independent test, and only while that attestation is valid for the version in force.*
+*Figure 9. Proposed onboarding of a school. Nothing is installed on devices. A school counts as protected only after the independent test, and only while that attestation is valid for the version in force.*
 
 
 ---
@@ -270,7 +270,7 @@ We consider the following adversaries.
 
 ### 6.3 Contract-level considerations
 
-The contracts are deliberately small. `VerifiablePolicyRegistry` is append-only with respect to versions, enforces the validity bound, and implements the appeal state machine None → Open → {Accepted, Rejected}. In `MetricsAnchor`, the publisher writes each (scope, day) once, and only the governor can correct it, through a public, reason-bearing and revision-counted correction. Neither contract holds funds. Neither is upgradeable. Both are compiled with a pinned compiler version. A defect is remedied by deploying new contracts, re-creating each scope there under the same governor Safe, and pointing the resolver's synchronisation process and the dashboard to the new addresses, while the old record remains readable. Because the scope identifier is derived from the governor and the name, the same Safe and the same name reproduce the same identifier on the new deployment. We prefer this to proxy patterns, whose administrative keys would weaken P2. Before any production deployment we plan static analysis, invariant testing of the properties in §3.3 and an external audit.
+The contracts are deliberately small. `VerifiablePolicyRegistry` is append-only with respect to versions, enforces the validity bound, and implements the appeal state machine None → Open → {Accepted, Rejected}. In `MetricsAnchor`, the publisher writes each (scope, day) once, and only the governor can correct it, through a public, reason-bearing and revision-counted correction. `IssuerRoleResolver` accepts calls only from EAS and holds no state of its own. None of the three contracts holds funds, none is upgradeable, and all are compiled with a pinned compiler version. A defect is remedied by deploying new contracts, re-creating each scope there under the same governor Safe, and pointing the resolver's synchronisation process and the dashboard to the new addresses, while the old record remains readable. Because the scope identifier is derived from the governor and the name, the same Safe and the same name reproduce the same identifier on the new deployment. We prefer this to proxy patterns, whose administrative keys would weaken P2. Before any production deployment we plan static analysis, invariant testing of the properties in §3.3 and an external audit.
 
 <p align="center"><img src="figures/fig-state-machines.svg" alt="Appeal and governor handover state machines" width="100%"></p>
 

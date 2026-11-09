@@ -36,7 +36,7 @@ All outputs are open and reusable without permission: code under AGPL-3.0-only, 
 | Output | Status on the v0.3 candidate branch | Who can reuse it |
 | --- | --- | --- |
 | Policy registry pattern: versions, reasons, mandatory expiry, appeals by document hash, on-chain issuer roles | Implemented, tested, not audited | Any governed policy with a bounded audience |
-| `MetricsAnchor`: write-once daily roots, row verification with domain-separated, day-bound leaves | Implemented, tested, not audited | Any programme publishing aggregate counts |
+| `MetricsAnchor`: daily roots anchored once, with public governor corrections, row verification with domain-separated, day-bound leaves | Implemented, tested, not audited | Any programme publishing aggregate counts |
 | EAS schemas for deployment, independent test and conformance attestations | Defined, not yet registered on a network | Any scheme where operators must not certify themselves |
 | `vpr` toolkit: canonical hashing, aggregation with small-cell suppression, Merkle proofs, verification CLI | Implemented, tested | Integrators and independent verifiers ([integration guide](../toolkit/INTEGRATION_GUIDE.md)) |
 | End-to-end demonstrator with synthetic data | Implemented, run in CI | Reviewers and new integrators |

@@ -22,7 +22,7 @@
 <line x1="790" y1="244" x2="790" y2="297" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
 <path d="M290,108 C330,120 335,165 357,182" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#r)"/>
 <g stroke="#dc2626" stroke-width="2.5"><line x1="318" y1="134" x2="334" y2="150"/><line x1="334" y1="134" x2="318" y2="150"/></g>
-<text x="308" y="136" font-size="11" fill="#dc2626" text-anchor="end">refused by the resolver</text>
+<text x="308" y="136" font-size="11" fill="#dc2626" text-anchor="end">refused</text>
 <rect x="50" y="300" width="860" height="66" rx="8" fill="#f8fafc" stroke="#334155"/>
 <text x="480" y="326" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">Verifier rule: a school counts as protected under the version in force only if</text>
 <text x="480" y="348" font-size="12" fill="#475569" text-anchor="middle">a valid, unrevoked IndependentTest exists for that version, and its attester belongs to the reviewer role of the scope</text>

@@ -120,7 +120,7 @@ Canaries cannot detect fabricated additional events, and they cannot detect omis
 
 | Risk | Status today | Mitigation | Residual |
 | --- | --- | --- | --- |
-| Replay of a root or proof on another day, scope or chain | Mitigated for roots (day in leaf, write-once per scope/day); Designed for proofs | `domain`, scope and day as public inputs read on-chain | Low once implemented |
+| Replay of a root or proof on another day, scope or chain | Mitigated for roots (day in leaf; the publisher anchors each scope/day once, and only public governor corrections follow); Designed for proofs | `domain`, scope and day as public inputs read on-chain | Low once implemented |
 | Substitution of the policy document | Mitigated | `contentHash` on-chain; `vpr policy-hash` | Document availability (mirrors) |
 | Equivocation (different releases shown to different people) | Partly mitigated | One root per scope/day on a public chain; dataset URI on-chain | Off-chain hosts can serve different files; anyone can detect this by recomputing the root |
 | Truncation or omission of events before aggregation | **Not mitigated cryptographically** | Reviewer tests; canaries (Designed); audit | High until canaries and TEE work exist |

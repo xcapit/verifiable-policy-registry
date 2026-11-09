@@ -37,7 +37,7 @@
 <text x="616" y="250" font-weight="600" fill="#0f172a">Three schemas + IssuerRoleResolver</text>
 <text x="616" y="266" fill="#475569">one issuer role per schema</text>
 <rect x="600" y="284" width="320" height="42" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
-<text x="616" y="302" font-weight="600" fill="#0f172a">Aggregator, MetricsAnchor, ZK relation</text>
+<text x="616" y="302" font-weight="600" fill="#0f172a">Aggregator, MetricsAnchor, ZK (designed)</text>
 <text x="616" y="318" fill="#475569">small-cell suppression, bound to a root</text>
 <rect x="600" y="336" width="320" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
 <text x="616" y="358" font-weight="600" fill="#0f172a">Governor (threshold authorisation)</text>

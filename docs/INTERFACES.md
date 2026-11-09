@@ -110,7 +110,7 @@ Produced by `vpr compile-rpz`. Standard Response Policy Zone usable by Unbound o
   ```
 - Exceptions: `<domain> CNAME rpz-passthru.` and `*.<domain> CNAME rpz-passthru.`
 - Blocks: `<domain> CNAME <block-page>.` (or `CNAME .` for NXDOMAIN), plus the wildcard. A comment states the source (`category:<name>` or `local`). Restricted entries carry no comment.
-- SOA serial: `YYYYMMDDHH` in UTC.
+- SOA serial: the policy version, so the same policy and feeds always produce the same zone (and the same `zoneHash`).
 
 ## I5 · Block events (resolver exporter → aggregator)
 
