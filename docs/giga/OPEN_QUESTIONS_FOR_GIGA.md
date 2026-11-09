@@ -11,6 +11,8 @@ Decisions that only Giga, a ministry, a connectivity provider or another partner
 3. Which schools (2–5 for the alpha) would be selected from Giga Maps, and on what criteria (connectivity type, size, language)?
 4. Which school levels are in scope (primary, secondary), and should teachers have a separate profile?
 5. Who at Giga would act as a governing signer, and is a Giga signature compatible with Giga's institutional role?
+5a. Should the independent reviewer also be a governing signer, or should the third signer be a distinct institution?
+5b. Do parents or the community need an appeal channel of their own?
 
 ## Governance and policy
 
@@ -26,6 +28,8 @@ Decisions that only Giga, a ministry, a connectivity provider or another partner
 12. Are there data-residency requirements for the resolver hosting?
 13. Does the ministry or provider already hold IWF membership or an equivalent national list, and under what terms can the operator use it?
 14. Which national hotline should the block page link to for reporting illegal content?
+14a. What is the legal basis for filtering in schools in the pilot country, and who runs the child-rights impact assessment?
+14b. Who stores published appeal documents, for how long, and who can withdraw them?
 
 ## Connectivity and operations
 
@@ -40,6 +44,7 @@ Decisions that only Giga, a ministry, a connectivity provider or another partner
 20. Who would operate the system after the pilot (ministry, provider, regional host, or a contractor)?
 21. Who would pay operating costs after the pilot, and through which procurement route?
 22. Is phase 2 (20–50 schools) something Giga would consider, and what evidence would it need at Gate C?
+22a. Who would fund the alpha itself (resolver hosting, reviewer, support during weeks 5–16)?
 
 ## Communication and languages
 

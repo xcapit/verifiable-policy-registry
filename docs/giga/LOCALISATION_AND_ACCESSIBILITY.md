@@ -8,7 +8,7 @@ What people at schools and ministries will read and use, in which languages, and
 
 | Audience | Material | Language need | Status |
 | --- | --- | --- | --- |
-| Students and teachers | Block page: why a site is blocked, how to ask for a review | Main language(s) of the pilot country | Planned (VPR-017: Spanish and Portuguese first) |
+| Students and teachers | Block page: why a site is blocked, how to ask for a review | Main language(s) of the pilot country | Planned (VPR-017: Spanish and Portuguese first if the pilot is in Latin America; otherwise set at Gate A) |
 | Teachers and school focal points | Appeal form | Same as block page | Planned (VPR-017) |
 | School focal points | One-page guide: what changes, whom to call, what is not collected | Same as block page | Planned (M2) |
 | Parents and community | Short notice: what the filter does and does not do, and how to see the public policy | Same as block page | Planned (M2), wording to be agreed with the ministry |
@@ -27,7 +27,7 @@ The policy document itself (categories, blocked and excepted domains with reason
 
 ## Accessibility of the block page and appeal form
 
-Target: WCAG 2.1 level AA for the block page and appeal form.
+Target: WCAG 2.2 level AA for the block page and appeal form (or 2.1 AA if national rules require).
 
 - Works without JavaScript and on old, low-end browsers and phones.
 - Small page weight so that it loads on slow and satellite links.
@@ -39,7 +39,7 @@ Target: WCAG 2.1 level AA for the block page and appeal form.
 
 - The block page uses short sentences and a simple icon showing that the site is blocked by the school network, not by the child's own fault.
 - The message never accuses or warns the child; it explains that the site is not available on the school network and that a teacher can ask for a review.
-- Students are not asked to submit appeals themselves or to type any personal information; appeals are meant for teachers and staff.
+- Students are not asked to submit appeals themselves or to type any personal information; the relayer is designed for teachers and staff, rate-limits rather than gates by role, and anyone can file a document hash directly. Whether parents or the community need their own channel is an open question.
 - The block page does not show which category triggered the block when that category could embarrass or stigmatise (for example adult content); a generic message is shown instead. To be confirmed in the scope charter.
 
 ## Training

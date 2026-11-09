@@ -38,17 +38,17 @@ Candidate schools may have intermittent, low-bandwidth, satellite or power-limit
 
 ## Degraded modes
 
-No degraded mode silently removes child protection or the ability to appeal. Each mode is visible to the operator and, where it affects schools, to the public dashboard.
+No degraded mode silently removes child protection or the ability to appeal. Each mode is visible to the operator. Where it affects schools, it is also reported to the governing signers and the ministry within the notification target set in the scope charter, and shown on the public dashboard once that exists (VPR-021, M3).
 
 | Situation | Behaviour | Child safety | Appeals |
 | --- | --- | --- | --- |
 | One resolver instance down | The other instance serves all schools | Unchanged | Unchanged |
-| Both resolver instances down | Schools lose name resolution (effectively offline). The scope charter decides whether the provider switches to a secondary protective resolver; an unfiltered fallback is not recommended | Kept, or service paused | Block page unreachable; appeals by email or phone to the operator's support line, recorded later |
+| Both resolver instances down | Schools lose name resolution (effectively offline). The scope charter decides whether the provider switches to a secondary protective resolver; an unfiltered fallback is not permitted in the pilot. If the service is paused, the pause is announced to the ministry and the schools | Kept, or service paused | Block page unreachable; appeals by email or phone to the operator's support line, recorded later |
 | Public record unreachable | Last verified policy keeps running; publication of summaries and appeals is queued | Unchanged | Relayer accepts appeals and files them when the network returns; the delay is shown on the block page |
 | Policy expires without renewal | Fallback defined in the scope charter (recommended: protective categories only, malware and phishing) | Core protection kept | Unchanged |
 | Exporter or daily job fails | Filtering unchanged; no summary for that day; the gap is visible in the public record | Unchanged | Unchanged |
 | Block page down | Blocks still applied; operator restores the page as priority | Unchanged | Support line as above |
-| Provider stops redirecting DNS | Devices may bypass the filter. Reviewer bypass tests detect it; attestation revoked | Reduced, and shown publicly | Unchanged |
+| Provider stops redirecting DNS | Devices may bypass the filter. Reviewer bypass tests detect it; attestation revoked | Reduced; reported to the signers and the ministry, and shown on the dashboard once it exists | Unchanged |
 
 ## Policy and restricted lists
 

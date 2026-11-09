@@ -25,6 +25,8 @@ A template for computing the cost of running the system per school. **No figure 
 | P_h | Prover machine cost per hour (from M4) | currency/hour | Unknown — benchmarks (VPR-036, M4) |
 | P_t | Proving hours per scope per day (from M4) | hours/day | Unknown — benchmarks (VPR-036, M4) |
 | g_ver | Gas per proof verification (from M4) | gas | Unknown — benchmarks (VPR-036, M4) |
+| L | Threat-feed and restricted-list licences | currency/month | Unknown — input required (operator and ministry, M1) |
+| g_app | Gas per appeal filed or answered through the relayer, and appeals per month | gas, appeals/month | Unknown — measured on the test network (operator, M2) |
 | F | Fixed monthly costs per country (dashboard, mirroring, support, policy staff time) | currency/month | Unknown — input required (operator and ministry, before Gate C) |
 
 ## Formulas, per school per month
@@ -39,7 +41,9 @@ A template for computing the cost of running the system per school. **No figure 
 | Policy versions on the public record | V × g_pol × p_gas ÷ S_scope |
 | Proof generation (from M4) | P_h × P_t × D_month ÷ S_scope |
 | Proof verification (from M4) | D_month × g_ver × p_gas ÷ S_scope |
-| Share of fixed country costs | F ÷ (schools in the country) |
+| Share of fixed country costs | F ÷ (schools served by the deployment) |
+| Feed and list licences | L ÷ S |
+| Appeal relayer gas | g_app × appeals per month × p_gas ÷ S_scope |
 
 **Total per school per month** = the sum of the lines above.
 

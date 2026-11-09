@@ -42,15 +42,15 @@ The pilot follows the two-phase plan in [../ROADMAP.md](../ROADMAP.md), preceded
 
 | Stage | When | Schools | Data |
 | --- | --- | --- | --- |
-| 0 · Synthetic pre-pilot | Weeks 1–6 | None | Synthetic policy, synthetic domains, synthetic event counts |
+| 0 · Synthetic pre-pilot | Weeks 1–4 local demonstrator; weeks 5–7 public-testnet rehearsal | None | Synthetic policy, synthetic domains, synthetic event counts |
 | 1 · Alpha | Weeks 8–16 (phase 1) | 2–5 schools | Designed flow: three-field block events cross the resolver boundary; only thresholded aggregate counts are published |
 | 2 · Cohort | Phase 2, only if gates are met | 20–50 schools | Same as alpha |
 
 ### Stage 0 · Synthetic pre-pilot
 
-Before any school is connected, the full flow would run end to end on a public test network with synthetic data only: a synthetic policy would be published, compiled into a filter zone and checked against synthetic allowed and blocked domains; synthetic events would be aggregated with small-cell suppression; the daily summary would be anchored and independently verified; an appeal hash would be filed and resolved; and a policy would be allowed to expire. The repeatable local-chain demonstrator exists today; the public-testnet deployment and partner rehearsal are Planned for M2. Nothing in Stage 0 would touch a school network or a child.
+Before any school is connected, the full flow would run end to end on a public test network with synthetic data only: a synthetic policy would be published, compiled into a filter zone and checked against synthetic allowed and blocked domains; synthetic events would be aggregated with small-cell suppression; the daily summary would be anchored and independently verified; an appeal hash would be filed and resolved; and a policy would be allowed to expire. The repeatable local-chain demonstrator exists today; the public-testnet deployment and partner rehearsal are Planned for M2. Nothing in Stage 0 would touch a school network or a child. Records written to a public network, including policy fingerprints and appeal hashes, are public and cannot be erased; documents behind them can be withdrawn off-chain.
 
-**Exit criteria for Stage 0.** All steps pass on the test network; the reviewer confirms that no output contains queried domain names, IP addresses or device identifiers; the scope charter, DPIA and privacy statement are signed (Gate A in the roadmap).
+**Exit criteria for Stage 0.** All steps pass locally by week 4 and on the public test network by week 7, before the first school in week 8; the reviewer confirms that no output contains queried domain names, IP addresses or device identifiers; the scope charter, DPIA and privacy statement are signed (Gate A in the roadmap).
 
 ### Entry gates for the alpha (Stage 1)
 
@@ -63,12 +63,12 @@ All of the following must be true before the first school is connected:
 5. The reviewer test kit can run from a school network.
 6. A rollback has been rehearsed: the school's DNS setting can be returned to its previous state within the target agreed in the scope charter.
 
-### Exit gates for the alpha (Gate B and Gate C)
+### Gates during and after the alpha (Gates B and C)
 
 - Gate B (week 10): at least two alpha schools hold a valid independent test attestation, bypass tests pass, and no end-user personal data appears in any export.
 - Gate C (week 16): the registry and anchor are audited, with no open high-severity finding, before they are used on the main public network.
 
-Phase 2 (Stage 2) is proposed only if both gates are met and the evaluation in [MEASUREMENT_AND_EVALUATION.md](MEASUREMENT_AND_EVALUATION.md) supports it.
+Phase 2 (Stage 2) is proposed only if Gates A, B and C are met and the evaluation in [MEASUREMENT_AND_EVALUATION.md](MEASUREMENT_AND_EVALUATION.md) supports it.
 
 ### Stop conditions
 

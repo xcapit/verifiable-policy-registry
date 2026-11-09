@@ -10,7 +10,7 @@ Proposed allocation of work during a pilot, together with the decisions required
 | --- | --- | --- |
 | Ministry of Education | Pilot country ministry (to be confirmed) | Approves schools and content policy; one of the governing signers; owns the national decision to continue |
 | Giga counterpart | Giga country or programme team (to be confirmed) | Selects schools from Giga Maps; one of the governing signers; links the pilot to Giga's connectivity programme |
-| Independent reviewer | Child-protection NGO or university (to be confirmed) | Third governing signer; tests schools; reviews appeals and over-blocking reports |
+| Independent reviewer | Child-protection NGO or university (to be confirmed) | Third governing signer; tests schools; reviews appeals and over-blocking reports. The same institution would then both co-approve the policy and test it; a distinct third signer would give stronger separation and is an open question |
 | Operator | Xcapit, proposed for the pilot | Would run resolvers, exporter, daily job and block page; publishes datasets |
 | Implementer | Xcapit, proposed (team in [../../MAINTAINERS.md](../../MAINTAINERS.md)) | Would build and maintain the software and train operators |
 | Auditor | External firm (to be selected, M1) | Audits contracts and resolver configuration |
@@ -56,6 +56,7 @@ Operating options are described in [../SUSTAINABILITY.md](../SUSTAINABILITY.md):
 
 | Decision | Owner | When |
 | --- | --- | --- |
+| Who funds the alpha (resolver hosting, reviewer, support, weeks 5–16) | Unknown — input required; not covered by the proposed ESP scope | Before Gate A |
 | Who operates after week 16 | Unknown — decision by confirmed partners | Before Gate C |
 | Who pays operating costs | Unknown — input required from confirmed partners | Before Gate C |
 | Whether to continue to phase 2 | Confirmed governing institutions, on the evaluation evidence | At Gate C |

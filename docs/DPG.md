@@ -6,13 +6,13 @@ The authoritative, indicator-by-indicator assessment, with evidence, gaps, owner
 
 ## 1. Relevance to the SDGs
 
-| SDG target | How the project contributes |
+| SDG target | How the project would contribute if deployed (no deployment exists) |
 | --- | --- |
-| **4.a** Safe, non-violent, inclusive and effective learning environments | Connected schools get protection from malware, phishing and harmful content without turning the network into a surveillance tool |
-| **16.2** End abuse, exploitation and all forms of violence against children | Blocks access to child sexual abuse material through established restricted lists, and reduces children's exposure to exploitation online |
-| **16.6** Effective, accountable and transparent institutions | Every policy change is public, signed by several institutions, time-limited and contestable |
-| **16.10** Public access to information and protection of fundamental freedoms | Mandatory expiry, published reasons and on-chain appeals limit over-blocking and make censorship visible |
-| **9.c** Universal access to ICT | Removes a common barrier to connecting schools (fear of unsafe internet) in programmes such as Giga |
+| **4.a** Safe, non-violent, inclusive and effective learning environments | Would protect connected schools from malware, phishing and harmful content while publishing only suppressed aggregates |
+| **16.2** End abuse, exploitation and all forms of violence against children | Would block access to child sexual abuse material through established restricted lists, applied by hash commitment |
+| **16.6** Effective, accountable and transparent institutions | Each policy change would be public, authorised by the scope governor (designed as a multisig of several institutions), time-limited and contestable |
+| **16.10** Public access to information and protection of fundamental freedoms | Mandatory expiry, published reasons and on-chain appeals are designed to limit over-blocking and make it visible |
+| **9.c** Universal access to ICT | Aims to make protective filtering in connected schools accountable, so that safety measures can be adopted without opaque blocking |
 
 ## 4. Platform independence
 
@@ -20,13 +20,13 @@ All mandatory dependencies are open source or open standards, and each has a fun
 
 | Dependency | Licence / nature | Alternative without changes to the core |
 | --- | --- | --- |
-| Ethereum (OP Mainnet) | Open protocol, MIT-licensed clients | Any EVM chain where EAS is available (Base, Ethereum L1, others) |
+| Ethereum (OP Mainnet) | Open protocol, open-source clients (licences vary by client) | Any EVM chain where EAS is available (Base, Ethereum L1, others) |
 | Ethereum Attestation Service | Open source (MIT) | W3C Verifiable Credentials 2.0 signed off-chain; the schemas are CC0 |
 | Safe multisig | Open source (LGPL-3.0) | Any contract wallet or multisig that can call the registry: the governor is a plain address |
 | Unbound | Open source (BSD) | PowerDNS Recursor, Knot Resolver or BIND: the zone is standard RPZ |
 | Hardhat, Python, pycryptodome, PyYAML | Open source | Foundry; any keccak256 implementation |
 
-No component requires a proprietary service, a paid API or a specific cloud provider.
+No software component requires a proprietary service, a paid API or a specific cloud provider. Deployments may need licensed data, such as threat feeds or a restricted list obtained under its provider's terms; those are inputs, not software dependencies.
 
 ## 6. Extracting data and content
 

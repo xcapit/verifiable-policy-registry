@@ -19,6 +19,10 @@ Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANA
 | VPR-057 | Reviewer guide mapped to the 14 review questions | VPR-050–056 | **Done in v0.3** |
 | VPR-058 | Registry fields `catRoot` and `unitRoot` (ADR-0010) and ZK verifier anchoring | VPR-033 | Designed; Planned (M4) |
 | VPR-059 | Declare the licence of published datasets (ODC-PDDL or CC0) | Maintainer decision | Blocked: maintainer decision |
+| VPR-061 | Child-rights and human-rights impact assessment, including a misuse review, with the deploying partner (DPG indicator 9) | Depends on a confirmed partner | Planned (M1–M2); blocked without a partner |
+| VPR-062 | Run the demonstrator on a second EVM network and with a second resolver implementation (DPG indicator 4) | VPR-010, VPR-055 | Planned (M2) |
+| VPR-063 | Bulk export of on-chain history (versions, appeals, roots) to CSV/JSON (DPG indicator 6) | — | Planned (M3) |
+| VPR-064 | Playbook for new countries (charters, profiles, onboarding) | VPR-026 | Planned (M3) |
 | VPR-060 | Check of `valid_days` and document version against the on-chain call in tools and dashboard | — | Planned (M2, with VPR-015) |
 
 ## M1 · Design and sign-off (weeks 1–4)
@@ -63,7 +67,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | VPR-021 | Public dashboard (static site) reading registry, EAS and anchor | Shows policy in force + history with reasons, schools with valid attestations, daily metrics with verification button |
 | VPR-022 | NIST SP 800-81r3 compliance matrix `docs/compliance/nist-800-81r3.md` | Each applicable recommendation mapped to config or control, with evidence |
 | VPR-023 | UK Safer Internet Centre self-certification checklist | Completed and published in `docs/compliance/` |
-| VPR-024 | Security analysis with MIESC + external audit preparation | Findings triaged; no open high-severity issues |
+| VPR-024 | Static analysis (MIESC, Slither) and external audit of the registry, anchor and resolver configuration, with fixes and a re-check | Public audit report; no open high-severity finding after re-check |
 | VPR-025 | DPG application package | Every Gap and Credible-path row in `docs/DPG_EVIDENCE_MATRIX.md` closed or re-assessed; all 9 DPG Standard indicators evidenced with links; application submitted by the authorised representative |
 | VPR-027 | **Done in 0.2.0.** Domain-separate Merkle leaves and internal nodes (RFC 9162-style `0x00`/`0x01` prefixes) in `MetricsAnchor.verifyLeaf`, `tools/vpr/merkle.py` and the JavaScript tests | An internal node presented as a leaf no longer verifies; shared test vector updated in all three implementations; ADR and new dataset format version per INTERFACES.md |
 | VPR-026 | Impact report template | Uses only published aggregates |

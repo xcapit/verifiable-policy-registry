@@ -4,7 +4,7 @@
 
 ## 1. Who could build on this
 
-The components solve a recurring pattern: *an institution enforces a rule off-chain, and others need to verify how the rule was governed and what aggregate effect it had, without learning about individuals.* Possible adopters, none of whom has committed to anything:
+The components solve a recurring pattern: *an institution enforces a rule off-chain, and others need to verify how the rule was governed and what aggregate effect it had, with data minimisation and small-cell suppression (re-identification risks analysed, not eliminated).* Possible adopters, none of whom has committed to anything:
 
 | Builder or programme | Component they would reuse | Example |
 | --- | --- | --- |
@@ -18,8 +18,8 @@ The components solve a recurring pattern: *an institution enforces a rule off-ch
 
 - **No school logic in the core.** The toolkit verifies datasets keyed by a generic unit identifier. The school example and the public-service example go through the same verifier ([integration guide](../toolkit/INTEGRATION_GUIDE.md)).
 - **Stable, specified formats.** Policy format 1, dataset format 2 and appeal format 2 are specified in [INTERFACES](../INTERFACES.md) with shared test vectors across Solidity and Python.
-- **Permissionless licences.** CC0 for schemas, CC BY 4.0 for documentation, AGPL-3.0-only for code. The AGPL requires that hosted modified versions publish their source, which protects the accountability purpose ([ADR-0002](../adr/0002-licensing.md)).
-- **Runs without credentials.** The demonstrator and tests need no keys, RPC tokens or paid services ([README](../../README.md)).
+- **Open licences.** CC0 for schemas, CC BY 4.0 for documentation, AGPL-3.0-only for code. The AGPL requires that hosted modified versions publish their source, which protects the accountability purpose ([ADR-0002](../adr/0002-licensing.md)).
+- **Runs without credentials locally.** The local demonstrator and tests need no keys, RPC tokens or paid services; a public-testnet run needs an RPC endpoint and a funded test key ([README](../../README.md)).
 
 ## 3. How adoption would be measured
 

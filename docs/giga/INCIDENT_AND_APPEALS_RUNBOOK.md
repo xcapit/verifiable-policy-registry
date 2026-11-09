@@ -63,7 +63,7 @@ Content categories other than security threats are not added through the emergen
 
 ## 7. Illegal content (for example child sexual abuse material)
 
-The project never stores or shows such content. If someone encounters it through a pilot school, they report it to the national hotline (member of INHOPE) or to the IWF; the block page will carry the hotline link for the country (Planned, VPR-017). Domains confirmed as abusive are handled through the restricted list, never through a public policy entry that would point people to them.
+The system is designed not to store or show such content. If someone encounters it through a pilot school, they report it to the national hotline (member of INHOPE) or to the IWF; the block page will carry the hotline link for the country (Planned, VPR-017). Domains confirmed as abusive are handled through the restricted list, never through a public policy entry that would point people to them.
 
 ## 8. Records
 
