@@ -43,7 +43,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--application-and-initial
 | VPR-023 | UK Safer Internet Centre self-certification checklist | Completed and published in `docs/compliance/` |
 | VPR-024 | Security analysis with MIESC + external audit preparation | Findings triaged; no open high-severity issues |
 | VPR-025 | DPG application package | Every item in the *Still to do* list of `docs/DPG.md` closed; all 9 DPG Standard indicators evidenced with links; application submitted by the authorised representative |
-| VPR-027 | Domain-separate Merkle leaves and internal nodes (RFC 9162-style tags) in Solidity, JS and Python, with a new shared test vector | `verifyLeaf` rejects an internal node presented as a leaf; dataset format version bumped; INTERFACES updated |
+| VPR-027 | Domain-separate Merkle leaves and internal nodes (RFC 9162-style `0x00`/`0x01` prefixes) in `MetricsAnchor.verifyLeaf`, `tools/vpr/merkle.py` and the JavaScript tests | An internal node presented as a leaf no longer verifies; shared test vector updated in all three implementations; ADR and new dataset format version per INTERFACES.md |
 | VPR-026 | Impact report template | Uses only published aggregates |
 
 ## M4 · Zero-knowledge proofs of aggregation (weeks 5–16)

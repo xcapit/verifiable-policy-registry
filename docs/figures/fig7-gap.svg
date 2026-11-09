@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 370" width="960" height="370" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
 <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
 <rect width="960" height="370" fill="#ffffff"/>
-<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a" text-anchor="start">Figure 7. The enforcement–accountability gap, link by link</text>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a" text-anchor="start">The enforcement–accountability gap, link by link</text>
 <rect x="30" y="60" width="150" height="66" rx="8" fill="#fff" stroke="#334155" stroke-width="1.5"/>
 <text x="105" y="88" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">Resolver behaviour</text>
 <text x="105" y="107" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">what was actually blocked</text>
@@ -29,7 +29,7 @@
 <text x="480" y="175" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">Operator honesty</text>
 <text x="480" y="195" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">no cryptographic link</text>
 <text x="480" y="211" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">between log and figures</text>
-<rect x="375" y="248" width="210" height="58" rx="8" fill="#fff" stroke="#d97706" stroke-dasharray="5 4"/>
+<rect x="375" y="248" width="210" height="58" rx="8" fill="#fff" stroke="#2563eb" stroke-dasharray="5 4"/>
 <text x="480" y="272" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">ZK proof of aggregation</text>
 <text x="480" y="290" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">release = agg(log, k)</text>
 <line x1="680" y1="93" x2="777" y2="93" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>

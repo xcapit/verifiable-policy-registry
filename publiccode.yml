@@ -11,12 +11,12 @@ description:
   en:
     shortDescription: >-
       Public, multisig-governed and contestable content-filtering policies for school networks,
-      with independent attestations and k-anonymous impact metrics.
+      with independent attestations and threshold-suppressed impact metrics.
     longDescription: >-
       The Verifiable Policy Registry turns a content-filtering policy into a public object: every
       version is published in full with its reasons, signed by several institutions, time-limited and
       open to appeal. An independent reviewer, never the operator, attests that each school network
-      applies the policy. Impact metrics are published only as k-anonymous aggregates with a daily
+      applies the policy. Impact metrics are published only as aggregates with small cells suppressed, with a daily
       Merkle commitment that anyone can recompute. Contracts run on an Ethereum L2 and store only
       commitments; the filtering itself is done by a standard DNS resolver using RPZ. The first
       deployment targets schools connected by UNICEF Giga.
@@ -25,7 +25,7 @@ description:
       - Multisig governance and on-chain appeals
       - Separate issuers for deployment, test and conformance attestations
       - RPZ compilation for Unbound or PowerDNS
-      - k-anonymous datasets with Merkle proofs
+      - Threshold-suppressed datasets with Merkle proofs
 legal:
   license: AGPL-3.0-only
   mainCopyrightOwner: CryptoLab S.A.S. (Xcapit)

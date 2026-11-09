@@ -18,7 +18,7 @@ The work milestones overlap on purpose. Metrics start as soon as the first schoo
 
 - [x] `VerifiablePolicyRegistry` with versions, reasons, mandatory expiry, appeals and governor rotation
 - [x] `MetricsAnchor` with write-once daily roots and on-chain proof verification
-- [x] Python tooling: policy validation and hashing, RPZ compilation, k-anonymous aggregation, Merkle proofs, CLI
+- [x] Python tooling: policy validation and hashing, RPZ compilation, aggregation with small-cell suppression, Merkle proofs, CLI
 - [x] EAS schema definitions with separate issuer roles
 - [x] Reference Unbound configuration
 - [x] White paper, architecture, interfaces, decision records, governance, privacy statement draft

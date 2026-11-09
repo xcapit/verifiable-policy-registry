@@ -7,7 +7,7 @@
 1. **Treatment of IP addresses.** Client IP addresses are used only to answer queries and to apply access control. They are not written to disk and not shared.
 2. **Data collection and sharing.** No queried names, client IPs or device identifiers are logged. For each blocked query, the resolver emits a single event `(school_id, day, category)`, where `school_id` is the public Giga school identifier derived from the network the query came from. No other data leaves the resolver.
 3. **Exceptions.** A rolling in-memory operational buffer of up to [N] hours may exist for abuse and incident handling. It is never exported. [N to be fixed in the DPIA.]
-4. **Associated entities.** None receive query data. Aggregated, k-anonymous datasets (k ≥ 10) are published openly.
+4. **Associated entities.** None receive query data. Aggregated datasets, with every cell below k = 10 events suppressed, are published openly.
 5. **Correlation of data.** Not performed.
 6. **Result filtering.** Filtering follows the policy in force for the scope, published in full with reasons at the URI recorded in the Verifiable Policy Registry. Restricted lists (IWF) are applied and committed to by hash.
 7. **Applicable law.** UNICEF Policy on Personal Data Protection; data-protection law of the pilot country.

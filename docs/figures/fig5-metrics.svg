@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
 <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
 <rect width="960" height="440" fill="#ffffff"/>
-<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a" text-anchor="start">Figure 5. Impact metrics: minimise at the source, suppress small cells, commit daily</text>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a" text-anchor="start">Impact metrics: minimise at the source, suppress small cells, commit daily</text>
 <rect x="30" y="60" width="200" height="250" rx="8" fill="#f8fafc" stroke="#64748b"/>
 <text x="130" y="84" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">Resolver (in memory)</text>
 <rect x="48" y="100" width="164" height="24" rx="4" fill="#fef2f2" stroke="#fca5a5"/>
@@ -83,5 +83,5 @@
 <path d="M560,300 L560,355" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/><text x="568" y="334" font-size="11" fill="#475569">publish</text>
 <rect x="30" y="358" width="560" height="56" rx="8" fill="#f8fafc" stroke="#64748b"/>
 <text x="310" y="382" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">Public release (CSV / JSON): anyone recomputes the root and compares it</text>
-<text x="310" y="400" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">vpr verify-root dataset.csv &lt;root&gt;  ·  MetricsAnchor.verifyLeaf(row, proof)</text>
+<text x="310" y="400" font-size="11" font-weight="400" fill="#475569" text-anchor="middle">vpr verify-root dataset.csv &lt;root&gt;  ·  MetricsAnchor.verifyLeaf(scope, day, leaf, proof)</text>
 </svg>
