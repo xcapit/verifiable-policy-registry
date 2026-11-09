@@ -72,7 +72,7 @@ def main(argv=None):
     s.add_argument("--out")
     s.set_defaults(func=cmd_compile_rpz)
 
-    s = sub.add_parser("aggregate", help="aggregate events with k-anonymity and print the dataset root")
+    s = sub.add_parser("aggregate", help="aggregate events, suppress cells below k and print the dataset root")
     s.add_argument("events", help="CSV with school_id,day,category (no IPs, no domains)")
     s.add_argument("--k", type=int, default=metrics.DEFAULT_K)
     s.add_argument("--out-csv")

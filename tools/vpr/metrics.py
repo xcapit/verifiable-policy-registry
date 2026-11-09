@@ -1,4 +1,4 @@
-"""k-anonymous aggregation of filtering events and dataset commitments.
+"""Aggregation of filtering events with small-cell suppression, and dataset commitments.
 
 Input events carry only (school_id, day, category). The resolver must never pass client IPs,
 device identifiers or queried names to this module: privacy is enforced by what is collected,

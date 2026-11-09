@@ -1,7 +1,7 @@
 """Verifiable Policy Registry off-chain tooling.
 
 - policy: canonical policy documents, content hashes and RPZ compilation
-- metrics: k-anonymous aggregation of filtering events
+- metrics: aggregation of filtering events with small-cell suppression
 - merkle: sorted-pair keccak256 Merkle trees (compatible with MetricsAnchor.verifyLeaf)
 """
 

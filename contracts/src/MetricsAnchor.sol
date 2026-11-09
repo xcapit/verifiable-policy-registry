@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 /// @title Metrics Anchor
 /// @notice Anchors one Merkle root per scope per day. Each root commits to a public dataset of aggregated,
-///         k-anonymous counts (school id, day, category, count). Anyone can download the dataset from
+///         counts with small cells suppressed (school id, day, category, count). Anyone can download the dataset from
 ///         `datasetUri`, recompute the root and compare it with the one anchored here.
 /// @dev Roots are write-once: a published day can never be overwritten.
 contract MetricsAnchor {
