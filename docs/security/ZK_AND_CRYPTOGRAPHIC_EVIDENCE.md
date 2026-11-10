@@ -1,6 +1,6 @@
 # Zero-knowledge and cryptographic evidence
 
-*CC BY 4.0 · v0.3 · Authoritative specification of every encoding and commitment in VPR, and of the planned zero-knowledge relation. Status words: **Implemented** (code and passing tests), **Designed** (specified here, not implemented), **Planned** (future milestone).*
+*CC BY 4.0 · Authoritative specification of every encoding and commitment in VPR, and of the planned zero-knowledge relation. Status words: **Implemented** (code and passing tests), **Designed** (specified here, not implemented), **Planned** (future milestone).*
 
 > **Summary of status.** Policy hashing, release encoding, Merkle construction and on-chain row verification are **Implemented**, and the same test vector passes in Solidity and Python. The event-log commitment, the zero-knowledge relation, the prover and the on-chain proof verifier are **Designed** in this document and **Planned** for milestone M4 on testnet ([ROADMAP](../ROADMAP.md)). No audit and no formal verification has taken place.
 
@@ -15,7 +15,7 @@ Assumptions: H is collision-resistant and second-preimage-resistant. Where it is
 
 ## 2. Policy document and content hash · Implemented
 
-- Canonical form: JSON with lexicographically sorted keys, separators `,` and `:` without whitespace, UTF-8, non-ASCII kept, after validation (domains lower-cased, trailing dot removed). Implementation: `tools/vpr/policy.py` (`canonical_json`, `content_hash`) and `tools/vpr/toolkit.py` (`canonical_json`, `document_hash`).
+- Canonical form: JSON with keys sorted by code point, separators `,` and `:` without whitespace, UTF-8, non-ASCII kept, after validation (domains lower-cased, trailing dot removed). For schema-valid documents with every integer below 2⁵³ in magnitude this equals RFC 8785 (JCS); the normative definition is INTERFACES I1. Implementation: `tools/vpr/policy.py` (`canonical_json`, `content_hash`) and `tools/vpr/toolkit.py` (`canonical_json`, `document_hash`).
 - `contentHash = H(canonical_json(document))`; `scopeId = H(abi.encode(governor, scope))`, computed on-chain by `scopeIdOf` (from v0.4; v0.3.0 and earlier used `H(utf8(scope))`).
 - **What the hash binds.** Every field of the document: scope, version, profile, categories, `valid_days`, `reason_code`, threat feeds by provider and version, local blocks and exceptions with reasons, and `restricted_list_hash`.
 - **What binds the document to the chain.** The governor's `publishPolicy(scopeId, contentHash, …, validity, …)` call. **Gap.** Nothing checks on-chain that `validity` equals `valid_days × 86400`, or that the version number in the document equals the on-chain version. `vpr policy-hash` lets anyone check the content hash. The equality checks for validity and version are planned as VPR-060, used by the sync daemon (VPR-015) and the dashboard (VPR-021).
@@ -69,6 +69,8 @@ Negative tests, all passing:
 The resolver exporter (VPR-016, Planned) emits events `e_j = (unit_id, day, category)`. The log of a day is `L = ⟨e_1, …, e_m⟩` in arrival order.
 
 **Event leaf.** `ev_j = H(0x02 ‖ scopeId:bytes32 ‖ dayNumber:uint32 ‖ j:uint32 ‖ len ‖ utf8(unit_id) ‖ len ‖ utf8(category) ‖ s_j)`, with a fresh 256-bit salt `s_j` drawn from a CSPRNG by the exporter. The scope is part of the leaf so that relation (b) below can check it.
+
+**Choice of hash.** This section specifies the event leaf and `C_L` with `H` = keccak-256. If the proving-system decision of §10 selects a dedicated circuit, the event leaf, the event-log tree and `C_L` will use a SNARK-friendly hash instead, with the same tags and field layout, and this section will be revised before implementation. The release encoding of §3 stays keccak-256 in every option, because `verifyRow` checks it on-chain.
 
 **Log commitment.** `C_L = H(0x04 ‖ MR(ev_1 … ev_m) ‖ r)`, where `MR` uses the node rule of §3 and `r` is a fresh 256-bit salt. The number of events *m* is **not** public: it is part of the witness and bound inside the proof. Publishing *m* would reveal `m − Σ published counts`, the exact number of events in suppressed cells. With one suppressed cell in a scope and day, that is the cell's value.
 
