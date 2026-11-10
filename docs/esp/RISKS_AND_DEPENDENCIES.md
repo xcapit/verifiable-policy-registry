@@ -27,4 +27,4 @@
 
 ## 3. L2-specific assumptions
 
-Sequencer censorship or delay is mitigated by forced inclusion through L1. Clients must treat records as final only after the confirmation depth set in the deployment manifest (VPR-049, planned). An RPC split view would be detected by comparing several providers against the manifest, once VPR-049 exists. Gas for appeals is paid by the relayer, and its funding is an open item in the [sustainability model](../SUSTAINABILITY.md).
+Sequencer censorship or delay is mitigated by forced inclusion through L1. Clients must treat records as final only at the finality tag set in the deployment manifest (`finality`, INTERFACES I11), normally `finalized`. An RPC split view would be detected by comparing several providers against the manifest; tooling for that comparison is planned with the dashboard (VPR-021). Gas for appeals is paid by the relayer, and its funding is an open item in the [sustainability model](../SUSTAINABILITY.md).

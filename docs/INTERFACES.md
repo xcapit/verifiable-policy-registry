@@ -54,12 +54,12 @@ Producer: policy authors (operator drafts, governor signers approve). Consumers:
 | `threat_feeds` | list of `{provider, version}` | optional | Third-party feeds by reference, never copied |
 | `restricted_list_hash` | `0x` hex or `null` | optional | Commitment to a restricted list (see below) |
 
-Validation rules enforced by `vpr.policy.validate`, identical to the JSON schema: required keys present and no unknown keys; scope, version, profile, categories (unique), `valid_days`, `reason_code` and `threat_feeds` well formed; domains valid; every block and exception has exactly a domain and a non-empty reason; no domain is both blocked and excepted; `restricted_list_hash` well formed.
+Validation rules enforced by `vpr.policy.validate`, a superset of the JSON schema (it also normalises domains, requires `feed_hashes` keys to equal `categories`, rejects floating-point numbers such as `1.0` that the schema's `integer` type accepts, and rejects duplicate YAML keys): required keys present and no unknown keys; scope, version, profile, categories (unique), `valid_days`, `reason_code` and `threat_feeds` well formed; domains valid; every block and exception has exactly a domain and a non-empty reason; no domain is both blocked and excepted; `restricted_list_hash` well formed.
 
 **Canonical form and `contentHash`.**
 
 1. Parse the document and validate it. Validation normalises domains (lowercase, trailing dot removed).
-2. Serialise as JSON with keys sorted, separators `,` and `:` without spaces, UTF-8, non-ASCII characters kept as is (Python: `json.dumps(doc, sort_keys=True, separators=(",", ":"), ensure_ascii=False)`).
+2. Serialise as JSON with keys sorted by code point, separators `,` and `:` without spaces, UTF-8, non-ASCII characters kept as is (Python: `json.dumps(doc, sort_keys=True, separators=(",", ":"), ensure_ascii=False)`). This expression is the normative definition. For a document accepted by `vpr.policy.validate` (ASCII keys, integer numbers only) it produces the same bytes as the JSON Canonicalization Scheme (RFC 8785) whenever every integer is smaller than 2⁵³ in magnitude, so a JCS implementation can be used to verify such documents. JCS sorts keys by UTF-16 code unit and this rule by code point; the two agree on ASCII keys. Above 2⁵³ JCS would serialise an integer as a double and the hashes would differ. A string containing a lone surrogate is rejected here (it cannot be encoded as UTF-8), whereas JCS would escape it.
 3. `contentHash = keccak256(canonical_bytes)`.
 
 Comments and key order in the YAML do not affect the hash; values do. `vpr policy-hash <file>` prints the `scopeId` and `contentHash`.
@@ -122,10 +122,10 @@ CSV with header `<unit>,day,category` (`<unit>` is `school_id` or `unit_id`), on
 
 Produced by `vpr aggregate`. Format `vpr-dataset/2`, described by [`schemas/dataset.schema.json`](../schemas/dataset.schema.json).
 
-- A release covers exactly one UTC day. CSV with header `<unit>,day,category,count`, where `<unit>` is `school_id` (school use case) or `unit_id` (any other use case); the encoding is the same, rows sorted by `(school_id, day, category, count)`, `\n` line endings, UTF-8. Cells `(school_id, day, category)` are unique.
+- A release covers exactly one UTC day. CSV with header `<unit>,day,category,count`, where `<unit>` is `school_id` (school use case) or `unit_id` (any other use case); the encoding is the same, rows sorted by `(school_id, day, category, count)`, strings compared by Unicode code point (equivalently, byte-wise on their UTF-8 encoding), `\n` line endings, UTF-8. Cells `(school_id, day, category)` are unique.
 - Rows with `count < k` are suppressed (default k = 10). The JSON summary reports `format`, `k`, `root` and `rows`. The number of suppressed cells is not published.
 - Leaf: `keccak256(0x00 ‖ day:uint32 ‖ count:uint256 ‖ len(school_id):uint16 ‖ school_id ‖ len(category):uint16 ‖ category)`, big-endian, where `day` is the on-chain day number. Length prefixes make the encoding unambiguous, and the day binds a row to one anchored date.
-- Internal node: `keccak256(0x01 ‖ min(a,b) ‖ max(a,b))`; leaves in row order; an odd node is promoted unchanged. Leaves and nodes are domain-separated as in RFC 9162. An empty release has no root and is not anchored.
+- Internal node: `keccak256(0x01 ‖ min(a,b) ‖ max(a,b))`, comparing the two hashes as 256-bit unsigned integers; leaves in row order; an odd node is promoted unchanged. The tree has the shape of RFC 9162's (promoting an odd node unchanged gives the same tree) and uses its `0x00`/`0x01` domain-separation tags. It differs in the hash (keccak-256) and in ordering children by value, so a proof shows inclusion but not position, and there is no consistency proof between releases. An empty release has no root and is not anchored.
 - Anyone can check a release with `vpr verify-root dataset.csv <root>`, or a single row on-chain with `MetricsAnchor.verifyRow`.
 
 ## I7 · `MetricsAnchor` ABI

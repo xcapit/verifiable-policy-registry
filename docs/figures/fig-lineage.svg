@@ -10,8 +10,8 @@
 <text x="56" y="94" font-weight="600" fill="#0f172a">Protective DNS, RPZ, NIST SP 800-81r3</text>
 <text x="56" y="110" fill="#475569">filtering at the resolver, standard zones</text>
 <rect x="40" y="128" width="300" height="42" rx="6" fill="#f8fafc" stroke="#64748b"/>
-<text x="56" y="146" font-weight="600" fill="#0f172a">Certificate Transparency, CONIKS, Rekor</text>
-<text x="56" y="162" fill="#475569">public, append-only logs of decisions</text>
+<text x="56" y="146" font-weight="600" fill="#0f172a">CT, CONIKS, Rekor; witnesses, monitors</text>
+<text x="56" y="162" fill="#475569">append-only logs; split views detected</text>
 <rect x="40" y="180" width="300" height="42" rx="6" fill="#f8fafc" stroke="#64748b"/>
 <text x="56" y="198" font-weight="600" fill="#0f172a">OONI and external measurement</text>
 <text x="56" y="214" fill="#475569">tests by a party other than the operator</text>
@@ -29,7 +29,7 @@
 <text x="616" y="110" fill="#475569">resolver pair compiled from the policy in force</text>
 <rect x="600" y="128" width="320" height="42" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
 <text x="616" y="146" font-weight="600" fill="#0f172a">VerifiablePolicyRegistry</text>
-<text x="616" y="162" fill="#475569">one history for all, no gossip needed (§3.2)</text>
+<text x="616" y="162" fill="#475569">one history at finality; monitors (§3.2, §3.4)</text>
 <rect x="600" y="180" width="320" height="42" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
 <text x="616" y="198" font-weight="600" fill="#0f172a">Independent test attestations</text>
 <text x="616" y="214" fill="#475569">from inside the school network</text>

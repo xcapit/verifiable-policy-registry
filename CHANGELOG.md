@@ -5,6 +5,16 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- White paper v0.7.
+  - Related work on transparency logs (tamper-evident history trees, gossip, witness cosigning, Sigsum, the Go checksum database), and the case for a ledger rather than a witnessed log.
+  - The rollup trust model: unsafe, safe and finalized blocks; ledger safety and liveness defined; L2 upgrade keys and the Security Council; P-256 through RIP-7212.
+  - P1 to P7 restated with adversary, assumptions and the mechanism or invariant that enforces each.
+  - A section on who monitors the record.
+  - Precise statements of the canonical form relative to RFC 8785 and of the Merkle tree relative to RFC 9162.
+  - Corrections: the restricted-list commitment is not hiding (with Apple's committed database as prior art); appellant unlinkability needs the relayer; canaries must be indistinguishable to be effective.
+  - Two stated limits of the governor design: institution-level concentration of roles, and no notice period before a version takes effect.
+  - New adversary A11 (rollup governance).
+- INTERFACES, cryptographic evidence and threat model aligned with the white paper: canonical form and row order specified exactly; RFC 9162 scope stated; hash choice for the event log tied to the proving-system decision; T27 and T47 updated; T49 (L2 governance) added; claims C55 (finality and chain governance) and C56 (JCS equivalence, not yet tested) added. Figures 2, 3 and 14 updated.
 - Documentation: the v0.3 planning reports (baseline and gap analysis, implementation report) are removed; they described how the release was prepared, not the system, and remain in the v0.3.0 to v0.5.0 tags. The reviewer guide (`docs/review/REVIEWER_GUIDE.md`) covers the current toolchain and scope.
 - Stale statements corrected: anchor corrections in the cryptographic evidence and threat model (T12), the architecture sequence and on-chain data table, the opcode target in the public-goods case, ADR-0003's L1 cost argument, interface and version headers. ADR-0007 is renamed to match its corrected wording (small-cell suppression, not k-anonymity).
 - The 15 mutants that did not come from the suites' authors are attributed to a separate internal review; no external review has taken place (claim C45).

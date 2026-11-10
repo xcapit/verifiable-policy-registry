@@ -8,9 +8,9 @@
 <line x1="40" y1="74" x2="920" y2="74" stroke="#cbd5e1"/>
 
 <rect x="40" y="84" width="180" height="40" rx="6" fill="#ecfdf5" stroke="#059669"/>
-<text x="56" y="101" font-weight="600" fill="#0f172a">Ledger (L2 + L1)</text><text x="56" y="116" fill="#475569">cryptographic</text>
-<text x="250" y="101" fill="#0f172a">safety; eventual liveness via forced inclusion;</text><text x="250" y="116" fill="#0f172a">keccak-256 and ECDSA / P-256 security</text>
-<text x="620" y="108" fill="#475569">a single honest RPC endpoint</text>
+<text x="56" y="101" font-weight="600" fill="#0f172a">Ledger (L2 + L1)</text><text x="56" y="116" fill="#475569">consensus, governance</text>
+<text x="250" y="101" fill="#0f172a">finalized history; forced-inclusion liveness;</text><text x="250" y="116" fill="#0f172a">honest L2 upgrade keys; keccak, ECDSA, P-256</text>
+<text x="620" y="101" fill="#475569">a single honest RPC endpoint;</text><text x="620" y="116" fill="#475569">unsafe (sequencer-only) blocks</text>
 
 <rect x="40" y="134" width="180" height="40" rx="6" fill="#ecfdf5" stroke="#059669"/>
 <text x="56" y="151" font-weight="600" fill="#0f172a">Governor (Safe)</text><text x="56" y="166" fill="#475569">threshold</text>
@@ -34,8 +34,8 @@
 
 <rect x="40" y="334" width="180" height="36" rx="6" fill="#f8fafc" stroke="#64748b"/>
 <text x="56" y="356" font-weight="600" fill="#0f172a">Schools, public</text>
-<text x="250" y="356" fill="#0f172a">no keys, no tokens, no trust required</text>
-<text x="620" y="356" fill="#475569">technical skill to verify (tools provided)</text>
+<text x="250" y="356" fill="#0f172a">no keys, no tokens; verifying is optional</text>
+<text x="620" y="356" fill="#475569">that anyone is watching (§3.4)</text>
 </g>
 <line x1="600" y1="80" x2="600" y2="370" stroke="#e2e8f0" stroke-width="2"/>
 </svg>
