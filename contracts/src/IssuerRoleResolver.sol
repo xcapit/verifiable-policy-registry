@@ -33,7 +33,7 @@ interface IIssuerRoles {
 /// @notice EAS schema resolver that accepts an attestation only if its attester holds, at issuance time, the role
 ///         this schema requires in the scope named inside the attestation. One resolver is deployed per schema,
 ///         and the schema kind fixes both the role and the encoding:
-///         Deployment → Operator, IndependentTest → Reviewer, Conformance → Auditor.
+///         Deployment -> Operator, IndependentTest -> Reviewer, Conformance -> Auditor.
 /// @dev Implements the resolver interface EAS calls (attest, multiAttest, revoke, multiRevoke, isPayable) and
 ///      ISemver's `version()`. The scope id is a static head field, so it is read at a fixed offset; the head of
 ///      `data` must be complete and the offset of the schema's first string must be canonical (it points just
@@ -42,7 +42,7 @@ interface IIssuerRoles {
 ///      The role is checked at issuance only. Revocation is left to EAS (only the attester may revoke), so an
 ///      attestation issued while the attester held the role stays valid after the role is withdrawn; verifiers
 ///      compare the attestation time with the `IssuerSet` history and with `validUntil`.
-///      Tested against the published EAS 1.9.0 contracts (test/EasIntegration.test.js) and fuzzed
+///      Tested against the published EAS contracts v1.4.0 (npm package 1.9.0) (test/EasIntegration.test.js) and fuzzed
 ///      (test-foundry/PropertyFuzz.t.sol). Holds no funds, keeps no state of its own, is not upgradeable.
 contract IssuerRoleResolver {
     enum SchemaKind {
@@ -77,7 +77,7 @@ contract IssuerRoleResolver {
     /// @notice A batch has a different number of attestations and values.
     error LengthMismatch();
 
-    /// @param easAddress The EAS contract allowed to call this resolver (on OP Stack, the predeploy at 0x4200…0021).
+    /// @param easAddress The EAS contract allowed to call this resolver (on OP Stack, the predeploy at 0x4200...0021).
     /// @param roles The VerifiablePolicyRegistry.
     /// @param schemaKind The schema this resolver is registered with; it fixes the role and the ABI layout.
     constructor(address easAddress, IIssuerRoles roles, SchemaKind schemaKind) {

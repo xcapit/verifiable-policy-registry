@@ -15,11 +15,14 @@ remappings = ["forge-std/=node_modules/forge-std/src/"]
 
 [fuzz]
 runs = 1000
+failure_persist_dir = "cache-forge/fuzz"
 
 [invariant]
 runs = 256
 depth = 64
 fail_on_revert = false
+# keep Foundry's replay files out of Hardhat's cache/ directory
+failure_persist_dir = "cache-forge/invariant"
 
 # CI profile: more fuzz runs and deeper invariant campaigns.
 [profile.ci.fuzz]

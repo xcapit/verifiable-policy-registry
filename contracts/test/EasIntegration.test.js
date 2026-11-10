@@ -6,7 +6,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const EAS_ARTIFACT = require("@ethereum-attestation-service/eas-contracts/artifacts/contracts/EAS.sol/EAS.json");
 const REGISTRY_ARTIFACT = require("@ethereum-attestation-service/eas-contracts/artifacts/contracts/SchemaRegistry.sol/SchemaRegistry.json");
-const { EAS_SCHEMAS, schemaUid, checkEasBindings } = require("../scripts/lib/eas-check");
+const { EAS_SCHEMAS, schemaUid, checkEasBindings, easVersions } = require("../scripts/lib/eas-check");
 
 const Role = { None: 0, Operator: 1, Reviewer: 2, Auditor: 3 };
 const Kind = { Deployment: 0, IndependentTest: 1, Conformance: 2 };
@@ -158,7 +158,10 @@ describe("IssuerRoleResolver with the real EAS contracts", function () {
   });
 
   describe("deployment check of schema bindings", function () {
-    it("accepts a correct deployment", async function () {
+    it("accepts a correct deployment and reports the EAS versions", async function () {
+      const versions = await easVersions({ ethers, provider: ethers.provider, manifest });
+      expect(versions.eas).to.equal("1.4.0");
+      expect(versions.schemaRegistry).to.equal("1.4.0");
       const results = await checkEasBindings({ ethers, provider: ethers.provider, manifest });
       expect(results).to.have.length(3);
       for (const r of results) expect(r.problems, r.name).to.deep.equal([]);

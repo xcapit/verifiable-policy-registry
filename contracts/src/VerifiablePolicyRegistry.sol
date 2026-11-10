@@ -22,9 +22,10 @@ pragma solidity =0.8.24;
 ///      in 1..6 and code 3 is used exactly for versions that resolve an appeal; an appeal is accepted only by a
 ///      version of its scope that names it, and final appeal states never change; the governor and the pending
 ///      governor never hold an issuer role; only the governor (or, to accept, the pending governor) mutates state.
-///      Time: `currentPolicy` compares expiry with block.timestamp. On OP Stack the L2 timestamp follows the block
-///      number (previous timestamp plus block time) and stays within 1800 s of its L1 origin, so expiry follows
-///      wall-clock time; the sequencer can delay transactions, not move time.
+///      Time: `currentPolicy` compares expiry with block.timestamp. On OP Stack, blocks that carry transactions are
+///      timestamped within [L1 origin, L1 origin + 1800 s], so expiry follows wall-clock time to about +/-30 minutes
+///      in normal operation, with a larger lag possible after a sequencer outage; the sequencer can also delay a
+///      renewal. See docs/security/CONTRACT_ASSURANCE.md section 9.
 ///      The contract holds no funds, is not upgradeable and makes no external calls.
 contract VerifiablePolicyRegistry {
     /// @notice Upper bound on any scope's maximum validity, so that "every version expires" cannot be

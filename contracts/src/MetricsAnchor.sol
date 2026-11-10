@@ -29,10 +29,13 @@ interface IPolicyRegistry {
 ///        anchored root is never 0, so a root of 0 always means an empty day.
 ///      - The leaf does not bind the scope id: roots are stored per scope, so a row is only ever verified against
 ///        the root of the scope it is checked for.
-///      Time on OP Stack: an L2 block's timestamp is not chosen by the sequencer; it is the previous block's plus the
-///      block time, and lies within `max_sequencer_drift` (1800 s since Fjord) of its L1 origin. The day number
-///      therefore follows wall-clock UTC. What the sequencer can do is delay a transaction across a day boundary;
-///      a publisher should anchor well before its back-fill window closes, and can force inclusion through L1.
+///      Time on OP Stack: the sequencer produces blocks, each timestamped the previous one plus the block time, and
+///      the derivation rules keep every block that carries transactions within [L1 origin, L1 origin + 1800 s]
+///      (`max_sequencer_drift` since Fjord). L2 time can therefore run up to about 30 minutes ahead of L1, and can
+///      lag after a sequencer outage. The day number follows wall-clock UTC to about +/-30 minutes in normal
+///      operation: a sequencer, alone or with the publisher, could let a day be anchored up to about 30 minutes
+///      before it ends in real time. The sequencer can also delay a transaction across a day boundary; a
+///      publisher should anchor well inside its back-fill window. See docs/security/CONTRACT_ASSURANCE.md section 9.
 ///      The contract holds no funds, is not upgradeable, and makes one external call, a view to the registry.
 contract MetricsAnchor {
     /// @notice Maximum length, in bytes, of a dataset URI written on-chain.
@@ -208,7 +211,7 @@ contract MetricsAnchor {
     }
 
     /// @notice Leaf of a dataset row (format 2):
-    ///         keccak256(0x00 ‖ day ‖ count ‖ len(unit) ‖ unit ‖ len(category) ‖ category),
+    ///         keccak256(0x00 || day || count || len(unit) || unit || len(category) || category),
     ///         with day as uint32, count as uint256 and lengths as uint16, all big-endian.
     /// @param day Days since the Unix epoch (UTC).
     /// @param unitId Unit identifier (the school id in the school use case), UTF-8.
@@ -231,7 +234,7 @@ contract MetricsAnchor {
     }
 
     /// @notice Verify that a row belongs to the dataset currently anchored for (scope, day). The leaf is computed
-    ///         from the row and the anchored day; internal nodes are keccak256(0x01 ‖ min(a, b) ‖ max(a, b)).
+    ///         from the row and the anchored day; internal nodes are keccak256(0x01 || min(a, b) || max(a, b)).
     /// @dev Proof length is not bounded here; a caller pays for its own proof. Returns false for an empty or
     ///      unanchored day.
     /// @param scopeId Scope identifier in the registry.

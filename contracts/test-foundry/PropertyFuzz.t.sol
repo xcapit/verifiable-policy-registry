@@ -4,7 +4,7 @@ pragma solidity =0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {VerifiablePolicyRegistry} from "../src/VerifiablePolicyRegistry.sol";
 import {MetricsAnchor, IPolicyRegistry} from "../src/MetricsAnchor.sol";
-import {IssuerRoleResolver, IIssuerRoles} from "../src/IssuerRoleResolver.sol";
+import {IssuerRoleResolver, IIssuerRoles, Attestation} from "../src/IssuerRoleResolver.sol";
 
 /// @title Property fuzz tests
 /// @notice Stateless properties over arbitrary inputs: Merkle proofs of dataset format 2, scope identifiers, and
@@ -26,6 +26,18 @@ contract PropertyFuzz is Test {
         uint32 noLimit = anchor.NO_LAG_LIMIT(); // read before vm.prank, which applies to the next call only
         vm.prank(governor);
         anchor.setPublisher(scope, publisher, noLimit);
+    }
+
+    // ---------------------------------------------------------------- shared cross-language test vector
+
+    /// The leaf and root of the shared vector (tools/tests, contracts/test/MetricsAnchor.test.js) are reproduced
+    /// exactly: an independent check of the leaf encoding, since the fuzz tests below build leaves with leafHash.
+    function test_sharedVector() public view {
+        bytes32 l0 = anchor.leafHash(DAY, "giga-0001", "adult", 40);
+        bytes32 l1 = anchor.leafHash(DAY, "giga-0001", "malware", 25);
+        bytes32 l2 = anchor.leafHash(DAY, "giga-0003", "malware", 25);
+        assertEq(l0, 0xd16b6d8f55bf68aa54ca8d755e0c0beb5c84c2e63e9eda7ab55abc5579b8a348);
+        assertEq(_node(_node(l0, l1), l2), 0x7d91cbb18fd37a7042393e2043b2fed8a1d0723bdf8845d72bc7188febdf6747);
     }
 
     // ---------------------------------------------------------------- Merkle tree of format 2 (reference model)
@@ -125,6 +137,55 @@ contract PropertyFuzz is Test {
             test_.scopeOf(abi.encode(school, s, version, true, false, true, false, bytes32(0), uint64(1), uint64(2))), s
         );
         assertEq(conf.scopeOf(abi.encode(s, framework, school, bytes32(0), uint64(1), uint64(2))), s);
+    }
+
+    function _attestation(address attester, bytes memory data) internal pure returns (Attestation memory a) {
+        a.attester = attester;
+        a.revocable = true;
+        a.data = data;
+    }
+
+    /// The resolver accepts an attestation exactly when the attester holds the schema's role, never a different
+    /// (higher or lower) one, for each of the three schemas.
+    function testFuzz_resolverRequiresExactRole(uint8 roleSeed, uint8 kindSeed, address attester) public {
+        vm.assume(attester != address(0) && attester != governor);
+        IssuerRoleResolver.SchemaKind kind = IssuerRoleResolver.SchemaKind(bound(kindSeed, 0, 2));
+        uint8 role = uint8(bound(roleSeed, 0, 3));
+        vm.prank(governor);
+        reg.setIssuer(scope, attester, VerifiablePolicyRegistry.Role(role));
+        IssuerRoleResolver r = new IssuerRoleResolver(address(this), IIssuerRoles(address(reg)), kind);
+        bytes memory data = kind == IssuerRoleResolver.SchemaKind.Conformance
+            ? abi.encode(scope, "NIST SP 800-81r3", "r3", bytes32(0), uint64(1), uint64(2))
+            : (
+                kind == IssuerRoleResolver.SchemaKind.Deployment
+                    ? abi.encode("giga-0001", scope, uint256(1), bytes32(0), uint64(1))
+                    : abi.encode("giga-0001", scope, uint256(1), true, true, true, true, bytes32(0), uint64(1), uint64(2))
+            );
+        uint8 required = uint8(kind) + 1; // Deployment -> Operator (1), IndependentTest -> Reviewer (2), Conformance -> Auditor (3)
+        assertEq(r.attest(_attestation(attester, data)), role == required);
+    }
+
+    /// A batch is accepted exactly when every attestation in it would be accepted on its own.
+    function testFuzz_resolverBatchAllOrNothing(uint8 mask, uint8 sizeSeed) public {
+        uint256 n = bound(sizeSeed, 1, 6);
+        IssuerRoleResolver r =
+            new IssuerRoleResolver(address(this), IIssuerRoles(address(reg)), IssuerRoleResolver.SchemaKind.IndependentTest);
+        address reviewer = makeAddr("reviewer");
+        address other = makeAddr("other");
+        vm.startPrank(governor);
+        reg.setIssuer(scope, reviewer, VerifiablePolicyRegistry.Role.Reviewer);
+        reg.setIssuer(scope, other, VerifiablePolicyRegistry.Role.Operator);
+        vm.stopPrank();
+        bytes memory data = abi.encode("giga-0001", scope, uint256(1), true, true, true, true, bytes32(0), uint64(1), uint64(2));
+        Attestation[] memory list = new Attestation[](n);
+        uint256[] memory values = new uint256[](n);
+        bool all = true;
+        for (uint256 i = 0; i < n; i++) {
+            bool ok = (mask >> i) & 1 == 1;
+            list[i] = _attestation(ok ? reviewer : other, data);
+            all = all && ok;
+        }
+        assertEq(r.multiAttest(list, values), all);
     }
 
     /// Any non-canonical offset of the first string, or a truncated head, is refused.

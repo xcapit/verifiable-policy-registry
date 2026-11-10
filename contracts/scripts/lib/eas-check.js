@@ -23,6 +23,26 @@ const SCHEMA_REGISTRY_ABI = [
   "function getSchema(bytes32 uid) view returns (tuple(bytes32 uid, address resolver, bool revocable, string schema))",
 ];
 
+const SEMVER_ABI = ["function version() view returns (string)"];
+
+/**
+ * Versions of the EAS and SchemaRegistry deployments named in the manifest. On OP Stack chains both are
+ * predeploys behind proxies, upgradeable by the chain's upgrade process, so the deployed version can differ from
+ * the version the tests run against (v1.4.0, from the npm package 1.9.0); a reviewer should compare them.
+ */
+async function easVersions({ ethers, provider, manifest }) {
+  const c = manifest.contracts || {};
+  const read = async (address) => {
+    if (!address) return null;
+    try {
+      return await new ethers.Contract(address, SEMVER_ABI, provider).version();
+    } catch (e) {
+      return "unknown";
+    }
+  };
+  return { eas: await read(c.eas), schemaRegistry: await read(c.easSchemaRegistry) };
+}
+
 /** EAS schema UID: keccak256(abi.encodePacked(schema, resolver, revocable)). */
 function schemaUid(ethers, schema, resolver, revocable) {
   return ethers.solidityPackedKeccak256(["string", "address", "bool"], [schema, resolver, revocable]);
@@ -78,4 +98,4 @@ async function checkEasBindings({ ethers, provider, manifest }) {
   return results;
 }
 
-module.exports = { BINDINGS, EAS_SCHEMAS, schemaUid, checkEasBindings };
+module.exports = { BINDINGS, EAS_SCHEMAS, schemaUid, checkEasBindings, easVersions };
