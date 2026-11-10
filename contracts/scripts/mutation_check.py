@@ -3,8 +3,9 @@
 """Mutation check for the Foundry suites.
 
 Each mutant injects a realistic bug into a contract (one textual change), runs the suite that should catch it with
-a deliberately shallow campaign, and expects that suite to fail. A mutant that survives means an invariant or fuzz
-test is weaker than claimed. The source file is always restored, also on error.
+a deliberately shallow campaign under each of three fixed fuzzer seeds, and requires the suite to fail under every
+seed. A mutant that survives any seed means an invariant or fuzz test is weaker than claimed, or depends on luck.
+The source file is always restored, also on error.
 
 Usage (from contracts/): python3 scripts/mutation_check.py
 Exit code 0 if every mutant is killed, 1 otherwise.
@@ -15,6 +16,7 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+SEEDS = ["0x1", "0x2a", "0x7a69"]  # fixed, so that a result can be reproduced exactly
 
 # (id, file, original text, mutated text, suite expected to fail, description)
 MUTANTS = [
@@ -45,16 +47,18 @@ MUTANTS = [
 ]
 
 
-def run_suite(suite: str) -> bool:
-    env = dict(os.environ, FOUNDRY_FUZZ_RUNS="256", FOUNDRY_INVARIANT_RUNS="64", FOUNDRY_INVARIANT_DEPTH="32")
+def run_suite(suite: str, seed: str) -> bool:
+    env = dict(os.environ, FOUNDRY_FUZZ_RUNS="256", FOUNDRY_INVARIANT_RUNS="64", FOUNDRY_INVARIANT_DEPTH="32",
+               FOUNDRY_FUZZ_SEED=seed)
     r = subprocess.run(["forge", "test", "--match-contract", suite], cwd=ROOT, env=env, capture_output=True, text=True)
     return r.returncode == 0
 
 
 def main() -> int:
-    if not run_suite("Invariants|PropertyFuzz"):
-        print("unmutated suite fails; fix it before checking mutants")
-        return 1
+    for seed in SEEDS:
+        if not run_suite("Invariants|PropertyFuzz", seed):
+            print(f"unmutated suite fails with seed {seed}; fix it before checking mutants")
+            return 1
     survivors = 0
     for mid, rel, original, mutated, suite, what in MUTANTS:
         path = ROOT / rel
@@ -64,12 +68,13 @@ def main() -> int:
             return 1
         try:
             path.write_text(source.replace(original, mutated))
-            passed = run_suite(suite)
+            survived_seeds = [seed for seed in SEEDS if run_suite(suite, seed)]
         finally:
             path.write_text(source)
-        status = "SURVIVED" if passed else "killed  "
-        survivors += passed
-        print(f"{mid}  {status}  {suite:<18} {what}")
+        killed = len(SEEDS) - len(survived_seeds)
+        status = "killed  " if not survived_seeds else "SURVIVED"
+        survivors += bool(survived_seeds)
+        print(f"{mid}  {status}  {killed}/{len(SEEDS)} seeds  {suite:<18} {what}")
     print(f"\n{len(MUTANTS) - survivors}/{len(MUTANTS)} mutants killed")
     return 1 if survivors else 0
 

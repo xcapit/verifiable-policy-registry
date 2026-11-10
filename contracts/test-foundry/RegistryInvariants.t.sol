@@ -42,6 +42,12 @@ contract RegistryHandler is Test {
         return actors[seed % actors.length];
     }
 
+    /// @dev Caller of a governance function: the current governor half of the time (the authorised path),
+    ///      otherwise any actor (which exercises the unauthorised path).
+    function _caller(uint256 seed) private view returns (address) {
+        return seed % 2 == 0 ? governor() : _actor(seed / 2);
+    }
+
     /// @dev Records the first final status and resolution of each appeal and flags any later change of either.
     function _checkFinal() private {
         for (uint256 i = 0; i < appealIds.length; i++) {
@@ -58,7 +64,7 @@ contract RegistryHandler is Test {
     }
 
     function publish(uint256 actorSeed, bytes32 h, uint64 validity, uint16 reason, uint256 appealSeed) external {
-        address a = _actor(actorSeed);
+        address a = _caller(actorSeed);
         address gov = governor();
         // Mostly valid inputs, so that versions and acceptances actually happen; invalid ones are still drawn.
         validity = uint64(bound(validity, 0, 120 days));
@@ -87,7 +93,7 @@ contract RegistryHandler is Test {
 
     function rejectAppeal(uint256 actorSeed, uint256 idSeed, bytes32 reasonHash) external {
         if (appealIds.length == 0) return;
-        address a = _actor(actorSeed);
+        address a = _caller(actorSeed);
         address gov = governor();
         vm.prank(a);
         try reg.rejectAppeal(appealIds[idSeed % appealIds.length], reasonHash) {
@@ -97,7 +103,7 @@ contract RegistryHandler is Test {
     }
 
     function setIssuer(uint256 actorSeed, uint256 targetSeed, uint8 role) external {
-        address a = _actor(actorSeed);
+        address a = _caller(actorSeed);
         address gov = governor();
         // Half of the time, target the pending governor: the state the role-separation invariant is about.
         address pending = reg.pendingGovernor(scope);
@@ -109,7 +115,7 @@ contract RegistryHandler is Test {
     }
 
     function proposeGovernor(uint256 actorSeed, uint256 targetSeed, bool cancel) external {
-        address a = _actor(actorSeed);
+        address a = _caller(actorSeed);
         address gov = governor();
         vm.prank(a);
         try reg.proposeGovernor(scope, cancel ? address(0) : _actor(targetSeed)) {

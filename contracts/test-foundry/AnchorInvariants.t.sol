@@ -51,9 +51,16 @@ contract AnchorHandler is Test {
         return k == 0 ? governor : (k == 1 ? publisher : stranger);
     }
 
-    /// @dev A day around the current one: up to 40 days back, up to 2 days ahead.
+    /// @dev Half of the time, an exact boundary: the oldest day the window allows, the first day it refuses,
+    ///      yesterday or today. Otherwise any day from 40 days back to 2 days ahead.
     function _day(uint256 seed) private view returns (uint32) {
         uint256 t = block.timestamp / 1 days;
+        if (seed % 2 == 0) {
+            uint256 k = (seed / 2) % 4;
+            uint32 lag = anchor.maxLagDays(scope);
+            if (k < 2 && lag != anchor.NO_LAG_LIMIT() && lag + 1 <= t) return uint32(t - lag - k);
+            return uint32(t - (k % 2));
+        }
         return uint32(bound(seed, t - 40, t + 2));
     }
 

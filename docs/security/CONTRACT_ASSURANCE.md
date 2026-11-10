@@ -54,7 +54,7 @@ Stateless properties in [`PropertyFuzz`](../../contracts/test-foundry/PropertyFu
 
 ## 5. Mutation check
 
-A test suite that never fails proves little. [`scripts/mutation_check.py`](../../contracts/scripts/mutation_check.py) injects one realistic bug at a time, runs the suite that should catch it with a deliberately shallow campaign (64 runs × 32 calls), and requires it to fail. CI runs it on every push.
+A test suite that never fails proves little. [`scripts/mutation_check.py`](../../contracts/scripts/mutation_check.py) injects one realistic bug at a time, runs the suite that should catch it with a deliberately shallow campaign (64 runs × 32 calls), and requires it to fail under each of three fixed fuzzer seeds, so that a result is reproducible and does not depend on a lucky draw. CI runs it on every push.
 
 | Id | Injected bug | Caught by |
 | --- | --- | --- |
@@ -70,7 +70,7 @@ A test suite that never fails proves little. [`scripts/mutation_check.py`](../..
 | R5 | A resolved appeal may be rejected again | `RegistryInvariants` |
 | E1 | A non-canonical attestation encoding is accepted | `PropertyFuzz` |
 
-The first run left A4 and R5 alive. A4 survived because the anchor model followed a rewrite instead of flagging it; R5 because only the appeal status, not its resolution, was compared, and acceptances were rare. Both suites were strengthened before this table was produced. R3 also showed that a shallow campaign can miss a two-step sequence, so the handler now targets the pending governor half of the time.
+How the suites got here. The first run left A4 and R5 alive: the anchor model followed a rewrite instead of flagging it, and only the appeal status, not its resolution, was compared. Later, A2 and R3 were caught under some seeds and not others: A2 needs the exact first day outside the window, and R3 a proposal followed by a role grant to the pending governor. The handlers now draw boundary days half of the time and call governance functions from the current governor half of the time (the other half from random actors, which keeps the unauthorised paths exercised). After these changes every mutant was caught under 10 to 20 different seeds locally, and CI requires all three fixed seeds.
 
 ## 6. Integration with EAS
 
