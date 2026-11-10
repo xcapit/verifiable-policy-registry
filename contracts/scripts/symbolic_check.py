@@ -17,7 +17,8 @@ solver runs without timeouts, so every branch is decided exactly. Results hold w
 transaction from the concrete state built in each suite's setUp.
 
 Usage (from contracts/): python3 scripts/symbolic_check.py [--mutants]
-Environment: HALMOS, the Halmos executable (default: halmos). The checks were written for Halmos 0.3.3.
+Environment: HALMOS, the Halmos executable (default: halmos). Tested with Halmos 0.3.3 and the Yices 2.6.4 SMT
+solver (pip packages halmos==0.3.3 and yices-solver==2.6.4.post23), on Python 3.12.
 Exit code 0 if every condition holds, 1 otherwise.
 """
 import json

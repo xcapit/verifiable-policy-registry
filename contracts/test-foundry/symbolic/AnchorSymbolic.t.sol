@@ -12,10 +12,13 @@ import {SVM, SVM_ADDRESS} from "./SVM.sol";
 /// within the command's bounds, from the concrete state of setUp, for one transaction. The anchoring window is
 /// checked for every block.timestamp, so every UTC midnight and every window boundary is covered, not sampled.
 ///
+/// Time is symbolic from the fixture time on (block.timestamp >= the setUp time). Checks with symbolic keys rely
+/// on Halmos's model of keccak256 as injective, as in RegistrySymbolic.
 /// Assumption: block.timestamp / 1 days fits in uint32, so `today()` does not truncate (until the year
 /// 11 761 191).
 ///
-/// The `check_leaf_*` functions are secondary: they rest on Halmos's model of keccak256 as an injective function,
+/// The `check_leaf_*` functions are secondary: their conclusion is about keccak256 outputs, so it rests entirely
+/// on Halmos's model of keccak256 as an injective function,
 /// so they show that the leaf encoding is unambiguous and distinct from the node encoding as byte strings, not
 /// anything about keccak256 itself.
 contract AnchorSymbolic is Test {

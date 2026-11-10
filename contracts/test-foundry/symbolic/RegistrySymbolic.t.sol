@@ -20,6 +20,10 @@ import {SVM, SVM_ADDRESS} from "./SVM.sol";
 ///  - Frame conditions. One call with arbitrary calldata (any function, any arguments) from an arbitrary sender,
 ///    after which state that the specification says is final must be unchanged.
 ///
+/// Keccak256. Mapping slots are keccak256 of the key, and Halmos models keccak256 as injective; every check with
+/// a symbolic key (scope, appeal or address) relies on that model to keep distinct keys in distinct slots.
+///
+/// Time is symbolic from the fixture time on (block.timestamp >= the setUp time).
 /// Assumption: block.timestamp + MAX_VALIDITY_CAP < 2^64, so `uint64(block.timestamp)` does not truncate and
 /// `publishedAt + validity` does not overflow (the bound is reached in about 5.8 * 10^11 years).
 contract RegistrySymbolic is Test {
@@ -318,8 +322,8 @@ contract RegistrySymbolic is Test {
 
     // ------------------------------------------------------------------ frame conditions
 
-    /// One arbitrary call from an arbitrary sender: no past version of any scope changes, a resolved appeal keeps
-    /// its status and resolution, and an open appeal leaves the Open state only for Accepted or Rejected.
+    /// One arbitrary call from an arbitrary sender: neither stored version of S1 changes, a resolved appeal keeps
+    /// its status and resolution, and an open appeal never returns to None.
     function check_anyCall_keepsVersionsAndResolvedAppeals(address caller, uint256 ts) public {
         vm.assume(ts >= block.timestamp && ts <= MAX_TS);
         vm.warp(ts);

@@ -63,6 +63,7 @@ jobs:
 
   symbolic:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: contracts
@@ -80,7 +81,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install halmos==0.3.3
+      - run: pip install halmos==0.3.3 yices-solver==2.6.4.post23
       - name: Halmos symbolic checks (every check passes with no timeout or cut path; every canary fails)
         run: python3 scripts/symbolic_check.py
 

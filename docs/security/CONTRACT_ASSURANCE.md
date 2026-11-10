@@ -63,7 +63,7 @@ Stateless properties in [`PropertyFuzz`](../../contracts/test-foundry/PropertyFu
 
 ### 4.1 Bounded symbolic checks (Halmos)
 
-The fuzz campaigns above sample inputs. The checks in [`test-foundry/symbolic/`](../../contracts/test-foundry/symbolic/) are explored symbolically by Halmos 0.3.3, so they hold for **every** value of their parameters within the bounds below, not for the values a fuzzer happened to draw. Every address, hash, reason code, validity, day number and block timestamp is symbolic. Each UTC midnight, each window edge and the expiry instant are therefore covered, not sampled.
+The fuzz campaigns above sample inputs. The checks in [`test-foundry/symbolic/`](../../contracts/test-foundry/symbolic/) are explored symbolically by Halmos 0.3.3 with the Yices 2.6.4 solver, so they hold for **every** value of their parameters within the bounds below, not for the values a fuzzer happened to draw. Every address, hash, reason code, validity, day number and block timestamp is symbolic. Each UTC midnight, each window edge and the expiry instant are therefore covered, not sampled.
 
 What each check states, and how far it goes:
 
@@ -74,10 +74,11 @@ What each check states, and how far it goes:
   - Strings have lengths 0, 256 and 257, the URI bound and one past it; scope names have lengths 0, 1, 128 and 129.
   - Loops are unrolled up to 16 times, and the run is rejected if any path was cut by that bound.
   - The solver runs without timeouts, so every branch is decided exactly, and a timeout counts as a failure, not a pass.
-  - Block time is assumed to satisfy `block.timestamp + 365 days < 2^64` for the registry and `block.timestamp / 1 days < 2^32` for the anchor; both bounds lie more than eleven million years ahead.
+  - Block time is symbolic from the fixture time on, and is assumed to satisfy `block.timestamp + 365 days < 2^64` for the registry and `block.timestamp / 1 days < 2^32` for the anchor; both bounds lie more than eleven million years ahead.
 - **Not vacuous.**
   - Each suite has a canary: a copy of a check whose predicate moves one boundary by one unit (validity `<` instead of `<=` the scope's maximum; the back-fill window one day narrower). The canary must produce a counterexample, and in each case the counterexample lies exactly on the moved boundary.
-  - The mutants of §5.1 that fall within these suites are injected one at a time, and the named check must fail on each. All 22 are caught: A1 to A4, A6 to A11, and R1 to R12 (`symbolic_check.py --mutants`, measured locally, about 15 minutes). A5 (node hashing in `verifyRow`) and E1 to E3 (the resolver) are outside these suites. The first run let A9 survive (a correction that rewrites `committedAt`), because the correction check ran at the time of the original write; the check now runs at a symbolic later time.
+  - The mutants of §5.1 that fall within these suites are injected one at a time, and the named check must fail on each. All 22 are caught: A1 to A4, A6 to A11, and R1 to R12 (`symbolic_check.py --mutants` at commit 0144a6a, run locally on one laptop: about 11 minutes for the checks and 27 minutes in all). A5 (node hashing in `verifyRow`) and E1 to E3 (the resolver) are outside these suites. The first run let A9 survive (a correction that rewrites `committedAt`), because the correction check ran at the time of the original write; the check now runs at a symbolic later time.
+- **Keccak256.** Mapping slots are keccak256 of their key, and Halmos models keccak256 as injective. Every check with a symbolic scope, appeal, day or address therefore relies on that model to keep distinct keys in distinct slots, which is the standard assumption that keccak256 has no collision.
 - **Storage reads.** The frame checks read stored versions and commitments from raw storage slots, because Halmos cannot decode a stored string after a write to a symbolic slot. `setUp` checks the assumed layout against the public getters, so a layout change makes the suite fail rather than pass vacuously.
 
 | Contract | Check | Statement |
@@ -89,7 +90,7 @@ What each check states, and how far it goes:
 | Registry | `check_createScope_acceptedExactlyWhenSpecified` | Creation succeeds exactly for a name of 1 to 128 bytes, 0 < `maxValidity` ≤ 365 days, and an id the caller has not used; the caller governs the new, empty scope. |
 | Registry | `check_handover_acceptedExactlyWhenSpecified` | A proposal succeeds exactly from the governor for an address without a role; acceptance succeeds exactly from the pending governor, who then governs with no handover pending. |
 | Registry | `check_currentPolicy_inForceExactlyBeforeExpiry` | At every later time the current version is reported in force exactly while `block.timestamp < expiresAt`. |
-| Registry | `check_anyCall_keepsVersionsAndResolvedAppeals` | After any call, no stored word of a past version changes, rejected and accepted appeals keep their status and resolution, and an open appeal never returns to None. |
+| Registry | `check_anyCall_keepsVersionsAndResolvedAppeals` | After any call, no stored word of either version in the fixture changes, rejected and accepted appeals keep their status and resolution, and an open appeal never returns to None. |
 | Registry | `check_anyCall_governorHoldsNoRole` | After any call (including `proposeGovernor`, `acceptGovernor` and `setIssuer` with any arguments), neither the governor nor the pending governor holds an issuer role. |
 | Anchor | `check_commitRoot_acceptedExactlyWhenSpecified` | `commitRoot` succeeds exactly when a publisher is appointed and is the caller, the UTC day has ended, the day is within the window or the window is unbounded, the day was never written, the root is not 0 and the URI is at most 256 bytes. On success the day holds the root, revision 0, not empty, committed at the block time. The zero address can never write, because an unappointed scope has a window of 0. |
 | Anchor | `check_markEmpty_acceptedExactlyWhenSpecified` | The same rule without a root; on success the day is empty. |
