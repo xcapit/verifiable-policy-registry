@@ -74,8 +74,9 @@
 <line x1="820" y1="178" x2="850" y2="138" stroke="#2563eb"/><path d="M910,238 L910,160 L868,138" fill="none" stroke="#2563eb" stroke-dasharray="3 3"/>
 <text x="903" y="200" font-size="10" font-weight="400" fill="#1d4ed8" text-anchor="end">odd</text>
 <text x="903" y="212" font-size="10" font-weight="400" fill="#1d4ed8" text-anchor="end">promoted</text>
-<text x="850" y="286" font-size="10" font-weight="400" fill="#1d4ed8" text-anchor="middle">L = keccak(0x00‖day‖n‖unit‖cat)</text>
-<text x="850" y="299" font-size="10" font-weight="400" fill="#1d4ed8" text-anchor="middle">N = keccak(0x01‖min‖max)</text>
+<text x="850" y="278" font-size="10" font-weight="400" fill="#1d4ed8" text-anchor="middle">L = keccak(0x00‖day‖count‖</text>
+<text x="850" y="290" font-size="10" font-weight="400" fill="#1d4ed8" text-anchor="middle">len‖unit‖len‖category)</text>
+<text x="850" y="303" font-size="10" font-weight="400" fill="#1d4ed8" text-anchor="middle">N = keccak(0x01‖min‖max)</text>
 <path d="M850,310 L850,355" stroke="#2563eb" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="640" y="358" width="300" height="56" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
 <text x="790" y="382" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">MetricsAnchor.commitRoot(scope, day, root, uri)</text>
