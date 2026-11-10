@@ -26,6 +26,7 @@ npx hardhat test                                   # unit and EAS integration te
 npx hardhat coverage                               # coverage (CI gate: 100 % lines, 98 % branches)
 FOUNDRY_PROFILE=ci forge test                      # fuzz and invariant suites (Foundry 1.3.5)
 python3 scripts/mutation_check.py                  # targeted mutation check, in a temporary copy
+python3 scripts/symbolic_check.py                  # Halmos symbolic checks (pip install halmos==0.3.3)
 slither . --compile-force-framework hardhat --filter-paths "node_modules|test-foundry"   # Slither 0.11.3
 cd ..
 pip install -e tools && (cd tools && python -m pytest -q)    # tools, toolkit, privacy and CLI tests
@@ -33,7 +34,7 @@ E2E_OUT=out ./examples/e2e/run.sh                              # demonstrator; w
 python tools/bench/bench_merkle.py                             # release benchmark
 ```
 
-Prerequisites: Node.js 20 or later, Python 3.10 or later, Foundry 1.3.5. No secrets, paid services or network access are needed beyond package installation. CI runs the same commands on every push; [CONTRACT_ASSURANCE.md](../security/CONTRACT_ASSURANCE.md) records the expected results.
+Prerequisites: Node.js 20 or later, Python 3.10 or later (Halmos 0.3.3 tested with 3.12), Foundry 1.3.5. No secrets, paid services or network access are needed beyond package installation. CI runs the same commands on every push; [CONTRACT_ASSURANCE.md](../security/CONTRACT_ASSURANCE.md) records the expected results.
 
 ## 3. Evidence index
 
@@ -41,7 +42,7 @@ Prerequisites: Node.js 20 or later, Python 3.10 or later, Foundry 1.3.5. No secr
 | --- | --- |
 | What is and is not claimed | [CLAIMS_AND_EVIDENCE.md](../CLAIMS_AND_EVIDENCE.md) |
 | Normative formats and ABIs | [INTERFACES.md](../INTERFACES.md) |
-| Contract assurance (static analysis, invariants, mutation, coverage, gas, OP Stack time) | [security/CONTRACT_ASSURANCE.md](../security/CONTRACT_ASSURANCE.md) |
+| Contract assurance (static analysis, invariants, symbolic checks, mutation, coverage, gas, OP Stack time) | [security/CONTRACT_ASSURANCE.md](../security/CONTRACT_ASSURANCE.md) |
 | Encodings, commitments, designed ZK relation, risks | [security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md](../security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md) |
 | Threats | [security/THREAT_MODEL.md](../security/THREAT_MODEL.md) |
 | Privacy and re-identification | [privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md) |
@@ -63,7 +64,7 @@ Prerequisites: Node.js 20 or later, Python 3.10 or later, Foundry 1.3.5. No secr
 | # | Question | Evidence to examine |
 | --- | --- | --- |
 | 1 | Are the properties that rest on cryptography and on the ledger correctly separated from those that rest on institutions? | White paper §3.3 and §6.1; claims ledger C01–C21 |
-| 2 | Do the contracts enforce what INTERFACES specifies, and do the invariant suites check it? | CONTRACT_ASSURANCE §4–§5; INTERFACES I2 and I7 |
+| 2 | Do the contracts enforce what INTERFACES specifies, and do the invariant suites and the symbolic checks check it (are the predicates of `test-foundry/symbolic/` faithful to INTERFACES, and are the bounds adequate)? | CONTRACT_ASSURANCE §4–§5; INTERFACES I2 and I7 |
 | 3 | Are the OP Stack time, ordering and finality assumptions stated correctly and handled? | CONTRACT_ASSURANCE §9; threat model T26–T29; manifest `finality` |
 | 4 | Is the Merkle encoding unambiguous, and is `verifyRow` sound against internal-node and cross-day substitution? | White paper §5.3; crypto evidence §3 |
 | 5 | Is the ZK relation sound, including hiding of the log commitment and binding of categories to the policy? | Crypto evidence §5–§7; ADR-0010 |

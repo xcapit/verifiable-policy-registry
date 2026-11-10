@@ -61,6 +61,30 @@ jobs:
       - name: Mutation check (every injected bug must be caught)
         run: python3 scripts/mutation_check.py
 
+  symbolic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - run: npm ci
+      - uses: foundry-rs/foundry-toolchain@v1.9.2
+        with:
+          version: v1.3.5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install halmos==0.3.3 yices-solver==2.6.4.post23
+      - name: Halmos symbolic checks (every check passes with no timeout or cut path; every canary fails)
+        run: python3 scripts/symbolic_check.py
+
   static-analysis:
     runs-on: ubuntu-latest
     defaults:
