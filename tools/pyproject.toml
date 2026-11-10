@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vpr-tools"
-version = "0.4.0"
+version = "0.5.0"
 description = "Off-chain tooling for the Verifiable Policy Registry: policy hashing, RPZ compilation and threshold-suppressed metrics"
 license = "AGPL-3.0-only"
 requires-python = ">=3.10"

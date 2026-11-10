@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-10
+
+Contract assurance for external review: static analysis, specification-oracle invariants, mutation testing, coverage and gas gates in CI, and an integration test through the real EAS contracts. Contract logic is unchanged since v0.4.0. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment. **Breaking change** to the deployment manifest (`finality` replaces `confirmations`).
+
 ### Added
 - Contract assurance (`docs/security/CONTRACT_ASSURANCE.md`): Slither in CI failing on any finding; Foundry invariant suites for the registry and the anchor, with every call checked against an oracle written from the specification, and property fuzzing (shared vector, Merkle proofs, leaf encoding, scope ids, resolver roles and ABI head); a targeted mutation check (26 mutants, 15 from an independent review, run in a temporary copy) and a slither-mutate score over the whole test stack; coverage as a CI gate (100 % lines, 98 % branches minimum) and per-function gas reports; OP Stack time and ordering semantics, including the ±30-minute accuracy of L2 time (VPR-040 Slither part, VPR-041, VPR-042).
 - Complete NatSpec on the three contracts (logic unchanged).
@@ -126,7 +130,8 @@ First public release: a proof of concept and the documentation needed for extern
 - Code of conduct, security policy, project governance, maintainers, support, contribution guide with DCO, issue and pull request templates.
 - Licence texts (AGPL-3.0-only, CC0-1.0, CC-BY-4.0), NOTICE, CITATION.cff and publiccode.yml.
 
-[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.1.0...v0.2.0

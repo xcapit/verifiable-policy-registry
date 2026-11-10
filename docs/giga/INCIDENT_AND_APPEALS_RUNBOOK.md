@@ -1,6 +1,6 @@
 # Incident and appeals runbook
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.4.0*
+*CC BY 4.0 · Proposal package for a school pilot · v0.5.0*
 
 Procedures for the most common situations during the pilot. Response times are proposals to be confirmed in the scope charter.
 
