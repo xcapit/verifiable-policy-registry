@@ -34,6 +34,14 @@ describe("VerifiablePolicyRegistry", function () {
   });
 
   describe("scopes", function () {
+    it("announces a new scope with its id, creator, name and maximum validity", async function () {
+      const name = "giga:XX:secondary";
+      const id = await registry.scopeIdOf(other.address, name);
+      await expect(registry.connect(other).createScope(name, 30 * DAY))
+        .to.emit(registry, "ScopeCreated")
+        .withArgs(id, other.address, name, 30 * DAY);
+    });
+
     it("derives the scope id from the governor and the name (shared vector)", async function () {
       expect(governor.address).to.equal(ACCOUNT0);
       expect(SCOPE).to.equal(SCOPE_ID_VECTOR);
@@ -126,7 +134,12 @@ describe("VerifiablePolicyRegistry", function () {
     it("lets only the governor publish, and stores the version", async function () {
       const hash = ethers.id("policy-v1");
       await expect(publish(other, SCOPE, hash)).to.be.revertedWithCustomError(registry, "NotGovernor");
-      await expect(publish(governor, SCOPE, hash, { uri: "ipfs://v1" })).to.emit(registry, "PolicyPublished");
+      // every argument of the event is checked: indexers rebuild the policy history from it
+      const t = (await time.latest()) + 100;
+      await time.setNextBlockTimestamp(t);
+      await expect(publish(governor, SCOPE, hash, { uri: "ipfs://v1" }))
+        .to.emit(registry, "PolicyPublished")
+        .withArgs(SCOPE, 1, hash, ethers.ZeroHash, "ipfs://v1", REASON_INITIAL, t + DAY, ethers.ZeroHash);
       const [version, policy, inForce] = await registry.currentPolicy(SCOPE);
       expect(version).to.equal(1n);
       expect(policy.contentHash).to.equal(hash);

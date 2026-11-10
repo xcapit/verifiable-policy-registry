@@ -118,6 +118,9 @@ describe("IssuerRoleResolver", function () {
     await expect(r.connect(eas).revoke(a, { value: 1 })).to.be.revertedWithCustomError(r, "NotPayable");
     await expect(r.connect(eas).multiRevoke([a], [0], { value: 1 })).to.be.revertedWithCustomError(r, "NotPayable");
     await expect(r.connect(eas).multiRevoke([a, a], [0])).to.be.revertedWithCustomError(r, "LengthMismatch");
+    // more values than attestations is also a mismatch, for issuance and for revocation
+    await expect(r.connect(eas).multiAttest([a], [0, 0])).to.be.revertedWithCustomError(r, "LengthMismatch");
+    await expect(r.connect(eas).multiRevoke([a], [0, 0])).to.be.revertedWithCustomError(r, "LengthMismatch");
     await expect(r.connect(eas).multiRevoke([a], [1])).to.be.revertedWithCustomError(r, "NotPayable");
   });
 

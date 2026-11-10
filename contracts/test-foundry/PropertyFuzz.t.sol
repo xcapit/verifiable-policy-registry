@@ -200,5 +200,8 @@ contract PropertyFuzz is Test {
         uint256 len = bound(cut, 0, 10 * 32 - 1);
         vm.expectRevert(IssuerRoleResolver.MalformedAttestation.selector);
         r.scopeOf(_slice(data, 0, len));
+        // The check is on the head only (documented): a complete head with a canonical offset passes even without
+        // its tail, whose strict decoding is the verifier's job.
+        assertEq(r.scopeOf(_slice(data, 0, 10 * 32)), s);
     }
 }
