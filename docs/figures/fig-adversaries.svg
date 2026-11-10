@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" width="960" height="500" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
-<rect width="960" height="500" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<rect width="960" height="540" fill="#ffffff"/>
 <text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">Adversaries, the mechanism that answers each, and the kind of guarantee</text>
 <g font-size="12">
 <text x="40" y="62" font-weight="600" fill="#475569">ADVERSARY</text>
@@ -36,7 +36,10 @@
 
 <text x="40" y="454" font-weight="600" fill="#0f172a">A10 · withholding documents</text><text x="330" y="446" fill="#0f172a">substitution fails the hash; withholding answered</text><text x="330" y="462" fill="#0f172a">by mirrors on independent hosts</text>
 <rect x="760" y="440" width="160" height="22" rx="11" fill="#2563eb"/><text x="840" y="455" font-weight="600" fill="#fff" text-anchor="middle">substitution detected</text>
+
+<text x="40" y="494" font-weight="600" fill="#0f172a">A11 · rollup governance</text><text x="330" y="486" fill="#0f172a">assumption stated (§3.2); EAS version reported</text><text x="330" y="502" fill="#0f172a">by check-eas.js, so an upgrade is visible</text>
+<rect x="760" y="480" width="160" height="22" rx="11" fill="#d97706"/><text x="840" y="495" font-weight="600" fill="#fff" text-anchor="middle">rests on the chain</text>
 </g>
-<g stroke="#f1f5f9"><line x1="40" y1="112" x2="920" y2="112"/><line x1="40" y1="152" x2="920" y2="152"/><line x1="40" y1="192" x2="920" y2="192"/><line x1="40" y1="232" x2="920" y2="232"/><line x1="40" y1="272" x2="920" y2="272"/><line x1="40" y1="312" x2="920" y2="312"/><line x1="40" y1="352" x2="920" y2="352"/><line x1="40" y1="392" x2="920" y2="392"/><line x1="40" y1="432" x2="920" y2="432"/></g>
-<text x="40" y="490" font-size="11" fill="#475569">Green: prevented under §3.2. Blue: not prevented, but public or without effect on filtering. Amber: rests on a named party. Grey: reduced within stated limits.</text>
+<g stroke="#f1f5f9"><line x1="40" y1="112" x2="920" y2="112"/><line x1="40" y1="152" x2="920" y2="152"/><line x1="40" y1="192" x2="920" y2="192"/><line x1="40" y1="232" x2="920" y2="232"/><line x1="40" y1="272" x2="920" y2="272"/><line x1="40" y1="312" x2="920" y2="312"/><line x1="40" y1="352" x2="920" y2="352"/><line x1="40" y1="392" x2="920" y2="392"/><line x1="40" y1="432" x2="920" y2="432"/><line x1="40" y1="472" x2="920" y2="472"/></g>
+<text x="40" y="530" font-size="11" fill="#475569">Green: prevented under §3.2. Blue: not prevented, but public or without effect on filtering. Amber: rests on a named party. Grey: reduced within stated limits.</text>
 </svg>
