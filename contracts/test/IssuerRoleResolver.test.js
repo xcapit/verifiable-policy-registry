@@ -111,6 +111,16 @@ describe("IssuerRoleResolver", function () {
     expect(await r.connect(eas).multiRevoke.staticCall([a], [0])).to.equal(true);
   });
 
+  it("refuses value and mismatched batches on every entry point", async function () {
+    const r = await resolver(Kind.IndependentTest);
+    const a = attestation(reviewer.address, testData(SCOPE));
+    await expect(r.connect(eas).multiAttest([a], [0], { value: 1 })).to.be.revertedWithCustomError(r, "NotPayable");
+    await expect(r.connect(eas).revoke(a, { value: 1 })).to.be.revertedWithCustomError(r, "NotPayable");
+    await expect(r.connect(eas).multiRevoke([a], [0], { value: 1 })).to.be.revertedWithCustomError(r, "NotPayable");
+    await expect(r.connect(eas).multiRevoke([a, a], [0])).to.be.revertedWithCustomError(r, "LengthMismatch");
+    await expect(r.connect(eas).multiRevoke([a], [1])).to.be.revertedWithCustomError(r, "NotPayable");
+  });
+
   it("checks every attestation in a batch", async function () {
     const r = await resolver(Kind.IndependentTest);
     const good = attestation(reviewer.address, testData(SCOPE));

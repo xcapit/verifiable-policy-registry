@@ -149,6 +149,16 @@ describe("MetricsAnchor", function () {
       expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(true);
     });
 
+    it("refuses a zero registry and an oversized correction URI", async function () {
+      const F = await ethers.getContractFactory("MetricsAnchor");
+      await expect(F.deploy(ethers.ZeroAddress)).to.be.revertedWithCustomError(F, "ZeroAddress");
+      await anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d");
+      await expect(anchor.correctRoot(SCOPE, DAY, ethers.id("x"), "x".repeat(257), ethers.id("r"))).to.be.revertedWithCustomError(
+        anchor,
+        "UriTooLong"
+      );
+    });
+
     it("corrects an empty day into a root and a root back into an empty day", async function () {
       const [s0, c0, n0] = ROWS[0];
       const reason = ethers.id("note");

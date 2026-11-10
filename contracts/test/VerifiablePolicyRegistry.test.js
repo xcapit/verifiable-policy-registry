@@ -157,6 +157,13 @@ describe("VerifiablePolicyRegistry", function () {
       await publish(governor, SCOPE, ethers.id("v"), { uri: "x".repeat(256) });
     });
 
+    it("refuses an empty content hash and reports no policy before the first version", async function () {
+      const [version, , inForce] = await registry.currentPolicy(SCOPE);
+      expect(version).to.equal(0n);
+      expect(inForce).to.equal(false);
+      await expect(publish(governor, SCOPE, ethers.ZeroHash)).to.be.revertedWithCustomError(registry, "EmptyContentHash");
+    });
+
     it("reverts cleanly for a version that does not exist", async function () {
       await expect(registry.getVersion(SCOPE, 0)).to.be.revertedWithCustomError(registry, "UnknownVersion");
       await expect(registry.getVersion(SCOPE, 1)).to.be.revertedWithCustomError(registry, "UnknownVersion");
@@ -206,6 +213,17 @@ describe("VerifiablePolicyRegistry", function () {
       const id2 = appealId(SCOPE, doc, 2);
       await expect(registry.connect(other).fileAppeal(SCOPE, doc)).to.emit(registry, "AppealFiled").withArgs(id2, SCOPE, doc, 2);
       expect(await registry.appealIdOf(SCOPE, doc, 2)).to.equal(id2);
+    });
+
+    it("never resolves an appeal twice, by acceptance or rejection", async function () {
+      const id = appealId(SCOPE, doc, 1);
+      await registry.connect(other).fileAppeal(SCOPE, doc);
+      await publish(governor, SCOPE, ethers.id("v1"), { reason: REASON_APPEAL_ACCEPTED, appeal: id });
+      await expect(publish(governor, SCOPE, ethers.id("v2"), { reason: REASON_APPEAL_ACCEPTED, appeal: id })).to.be.revertedWithCustomError(
+        registry,
+        "AppealNotOpen"
+      );
+      await expect(registry.rejectAppeal(id, ethers.id("late"))).to.be.revertedWithCustomError(registry, "AppealNotOpen");
     });
 
     it("rejects empty documents, unknown scopes and appeals from another scope", async function () {

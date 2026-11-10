@@ -208,6 +208,7 @@ contract VerifiablePolicyRegistry {
         if (!scopes[scopeId].exists) revert UnknownScope();
         address pending = pendingGovernor[scopeId];
         if (pending == address(0) || msg.sender != pending) revert NotPendingGovernor();
+        // Defence in depth: unreachable while proposeGovernor and setIssuer enforce the same rule.
         if (issuerRole[scopeId][pending] != Role.None) revert GovernorCannotHoldRole();
         address previous = scopes[scopeId].governor;
         scopes[scopeId].governor = pending;
