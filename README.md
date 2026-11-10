@@ -1,6 +1,6 @@
 # Verifiable Policy Registry
 
-[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.5-informational.svg)](docs/WHITEPAPER.md)
+[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.6-informational.svg)](docs/WHITEPAPER.md)
 
 **Accountable content filtering for school connectivity, designed to minimise and never publish data about children.**
 
@@ -17,7 +17,7 @@ The project team proposes a first deployment in schools connected by **UNICEF Gi
 > | **Implemented** (code + passing tests) | Policy registry with expiry, appeals by hash and on-chain issuer roles; metrics anchor with on-chain row verification; policy hashing, fail-closed zone compilation and zone evaluation; aggregation with small-cell suppression; generic verification toolkit and CLI |
 > | **Demonstrated** (CI, synthetic data, local chain) | Policy → zone → releases for two use cases → anchored roots → accepted and rejected proofs → appeal → expiry, with a machine-readable evidence manifest ([demo](examples/e2e/run.sh), [benchmarks](docs/benchmarks/BENCHMARKS.md)) |
 > | **Designed, not implemented** | Zero-knowledge proof of aggregation, hiding event-log commitment, canary checks ([specification](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md)); resolver container; deployment manifest |
-> | **Audit and review** | None. Not audited, not formally verified, no independent review yet ([reviewer guide](docs/review/V03_REVIEWER_GUIDE.md)) |
+> | **Audit and review** | None. Not audited, not formally verified, no independent review yet ([reviewer guide](docs/review/REVIEWER_GUIDE.md)) |
 > | **Deployment and pilot** | Local test chains only. No public deployment, no school, no partner commitment |
 
 <p align="center"><img src="docs/figures/fig1-architecture.svg" alt="Architecture: enforcement plane in-country, accountability plane on Ethereum L2" width="100%"></p>
@@ -42,7 +42,7 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 
 | If you are… | Start with |
 | --- | --- |
-| evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Claims and evidence](docs/CLAIMS_AND_EVIDENCE.md) · [Reviewer guide](docs/review/V03_REVIEWER_GUIDE.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG evidence matrix](docs/DPG_EVIDENCE_MATRIX.md) |
+| evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Claims and evidence](docs/CLAIMS_AND_EVIDENCE.md) · [Reviewer guide](docs/review/REVIEWER_GUIDE.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG evidence matrix](docs/DPG_EVIDENCE_MATRIX.md) |
 | assessing a pilot (Giga, ministries, providers) | [Pilot readiness](docs/giga/PILOT_READINESS.md) · [Operating model](docs/giga/OPERATING_MODEL.md) · [Cost model](docs/giga/COST_MODEL_TEMPLATE.md) · [Sustainability](docs/SUSTAINABILITY.md) |
 | assessing ecosystem value (Ethereum builders, ESP) | [Public-goods case](docs/esp/PUBLIC_GOODS_CASE.md) · [Toolkit guide](docs/toolkit/INTEGRATION_GUIDE.md) · [Second use case](examples/public-service/README.md) |
 | building a component | [Architecture](docs/ARCHITECTURE.md) · [Interfaces](docs/INTERFACES.md) · [Decision records](docs/adr) · [Backlog](docs/BACKLOG.md) |

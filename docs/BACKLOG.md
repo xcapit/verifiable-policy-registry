@@ -4,7 +4,7 @@ Issue-ready tasks after the proof of concept. Each has acceptance criteria so it
 
 ## v0.3 · Readiness for external review
 
-Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANALYSIS.md). Items marked **Done in v0.3** are implemented or written in the v0.3 branch; the others carry their milestone.
+Dependency-aware checklist for v0.3. Items marked **Done in v0.3** were delivered in v0.3.0; the others carry their milestone.
 
 | ID | Task | Depends on | Status |
 | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANA
 | VPR-054 | Demonstrator with zone evaluation, expiry, appeal rejection, negative cases and evidence manifest | VPR-053 | **Done in v0.3** |
 | VPR-055 | Pinned resolver container in the demonstrator (real DNS queries, no query logging asserted) | VPR-019 | Planned (M2) |
 | VPR-056 | Giga pilot-readiness package; ESP package; DPG evidence matrix | VPR-050 | **Done in v0.3** (proposal documents; inputs marked) |
-| VPR-057 | Reviewer guide mapped to the 14 review questions | VPR-050–056 | **Done in v0.3** |
+| VPR-057 | Reviewer guide | VPR-050–056 | **Done in v0.3** |
 | VPR-058 | Registry fields `catRoot` and `unitRoot` (ADR-0010) and ZK verifier anchoring | VPR-033 | Designed; Planned (M4) |
 | VPR-059 | Declare the licence of published datasets (ODC-PDDL or CC0) | Maintainer decision | Blocked: maintainer decision |
 | VPR-061 | Child-rights and human-rights impact assessment, including a misuse review, with the deploying partner (DPG indicator 9) | Depends on a confirmed partner | Planned (M1–M2); blocked without a partner |

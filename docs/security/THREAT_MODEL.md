@@ -1,6 +1,6 @@
 # Threat model
 
-*CC BY 4.0 · v0.3 · Covers backlog item VPR-003 for the components that exist or are designed. To be reviewed at Gate A (ROADMAP M1) and after every interface change. Residual-risk ratings: **L**ow, **M**edium, **H**igh, judged for a pilot with real schools after the planned mitigations, not for the current prototype.*
+*CC BY 4.0 · Covers backlog item VPR-003 for the components that exist or are designed. To be reviewed at Gate A (ROADMAP M1) and after every interface change. Residual-risk ratings: **L**ow, **M**edium, **H**igh, judged for a pilot with real schools after the planned mitigations, not for the current prototype.*
 
 ## 1. Assets
 
@@ -62,7 +62,7 @@ Verification methods: **T** automated test in this repository, **D** demonstrato
 | T09 | Exporter | Emits more than `(unit, day, category)`, or a domain or address inside those fields | Aggregator accepts only that header, exactly three fields per row, and identifier-only units and categories (tested); exporter and its unit tests are Planned (VPR-016) | L | M. Bruno | T (aggregator boundary only) |
 | T10 | Aggregator | Omits, truncates or fabricates events | **Not mitigated cryptographically.** Reviewer tests; canaries (Designed, VPR-038); audit | H | Operator, reviewer | R, A |
 | T11 | Aggregator | Publishes or leaks suppressed cells | No suppression count published; errors from the tools do not echo suppressed cells or restricted-list entries (tested; other input values may appear in messages); the designed ZK commitment keeps the event count *m* private (crypto evidence §5) | L | F. Arduh | T |
-| T12 | Publisher | Alters figures after publication | Write-once root per scope and day; anyone recomputes it | L | — | T, D |
+| T12 | Publisher | Alters figures after publication | The publisher writes each (scope, day) once; only the governor can correct it, publicly (T40); anyone recomputes the root | L | — | T, D |
 | T13 | Publisher | Serves different datasets to different people | Root on-chain; anyone holding a copy can recompute it; mirrors | M | Operator | D |
 | T14 | Publisher key | Compromised publisher anchors false roots | Governor rotates the publisher (`setPublisher`); only ended days within an explicit lag can be anchored, so a compromised key cannot back-fill history unless the governor chose `NO_LAG_LIMIT`; the governor corrects false roots with `correctRoot` (implemented, tested); roots are public and contestable | M | Governor | T, G |
 | T15 | Governor | One signer acts alone | Proposed m-of-n Safe deployment; the registry itself trusts one governor address | L after deployment; not applicable to the undeployed prototype | Signers | G (Planned) |

@@ -1,6 +1,6 @@
 # Interfaces
 
-*CC BY 4.0 · Policy format 1, dataset format 2, appeal format 2 · Applies to the contracts in `contracts/src/` and the `vpr` tools 0.2.x*
+*CC BY 4.0 · Policy format 1, dataset format 2, appeal format 3 · Applies to the contracts in `contracts/src/` and the `vpr` tools 0.5.x*
 
 This document specifies every boundary between the components described in [ARCHITECTURE.md](ARCHITECTURE.md): what each side sends, in which format, and what the receiver must check. If two components are built by different teams, this is the contract between them. Anything marked **planned** is not implemented yet and links to its backlog item.
 

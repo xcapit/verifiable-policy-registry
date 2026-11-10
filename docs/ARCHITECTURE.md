@@ -38,7 +38,7 @@ sequenceDiagram
   participant Anc as MetricsAnchor
   participant Pub as Public
 
-  Gov->>Reg: publishPolicy(scope, contentHash, uri, reason, validity)
+  Gov->>Reg: publishPolicy(scope, contentHash, restrictedListHash, uri, reason, validity, resolvesAppeal)
   Op->>Reg: read currentPolicy(scope)
   Op->>Op: fetch document at uri, check keccak256 == contentHash
   Op->>Res: load compiled RPZ (header carries contentHash)
@@ -57,7 +57,7 @@ sequenceDiagram
 
 | Data | Location | Visibility |
 | --- | --- | --- |
-| Policy content hash, reason code, expiry, signatures | On-chain | Public |
+| Policy content hash, reason code, expiry and the authorising governor address (signatures stay in the governor contract, for example the Safe) | On-chain | Public |
 | Full policy document (categories, local blocks, exceptions with reasons) | Off-chain (`uri`) | Public |
 | Restricted list (for example IWF) | Operator only | Commitment hash public; contents never published |
 | Deployment / test / conformance attestations | EAS | Public |

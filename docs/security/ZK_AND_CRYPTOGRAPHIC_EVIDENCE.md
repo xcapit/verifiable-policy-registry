@@ -58,7 +58,7 @@ Negative tests, all passing:
 | Release spanning several days | n/a | ✓ |
 | Non-integer or non-positive count | n/a | ✓ |
 
-**Write-once.** `commitRoot` reverts with `DayAlreadyCommitted` once a (scope, day) is anchored. Corrections are not possible on-chain. A correction must be published as a new release under a documented procedure, which is Planned with the dashboard (VPR-021).
+**Write-once for the publisher, correctable by the governor.** `commitRoot` and `markEmpty` revert with `DayAlreadyCommitted` once a (scope, day) is written. Only the scope's governor can change it afterwards, with `correctRoot`, which requires the hash of a published reason, records the new dataset URI, increments `revision` and emits `RootCorrected` with the previous root (INTERFACES I7). A correction is therefore public and attributable, never silent. The dashboard view of corrections is Planned (VPR-021).
 
 ## 4. Aggregation and suppression · Implemented
 

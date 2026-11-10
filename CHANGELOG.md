@@ -4,12 +4,17 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+- Documentation: the v0.3 planning reports (baseline and gap analysis, implementation report) are removed; they described how the release was prepared, not the system, and remain in the v0.3.0 to v0.5.0 tags. The reviewer guide (`docs/review/REVIEWER_GUIDE.md`) covers the current toolchain and scope.
+- Stale statements corrected: anchor corrections in the cryptographic evidence and threat model (T12), the architecture sequence and on-chain data table, the opcode target in the public-goods case, ADR-0003's L1 cost argument, interface and version headers. ADR-0007 is renamed to match its corrected wording (small-cell suppression, not k-anonymity).
+- The 15 mutants that did not come from the suites' authors are attributed to a separate internal review; no external review has taken place (claim C45).
+
 ## [0.5.0] - 2026-11-10
 
 Contract assurance for external review: static analysis, specification-oracle invariants, mutation testing, coverage and gas gates in CI, and an integration test through the real EAS contracts. Contract logic is unchanged since v0.4.0. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment. **Breaking change** to the deployment manifest (`finality` replaces `confirmations`).
 
 ### Added
-- Contract assurance (`docs/security/CONTRACT_ASSURANCE.md`): Slither in CI failing on any finding; Foundry invariant suites for the registry and the anchor, with every call checked against an oracle written from the specification, and property fuzzing (shared vector, Merkle proofs, leaf encoding, scope ids, resolver roles and ABI head); a targeted mutation check (26 mutants, 15 from an independent review, run in a temporary copy) and a slither-mutate score over the whole test stack; coverage as a CI gate (100 % lines, 98 % branches minimum) and per-function gas reports; OP Stack time and ordering semantics, including the ±30-minute accuracy of L2 time (VPR-040 Slither part, VPR-041, VPR-042).
+- Contract assurance (`docs/security/CONTRACT_ASSURANCE.md`): Slither in CI failing on any finding; Foundry invariant suites for the registry and the anchor, with every call checked against an oracle written from the specification, and property fuzzing (shared vector, Merkle proofs, leaf encoding, scope ids, resolver roles and ABI head); a targeted mutation check (26 mutants, 15 from a separate internal review, run in a temporary copy) and a slither-mutate score over the whole test stack; coverage as a CI gate (100 % lines, 98 % branches minimum) and per-function gas reports; OP Stack time and ordering semantics, including the ±30-minute accuracy of L2 time (VPR-040 Slither part, VPR-041, VPR-042).
 - Complete NatSpec on the three contracts (logic unchanged).
 - Integration test of `IssuerRoleResolver` through the real EAS contracts (EAS and SchemaRegistry v1.4.0, deployed from the artifacts of the pinned npm package `@ethereum-attestation-service/eas-contracts` 1.9.0): issuance only by the role holder, refusal across scopes and after a role is withdrawn, revocation by the attester, batches, malformed data and value (VPR-070).
 - `scripts/check-eas.js`: verifies a deployment manifest's EAS schema bindings (UID, schema string, resolver kind, registry and EAS wiring).

@@ -10,7 +10,7 @@
 | Static analysis (Slither 0.11.3, 100 detectors) | 0 findings; 5 accepted findings annotated in the source with their justification (§3) | CI job `static-analysis`, fails on any finding |
 | Invariant tests with a specification oracle (Foundry) | 11 invariants, 512 runs × 128 calls each in CI | CI job `invariants` |
 | Property fuzz tests (Foundry) | 10 tests: 8 fuzzed properties (5 000 runs each in CI), the shared vector and event attribution | CI job `invariants` |
-| Targeted mutation check | 26 of 26 mutants caught under three fixed seeds, 15 of them proposed by an independent review (§5.1) | CI job `invariants` |
+| Targeted mutation check | 26 of 26 mutants caught under three fixed seeds, 15 of them proposed by a separate internal review (§5.1) | CI job `invariants` |
 | Mutation score over the whole test stack (slither-mutate) | 784 mutants: 715 killed (91.2 %); the 69 survivors are equivalent or unreachable, so every behaviour-changing mutant is killed (§5.2) | Measured locally, reproducible |
 | Coverage (solidity-coverage) | 100 % statements, lines and functions; 98.68 % to 100 % branches (§7) | CI job `contracts`, enforced as a gate |
 | Gas | Per-function table (§8) | CI job `contracts` |
@@ -64,7 +64,7 @@ Stateless properties in [`PropertyFuzz`](../../contracts/test-foundry/PropertyFu
 
 ### 5.1 Targeted mutation check (CI)
 
-[`scripts/mutation_check.py`](../../contracts/scripts/mutation_check.py) injects one bug at a time into a temporary copy of the contracts, never into the working tree, and runs the Foundry suite that should catch it with a shallow campaign (64 runs × 32 calls) under three fixed fuzzer seeds; the suite must fail under every seed, and a mutant that does not compile is an error, not a kill. The list has 26 mutants: 11 written with the suites and 15 proposed by an independent review of the first version of this document, which found that the Foundry suites then missed them (most were caught by the Hardhat tests). All 26 are caught. Because the suites were improved until these mutants died, this is a regression check, not a mutation score; §5.2 gives the score.
+[`scripts/mutation_check.py`](../../contracts/scripts/mutation_check.py) injects one bug at a time into a temporary copy of the contracts, never into the working tree, and runs the Foundry suite that should catch it with a shallow campaign (64 runs × 32 calls) under three fixed fuzzer seeds; the suite must fail under every seed, and a mutant that does not compile is an error, not a kill. The list has 26 mutants: 11 written with the suites and 15 proposed by a separate internal review of the first version of this document, which found that the Foundry suites then missed them (most were caught by the Hardhat tests). All 26 are caught. Because the suites were improved until these mutants died, this is a regression check, not a mutation score; §5.2 gives the score.
 
 ### 5.2 Mutation score over the whole test stack
 
