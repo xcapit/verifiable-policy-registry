@@ -34,6 +34,14 @@ describe("VerifiablePolicyRegistry", function () {
   });
 
   describe("scopes", function () {
+    it("announces a new scope with its id, creator, name and maximum validity", async function () {
+      const name = "giga:XX:secondary";
+      const id = await registry.scopeIdOf(other.address, name);
+      await expect(registry.connect(other).createScope(name, 30 * DAY))
+        .to.emit(registry, "ScopeCreated")
+        .withArgs(id, other.address, name, 30 * DAY);
+    });
+
     it("derives the scope id from the governor and the name (shared vector)", async function () {
       expect(governor.address).to.equal(ACCOUNT0);
       expect(SCOPE).to.equal(SCOPE_ID_VECTOR);
@@ -126,7 +134,12 @@ describe("VerifiablePolicyRegistry", function () {
     it("lets only the governor publish, and stores the version", async function () {
       const hash = ethers.id("policy-v1");
       await expect(publish(other, SCOPE, hash)).to.be.revertedWithCustomError(registry, "NotGovernor");
-      await expect(publish(governor, SCOPE, hash, { uri: "ipfs://v1" })).to.emit(registry, "PolicyPublished");
+      // every argument of the event is checked: indexers rebuild the policy history from it
+      const t = (await time.latest()) + 100;
+      await time.setNextBlockTimestamp(t);
+      await expect(publish(governor, SCOPE, hash, { uri: "ipfs://v1" }))
+        .to.emit(registry, "PolicyPublished")
+        .withArgs(SCOPE, 1, hash, ethers.ZeroHash, "ipfs://v1", REASON_INITIAL, t + DAY, ethers.ZeroHash);
       const [version, policy, inForce] = await registry.currentPolicy(SCOPE);
       expect(version).to.equal(1n);
       expect(policy.contentHash).to.equal(hash);
@@ -155,6 +168,13 @@ describe("VerifiablePolicyRegistry", function () {
     it("caps the length of the policy URI", async function () {
       await expect(publish(governor, SCOPE, ethers.id("v"), { uri: "x".repeat(257) })).to.be.revertedWithCustomError(registry, "UriTooLong");
       await publish(governor, SCOPE, ethers.id("v"), { uri: "x".repeat(256) });
+    });
+
+    it("refuses an empty content hash and reports no policy before the first version", async function () {
+      const [version, , inForce] = await registry.currentPolicy(SCOPE);
+      expect(version).to.equal(0n);
+      expect(inForce).to.equal(false);
+      await expect(publish(governor, SCOPE, ethers.ZeroHash)).to.be.revertedWithCustomError(registry, "EmptyContentHash");
     });
 
     it("reverts cleanly for a version that does not exist", async function () {
@@ -206,6 +226,29 @@ describe("VerifiablePolicyRegistry", function () {
       const id2 = appealId(SCOPE, doc, 2);
       await expect(registry.connect(other).fileAppeal(SCOPE, doc)).to.emit(registry, "AppealFiled").withArgs(id2, SCOPE, doc, 2);
       expect(await registry.appealIdOf(SCOPE, doc, 2)).to.equal(id2);
+    });
+
+    it("records the filing time and refuses to resolve an appeal that does not exist", async function () {
+      await registry.connect(other).fileAppeal(SCOPE, doc);
+      const filedAt = await time.latest();
+      expect((await registry.appeals(appealId(SCOPE, doc, 1))).filedAt).to.equal(BigInt(filedAt));
+      const unknown = ethers.id("no such appeal");
+      await expect(publish(governor, SCOPE, ethers.id("v1"), { reason: REASON_APPEAL_ACCEPTED, appeal: unknown })).to.be.revertedWithCustomError(
+        registry,
+        "AppealNotOpen"
+      );
+      await expect(registry.rejectAppeal(unknown, ethers.id("r"))).to.be.revertedWithCustomError(registry, "AppealNotOpen");
+    });
+
+    it("never resolves an appeal twice, by acceptance or rejection", async function () {
+      const id = appealId(SCOPE, doc, 1);
+      await registry.connect(other).fileAppeal(SCOPE, doc);
+      await publish(governor, SCOPE, ethers.id("v1"), { reason: REASON_APPEAL_ACCEPTED, appeal: id });
+      await expect(publish(governor, SCOPE, ethers.id("v2"), { reason: REASON_APPEAL_ACCEPTED, appeal: id })).to.be.revertedWithCustomError(
+        registry,
+        "AppealNotOpen"
+      );
+      await expect(registry.rejectAppeal(id, ethers.id("late"))).to.be.revertedWithCustomError(registry, "AppealNotOpen");
     });
 
     it("rejects empty documents, unknown scopes and appeals from another scope", async function () {

@@ -19,6 +19,69 @@ jobs:
           cache-dependency-path: contracts/package-lock.json
       - run: npm ci
       - run: npx hardhat test
+      - name: Gas report (per function)
+        run: REPORT_GAS=1 GAS_REPORT_FILE=gas-report.txt npx hardhat test > /dev/null && cat gas-report.txt
+      - name: Coverage (gate - statements, lines and functions 100 %, branches at least 98 %)
+        run: |
+          npx hardhat coverage
+          node -e "
+            const t = require('./coverage/coverage-summary.json').total;
+            console.log('statements', t.statements.pct, 'lines', t.lines.pct, 'functions', t.functions.pct, 'branches', t.branches.pct);
+            const ok = t.statements.pct === 100 && t.lines.pct === 100 && t.functions.pct === 100 && t.branches.pct >= 98;
+            if (!ok) { console.error('coverage below the gate'); process.exit(1); }
+          "
+      - name: Upload gas and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contracts-reports
+          path: |
+            contracts/gas-report.txt
+            contracts/coverage/
+          if-no-files-found: warn
+
+  invariants:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - run: npm ci
+      - uses: foundry-rs/foundry-toolchain@v1.9.2
+        with:
+          version: v1.3.5
+      - name: Fuzz and invariant tests (CI profile)
+        run: FOUNDRY_PROFILE=ci forge test -vv
+      - name: Mutation check (every injected bug must be caught)
+        run: python3 scripts/mutation_check.py
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Contract sources are ASCII (tools that patch sources by offset, such as slither-mutate, need it)
+        run: python3 -c "import glob,sys; bad=[f for f in glob.glob('src/*.sol') if any(ord(c)>127 for c in open(f,encoding='utf8').read())]; print('non-ASCII:', bad) if bad else print('sources are ASCII'); sys.exit(1 if bad else 0)"
+      - run: pip install slither-analyzer==0.11.3
+      - name: Slither (fails on any finding; accepted ones are annotated in the source with a justification)
+        run: slither . --compile-force-framework hardhat --filter-paths "node_modules|test-foundry" --fail-pedantic
 
   tools:
     runs-on: ubuntu-latest

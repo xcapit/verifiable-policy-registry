@@ -5,7 +5,7 @@
 
 const fs = require("fs");
 const { ethers } = require("hardhat");
-const { checkEasBindings } = require("./lib/eas-check");
+const { checkEasBindings, easVersions } = require("./lib/eas-check");
 
 async function main() {
   const file = process.env.MANIFEST;
@@ -14,6 +14,8 @@ async function main() {
   const { chainId } = await ethers.provider.getNetwork();
   if (BigInt(manifest.chainId) !== chainId) throw new Error(`manifest chainId ${manifest.chainId} differs from the network (${chainId})`);
 
+  const versions = await easVersions({ ethers, provider: ethers.provider, manifest });
+  console.log(`EAS ${versions.eas} · SchemaRegistry ${versions.schemaRegistry} (tests run against v1.4.0)`);
   const results = await checkEasBindings({ ethers, provider: ethers.provider, manifest });
   let failed = 0;
   for (const r of results) {

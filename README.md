@@ -48,7 +48,7 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 | building a component | [Architecture](docs/ARCHITECTURE.md) · [Interfaces](docs/INTERFACES.md) · [Decision records](docs/adr) · [Backlog](docs/BACKLOG.md) |
 | operating or governing a deployment | [Policy governance](docs/GOVERNANCE.md) · [Privacy statement (RFC 8932)](docs/PRIVACY_STATEMENT.md) · [Roadmap](docs/ROADMAP.md) |
 | contributing | [Contributing](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Project governance](GOVERNANCE.md) |
-| reviewing security and privacy | [Security policy](SECURITY.md) · [Threat model](docs/security/THREAT_MODEL.md) · [Cryptographic evidence](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md) · [Privacy analysis](docs/privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md) |
+| reviewing security and privacy | [Security policy](SECURITY.md) · [Threat model](docs/security/THREAT_MODEL.md) · [Contract assurance](docs/security/CONTRACT_ASSURANCE.md) · [Cryptographic evidence](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md) · [Privacy analysis](docs/privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md) |
 
 ## Repository layout
 

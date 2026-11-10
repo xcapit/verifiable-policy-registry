@@ -149,6 +149,16 @@ describe("MetricsAnchor", function () {
       expect(await anchor.verifyRow(SCOPE, DAY, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(true);
     });
 
+    it("refuses a zero registry and an oversized correction URI", async function () {
+      const F = await ethers.getContractFactory("MetricsAnchor");
+      await expect(F.deploy(ethers.ZeroAddress)).to.be.revertedWithCustomError(F, "ZeroAddress");
+      await anchor.connect(publisher).commitRoot(SCOPE, DAY, root, "ipfs://d");
+      await expect(anchor.correctRoot(SCOPE, DAY, ethers.id("x"), "x".repeat(257), ethers.id("r"))).to.be.revertedWithCustomError(
+        anchor,
+        "UriTooLong"
+      );
+    });
+
     it("corrects an empty day into a root and a root back into an empty day", async function () {
       const [s0, c0, n0] = ROWS[0];
       const reason = ethers.id("note");
@@ -181,9 +191,17 @@ describe("MetricsAnchor", function () {
       expect(await anchor.verifyRow(SCOPE, DAY + 2, s0, c0, n0, [leaves[1], leaves[2]])).to.equal(false);
     });
 
-    it("rejects fields too long for the length-prefixed encoding", async function () {
+    it("rejects fields too long for the length-prefixed encoding, and accepts any length up to the limit", async function () {
       await expect(anchor.leafHash(DAY, "x".repeat(65536), "adult", 1)).to.be.revertedWithCustomError(anchor, "FieldTooLong");
       await expect(anchor.leafHash(DAY, "u", "c".repeat(65536), 1)).to.be.revertedWithCustomError(anchor, "FieldTooLong");
+      // the limit is the uint16 length prefix: 256 bytes and exactly 65 535 bytes are valid
+      await anchor.leafHash(DAY, "x".repeat(256), "c".repeat(256), 1);
+      await anchor.leafHash(DAY, "x".repeat(65535), "c".repeat(65535), 1);
+    });
+
+    it("exposes the documented sentinel for an unbounded back-fill window", async function () {
+      expect(await anchor.NO_LAG_LIMIT()).to.equal(2n ** 32n - 1n);
+      expect(await anchor.MAX_URI_LENGTH()).to.equal(256n);
     });
   });
 });
