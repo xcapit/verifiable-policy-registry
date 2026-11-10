@@ -30,6 +30,14 @@ describe("IssuerRoleResolver with the real EAS contracts", function () {
   let governor, operator, reviewer, auditor, stranger;
   let schemaRegistry, eas, registry, SCOPE, resolvers, uids, manifest;
 
+  // The UID depends on the block timestamp, so it is read from the Attested event, never from a staticCall.
+  async function attest(signer, req) {
+    const receipt = await (await eas.connect(signer).attest(req)).wait();
+    const log = receipt.logs.map((l) => eas.interface.parseLog(l)).find((e) => e && e.name === "Attested");
+    expect(log, "Attested event").to.not.equal(undefined);
+    return log.args.uid;
+  }
+
   function request(uid, data) {
     return { schema: uid, data: { recipient: ethers.ZeroAddress, expirationTime: 0, revocable: true, refUID: ethers.ZeroHash, data, value: 0 } };
   }
@@ -84,8 +92,7 @@ describe("IssuerRoleResolver with the real EAS contracts", function () {
     ];
     for (const [name, holder, others] of cases) {
       const req = request(uids[name], encode(name, SCOPE));
-      const uid = await eas.connect(holder).attest.staticCall(req);
-      await eas.connect(holder).attest(req);
+      const uid = await attest(holder, req);
       const att = await eas.getAttestation(uid);
       expect(att.attester).to.equal(holder.address);
       expect(att.schema).to.equal(uids[name]);
@@ -107,19 +114,19 @@ describe("IssuerRoleResolver with the real EAS contracts", function () {
       "InvalidAttestation"
     );
     const req = request(uids[name], encode(name, SCOPE));
-    const earlier = await eas.connect(reviewer).attest.staticCall(req);
-    await eas.connect(reviewer).attest(req);
+    const earlier = await attest(reviewer, req);
     await registry.setIssuer(SCOPE, reviewer.address, Role.None);
     await expect(eas.connect(reviewer).attest(req)).to.be.revertedWithCustomError(eas, "InvalidAttestation");
     // documented limitation: an attestation issued while the role was held stays valid on EAS
-    expect((await eas.getAttestation(earlier)).revocationTime).to.equal(0n);
+    const kept = await eas.getAttestation(earlier);
+    expect(kept.attester).to.equal(reviewer.address);
+    expect(kept.revocationTime).to.equal(0n);
   });
 
   it("lets the attester revoke, and EAS keeps the revocation time", async function () {
     const name = "VPR.IndependentTest.v1";
     const req = request(uids[name], encode(name, SCOPE));
-    const uid = await eas.connect(reviewer).attest.staticCall(req);
-    await eas.connect(reviewer).attest(req);
+    const uid = await attest(reviewer, req);
     await expect(eas.connect(operator).revoke({ schema: uids[name], data: { uid, value: 0 } })).to.be.revertedWithCustomError(eas, "AccessDenied");
     await eas.connect(reviewer).revoke({ schema: uids[name], data: { uid, value: 0 } });
     expect((await eas.getAttestation(uid)).revocationTime).to.be.greaterThan(0n);
