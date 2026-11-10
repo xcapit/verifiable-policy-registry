@@ -14,7 +14,7 @@
   "license": "AGPL-3.0-only",
   "devDependencies": {
     "@ethereum-attestation-service/eas-contracts": "1.9.0",
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^7.0.0",
     "forge-std": "github:foundry-rs/forge-std#v1.16.2",
     "hardhat": "^2.29.1",
     "solc": "^0.8.24"
