@@ -228,6 +228,18 @@ describe("VerifiablePolicyRegistry", function () {
       expect(await registry.appealIdOf(SCOPE, doc, 2)).to.equal(id2);
     });
 
+    it("records the filing time and refuses to resolve an appeal that does not exist", async function () {
+      await registry.connect(other).fileAppeal(SCOPE, doc);
+      const filedAt = await time.latest();
+      expect((await registry.appeals(appealId(SCOPE, doc, 1))).filedAt).to.equal(BigInt(filedAt));
+      const unknown = ethers.id("no such appeal");
+      await expect(publish(governor, SCOPE, ethers.id("v1"), { reason: REASON_APPEAL_ACCEPTED, appeal: unknown })).to.be.revertedWithCustomError(
+        registry,
+        "AppealNotOpen"
+      );
+      await expect(registry.rejectAppeal(unknown, ethers.id("r"))).to.be.revertedWithCustomError(registry, "AppealNotOpen");
+    });
+
     it("never resolves an appeal twice, by acceptance or rejection", async function () {
       const id = appealId(SCOPE, doc, 1);
       await registry.connect(other).fileAppeal(SCOPE, doc);

@@ -113,6 +113,20 @@ contract PropertyFuzz is Test {
         assertTrue(reg.scopeIdOf(g1, n1) != reg.scopeIdOf(g2, n2));
     }
 
+    /// Events name the calling contract, not the transaction origin: a governor is normally a Safe, a contract
+    /// whose transactions are submitted by an owner's account.
+    function test_eventsNameTheCallerNotTheOrigin() public {
+        assertTrue(tx.origin != address(this));
+        bytes32 id = reg.scopeIdOf(address(this), "giga:ZZ:primary");
+        vm.expectEmit(address(reg));
+        emit VerifiablePolicyRegistry.ScopeCreated(id, address(this), "giga:ZZ:primary", 30 days);
+        reg.createScope("giga:ZZ:primary", 30 days);
+        address next = makeAddr("next");
+        vm.expectEmit(address(reg));
+        emit VerifiablePolicyRegistry.GovernorProposed(id, address(this), next);
+        reg.proposeGovernor(id, next);
+    }
+
     /// Creating the same name from another address never touches the original scope.
     function testFuzz_noScopeSquatting(address squatter) public {
         vm.assume(squatter != governor && squatter != address(0));
