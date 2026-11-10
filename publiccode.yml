@@ -27,7 +27,7 @@ description:
       - RPZ compilation for Unbound or PowerDNS
       - Threshold-suppressed datasets with Merkle proofs
 legal:
-  license: AGPL-3.0-only
+  license: AGPL-3.0-only AND Apache-2.0
   mainCopyrightOwner: CryptoLab S.A.S. (Xcapit)
   repoOwner: Xcapit
 maintenance:

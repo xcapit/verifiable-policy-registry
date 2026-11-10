@@ -143,7 +143,7 @@ Criteria:
 - on-chain verification gas on OP Mainnet;
 - setup assumptions;
 - auditability of the circuit and of the toolchain;
-- licence compatibility with AGPL-3.0.
+- licence compatibility with Apache-2.0, the licence of the verifier ([ADR-0011](../adr/0011-licence-split-and-dataset-licence.md)).
 
 The benchmark plan is in [BENCHMARKS](../benchmarks/BENCHMARKS.md#planned-zk-benchmarks). Until the decision is taken, **no trusted-setup assumption is made**. If Groth16 is chosen, the setup ceremony and its participants become part of this document.
 

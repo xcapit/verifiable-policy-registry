@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: Apache-2.0
 pragma solidity =0.8.24;
 
 /// @dev Attestation layout used by the Ethereum Attestation Service (EAS v1.x) when it calls a schema resolver.

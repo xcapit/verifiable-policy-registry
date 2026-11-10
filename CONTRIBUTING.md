@@ -91,11 +91,13 @@ By contributing you agree that your contribution is licensed under the licence o
 
 | Path | Licence |
 | --- | --- |
-| Code (`contracts/`, `tools/`, `deploy/`, `.github/`) | [AGPL-3.0-only](LICENSE) |
+| Contracts and verifier (`contracts/`, `zk/`) | [Apache-2.0](LICENSES/Apache-2.0.txt) |
+| Other code (`tools/`, `deploy/`, `examples/`, `.github/`) | [AGPL-3.0-only](LICENSE) |
+| Published datasets and example datasets | [CC0-1.0](LICENSES/CC0-1.0.txt) |
 | Schemas (`schemas/`) | [CC0-1.0](LICENSES/CC0-1.0.txt) |
 | Documentation (`docs/`, Markdown files at the root) | [CC BY 4.0](LICENSES/CC-BY-4.0.txt) |
 
-New source files start with an SPDX header, for example `// SPDX-License-Identifier: AGPL-3.0-only` or `# SPDX-License-Identifier: AGPL-3.0-only`.
+New source files start with an SPDX header, matching the path: `// SPDX-License-Identifier: Apache-2.0` in `contracts/` and `zk/`, `# SPDX-License-Identifier: AGPL-3.0-only` elsewhere.
 
 ## Review
 

@@ -31,7 +31,7 @@ The ledger does **not** prove that an enforcement point behaves as declared, tha
 
 ## 3. Open-source public-goods outputs
 
-All outputs are open and reusable without permission: code under AGPL-3.0-only, schemas under CC0-1.0, documentation under CC BY 4.0 ([NOTICE](../../NOTICE), [ADR-0002](../adr/0002-licensing.md)).
+All outputs are open and reusable without permission: contracts and verifier under Apache-2.0, other code under AGPL-3.0-only, schemas and published datasets under CC0-1.0, documentation under CC BY 4.0 ([NOTICE](../../NOTICE), [ADR-0011](../adr/0011-licence-split-and-dataset-licence.md)).
 
 | Output | Status on the v0.3 candidate branch | Who can reuse it |
 | --- | --- | --- |

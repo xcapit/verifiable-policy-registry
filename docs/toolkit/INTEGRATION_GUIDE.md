@@ -1,6 +1,6 @@
 # Verification toolkit: integration guide
 
-*CC BY 4.0 · Toolkit API version 1 · Code AGPL-3.0-only; schemas CC0-1.0.*
+*CC BY 4.0 · Toolkit API version 1 · Contracts Apache-2.0; tools AGPL-3.0-only; schemas and datasets CC0-1.0.*
 
 The toolkit lets any publisher of aggregate public-interest figures commit to a daily release on an EVM chain and lets anyone verify it, without exposing small counts. It has no school- or filtering-specific logic. Content filtering for schools is one use case; [public-service interruptions](../../examples/public-service/README.md) is another, verified by the same code and the same contract.
 

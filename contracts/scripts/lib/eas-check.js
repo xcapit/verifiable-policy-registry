@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: Apache-2.0
 // Checks that each VPR schema registered in EAS is bound to an IssuerRoleResolver of the matching kind,
 // wired to the registry and EAS named in a deployment manifest (VPR-070). Used by scripts/check-eas.js
 // and by the integration test against the real EAS contracts.

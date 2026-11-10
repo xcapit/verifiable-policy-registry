@@ -18,7 +18,7 @@ Dependency-aware checklist from the [v0.3 gap analysis](V03_BASELINE_AND_GAP_ANA
 | VPR-056 | Giga pilot-readiness package; ESP package; DPG evidence matrix | VPR-050 | **Done in v0.3** (proposal documents; inputs marked) |
 | VPR-057 | Reviewer guide mapped to the 14 review questions | VPR-050–056 | **Done in v0.3** |
 | VPR-058 | Registry fields `catRoot` and `unitRoot` (ADR-0010) and ZK verifier anchoring | VPR-033 | Designed; Planned (M4) |
-| VPR-059 | Declare the licence of published datasets (ODC-PDDL or CC0) | Maintainer decision | Blocked: maintainer decision |
+| VPR-059 | Declare the licence of published datasets: CC0-1.0 ([ADR-0011](adr/0011-licence-split-and-dataset-licence.md)) | — | **Done** (2026-11-10) |
 | VPR-061 | Child-rights and human-rights impact assessment, including a misuse review, with the deploying partner (DPG indicator 9) | Depends on a confirmed partner | Planned (M1–M2); blocked without a partner |
 | VPR-062 | Run the demonstrator on a second EVM network and with a second resolver implementation (DPG indicator 4) | VPR-010, VPR-055 | Planned (M2) |
 | VPR-063 | Bulk export of on-chain history (versions, appeals, roots) to CSV/JSON (DPG indicator 6) | — | Planned (M3) |

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: Apache-2.0
 // Verifies the EAS schema bindings of a deployment manifest against the chain (VPR-070).
 // Usage: MANIFEST=../deployments/<network>.json npx hardhat run --network <network> scripts/check-eas.js
 // Exit code 0 if every schema is correctly bound, 1 otherwise.

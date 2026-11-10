@@ -1,6 +1,6 @@
 # Verifiable Policy Registry
 
-[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.5-informational.svg)](docs/WHITEPAPER.md)
+[![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0 / Apache-2.0](https://img.shields.io/badge/license-AGPL--3.0%20%2F%20Apache--2.0-blue.svg)](NOTICE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.5-informational.svg)](docs/WHITEPAPER.md)
 
 **Accountable content filtering for school connectivity, designed to minimise and never publish data about children.**
 
@@ -159,8 +159,10 @@ The project is developed by [Xcapit](https://xcapit.com) (CryptoLab S.A.S., Cór
 
 ## Licence and citation
 
-- Code: [GNU AGPL-3.0-only](LICENSE). Anyone who runs a modified version as a network service must offer its source.
+- Contracts and the zero-knowledge verifier (`contracts/`, `zk/`): [Apache-2.0](LICENSES/Apache-2.0.txt), so other projects can embed them.
+- All other code: [GNU AGPL-3.0-only](LICENSE). Anyone who runs a modified version as a network service must offer its source.
+- Published datasets: [CC0-1.0](LICENSES/CC0-1.0.txt), so anyone can recompute, mirror and republish them.
 - Schemas (`schemas/`): [CC0-1.0](LICENSES/CC0-1.0.txt).
 - Documentation (`docs/` and the Markdown files at the root): [CC BY 4.0](LICENSES/CC-BY-4.0.txt).
 
-Ownership and attribution are described in [NOTICE](NOTICE). If you refer to this work, please cite it using [CITATION.cff](CITATION.cff). The project is being prepared for registration as a [Digital Public Good](https://digitalpublicgoods.net/); see [docs/DPG.md](docs/DPG.md).
+Ownership and attribution are described in [NOTICE](NOTICE); the reasons for the split are in [ADR-0011](docs/adr/0011-licence-split-and-dataset-licence.md). If you refer to this work, please cite it using [CITATION.cff](CITATION.cff). The project is being prepared for registration as a [Digital Public Good](https://digitalpublicgoods.net/); see [docs/DPG.md](docs/DPG.md).

@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+- Licensing ([ADR-0011](docs/adr/0011-licence-split-and-dataset-licence.md)): contracts and the planned zero-knowledge verifier move to Apache-2.0; the rest of the code stays AGPL-3.0-only; published datasets are CC0-1.0 (closes VPR-059). NOTICE, CONTRIBUTING, CITATION.cff, publiccode.yml and the DPG evidence matrix updated.
+
 ### Added
 - Integration test of `IssuerRoleResolver` through the real EAS contracts (EAS 1.9.0 artifacts, pinned devDependency): issuance only by the role holder, refusal across scopes and after a role is withdrawn, revocation by the attester, batches, malformed data and value (VPR-070).
 - `scripts/check-eas.js`: verifies a deployment manifest's EAS schema bindings (UID, schema string, resolver kind, registry and EAS wiring).

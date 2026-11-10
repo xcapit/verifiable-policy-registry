@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: Apache-2.0
 // On-chain half of the end-to-end demonstrator. Runs on Hardhat's in-process network (chain id 31337),
 // with synthetic data. Input: E2E_INPUT (e2e.json from examples/e2e/prepare.py).
 // Output: E2E_MANIFEST (evidence manifest), merging the off-chain evidence in E2E_OFFCHAIN.

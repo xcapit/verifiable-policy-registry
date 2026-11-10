@@ -36,7 +36,7 @@ Commercial protective DNS services address the first two risks reasonably well. 
 4. An implemented aggregation and commitment pipeline, plus a Designed resolver-export boundary for source minimisation. We analyse residual leakage and the conditions under which differential privacy would be preferable (§5).
 5. A threat model with concrete adversaries and mitigations (§6), a mapping to relevant standards (§7), and a specification for a Planned zero-knowledge proof intended to close part of the enforcement–accountability gap, with trusted execution as further work (§11).
 
-An open-source implementation of the contracts and the off-chain tooling accompanies this paper under the AGPL-3.0 licence [4].
+An open-source implementation of the contracts and the off-chain tooling accompanies this paper [4]. The contracts and the planned verifier are released under Apache-2.0, the off-chain tooling under AGPL-3.0, and published datasets under CC0.
 
 ---
 

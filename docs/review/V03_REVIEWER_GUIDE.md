@@ -56,7 +56,7 @@ Prerequisites: Node.js 20 or later, Python 3.10 or later. No secrets, no paid se
 - **Roles in EAS.** Issuer roles are recorded on-chain and enforced at issuance by `IssuerRoleResolver` (added after v0.3.0); the schemas are not yet registered on a public network.
 - **Scope discovery.** It relies on a deployment manifest that is not yet specified (VPR-049).
 - **Release policy.** The threshold, minimum cohort and category tiers need pilot data and the DPIA.
-- **Dataset licence.** The licence of published datasets is undeclared (VPR-059, blocked on a maintainer decision).
+- **Dataset licence.** Published datasets are CC0-1.0 ([ADR-0011](../adr/0011-licence-split-and-dataset-licence.md), VPR-059).
 - **Partner inputs.** Costs, partners, signers and the pilot country are unknown.
 
 ## 5. The 14 review questions and where the evidence is

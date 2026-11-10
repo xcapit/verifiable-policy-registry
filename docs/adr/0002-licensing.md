@@ -1,6 +1,6 @@
 # ADR-0002: AGPL-3.0 for code, CC0 for schemas, CC BY 4.0 for docs
 
-- Status: Accepted
+- Status: Superseded in part by [ADR-0011](0011-licence-split-and-dataset-licence.md) (contracts, verifier and datasets)
 - Date: 2026-11-09
 
 ## Context

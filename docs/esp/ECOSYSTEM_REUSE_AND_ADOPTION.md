@@ -18,7 +18,7 @@ The components solve a recurring pattern: *an institution enforces a rule off-ch
 
 - **No school logic in the core.** The toolkit verifies datasets keyed by a generic unit identifier. The school example and the public-service example go through the same verifier ([integration guide](../toolkit/INTEGRATION_GUIDE.md)).
 - **Stable, specified formats.** Policy format 1, dataset format 2 and appeal format 2 are specified in [INTERFACES](../INTERFACES.md) with shared test vectors across Solidity and Python.
-- **Open licences.** CC0 for schemas, CC BY 4.0 for documentation, AGPL-3.0-only for code. The AGPL requires that hosted modified versions publish their source, which protects the accountability purpose ([ADR-0002](../adr/0002-licensing.md)).
+- **Open licences.** Apache-2.0 for the contracts and the verifier, so other projects can embed them; AGPL-3.0-only for the off-chain tooling, so a hosted modified filter must publish its source; CC0 for schemas and published datasets; CC BY 4.0 for documentation ([ADR-0011](../adr/0011-licence-split-and-dataset-licence.md)).
 - **Runs without credentials locally.** The local demonstrator and tests need no keys, RPC tokens or paid services; a public-testnet run needs an RPC endpoint and a funded test key ([README](../../README.md)).
 
 ## 3. How adoption would be measured

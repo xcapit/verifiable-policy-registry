@@ -1,15 +1,26 @@
 Verifiable Policy Registry
 Copyright (C) 2026 CryptoLab S.A.S. (Xcapit) and contributors
 
-This repository contains material under three licences:
+This repository contains material under four licences:
 
-  Code (contracts/, tools/, deploy/, .github/ and other source files)
+  Smart contracts and the zero-knowledge verifier (contracts/, and zk/ once it exists:
+  circuit or zkVM program, on-chain verifier and verification library)
+    Apache License 2.0 (Apache-2.0)
+    See contracts/LICENSE and LICENSES/Apache-2.0.txt
+
+  All other code (tools/, deploy/, examples/, .github/ and other source files)
     GNU Affero General Public License v3.0 only (AGPL-3.0-only)
     See LICENSE and LICENSES/AGPL-3.0-only.txt
 
   Schemas (schemas/)
     Creative Commons Zero v1.0 Universal (CC0-1.0)
     See LICENSES/CC0-1.0.txt
+
+  Published datasets (daily aggregate releases produced with the vpr tools in a VPR
+  deployment, and the example datasets in this repository)
+    Creative Commons Zero v1.0 Universal (CC0-1.0)
+    See LICENSES/CC0-1.0.txt. The publishing operator dedicates each release to the
+    public domain; the scope charter of a deployment records this dedication.
 
   Documentation (docs/ and the Markdown files at the repository root)
     Creative Commons Attribution 4.0 International (CC-BY-4.0)

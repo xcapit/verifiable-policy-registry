@@ -8,7 +8,9 @@ authors:
     affiliation: Xcapit
   - name: "Xcapit and contributors"
 repository-code: "https://github.com/xcapit/verifiable-policy-registry"
-license: AGPL-3.0-only
+license:
+  - AGPL-3.0-only
+  - Apache-2.0
 version: 0.4.0
 date-released: 2026-11-09
 keywords: [digital public good, content filtering, child online protection, ethereum, attestations, dns, privacy]

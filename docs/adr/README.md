@@ -9,7 +9,7 @@ Template: [0000-template.md](0000-template.md).
 | ADR | Title | Status |
 | --- | --- | --- |
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | Accepted |
-| [0002](0002-licensing.md) | AGPL-3.0 for code, CC0 for schemas, CC BY 4.0 for docs | Accepted |
+| [0002](0002-licensing.md) | AGPL-3.0 for code, CC0 for schemas, CC BY 4.0 for docs | Superseded in part by 0011 |
 | [0003](0003-commit-dont-store-on-op-mainnet.md) | Commit, do not store: hashes on OP Mainnet with EAS | Accepted |
 | [0004](0004-multisig-governor-expiry-appeals.md) | Multisig governor per scope, mandatory expiry, on-chain appeals | Accepted |
 | [0005](0005-issuer-separation.md) | Separate issuers: the operator never certifies itself | Accepted |
@@ -18,3 +18,4 @@ Template: [0000-template.md](0000-template.md).
 | [0008](0008-restricted-lists-hash-only.md) | Restricted lists by hash commitment only | Accepted |
 | [0009](0009-generic-verification-toolkit.md) | A use-case-independent verification toolkit | Accepted |
 | [0010](0010-category-and-unit-sets-on-chain.md) | Category and unit sets committed on-chain for the ZK relation | Proposed |
+| [0011](0011-licence-split-and-dataset-licence.md) | Apache-2.0 for contracts and verifier, CC0 for published datasets | Accepted |
