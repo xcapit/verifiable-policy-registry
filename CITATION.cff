@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: Boiero
     given-names: Fernando
+    orcid: "https://orcid.org/0009-0005-7935-2758"
     affiliation: Xcapit
-  - name: "Xcapit and contributors"
 repository-code: "https://github.com/xcapit/verifiable-policy-registry"
 license: AGPL-3.0-only
 version: 0.5.0

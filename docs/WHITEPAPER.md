@@ -1,6 +1,6 @@
 # Verifiable Policy Registry: Accountable and Privacy-Preserving Content Filtering for School Connectivity
 
-**Fernando Boiero** · Xcapit (CryptoLab S.A.S.), Córdoba, Argentina
+**Fernando Boiero** ([ORCID 0009-0005-7935-2758](https://orcid.org/0009-0005-7935-2758)) · Xcapit (CryptoLab S.A.S.), Córdoba, Argentina
 Correspondence: dpg@xcapit.com
 
 *White paper · Version 0.7 (draft for review) · November 2026 · Licensed under CC BY 4.0*
