@@ -23,7 +23,14 @@ if (process.env.OFFLINE_SOLC === "1") {
 module.exports = {
   solidity: {
     version: "0.8.24",
-    settings: { optimizer: { enabled: true, runs: 200 } },
+    // Pinned explicitly and identical in foundry.toml. Cancun is supported on OP Stack since Ecotone.
+    settings: { optimizer: { enabled: true, runs: 200 }, evmVersion: "cancun" },
+  },
+  // REPORT_GAS=1 npx hardhat test writes a per-function gas table (used for docs/benchmarks/BENCHMARKS.md).
+  gasReporter: {
+    enabled: process.env.REPORT_GAS === "1",
+    noColors: true,
+    outputFile: process.env.GAS_REPORT_FILE || undefined,
   },
   paths: {
     sources: "./src",

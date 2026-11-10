@@ -19,6 +19,62 @@ jobs:
           cache-dependency-path: contracts/package-lock.json
       - run: npm ci
       - run: npx hardhat test
+      - name: Gas report (per function)
+        run: REPORT_GAS=1 GAS_REPORT_FILE=gas-report.txt npx hardhat test > /dev/null && cat gas-report.txt
+      - name: Coverage
+        run: |
+          npx hardhat coverage
+          node -e "const c=require('./coverage/coverage-summary.json');const t=c.total;console.log('lines',t.lines.pct,'statements',t.statements.pct,'branches',t.branches.pct,'functions',t.functions.pct)" 2>/dev/null || true
+      - name: Upload gas and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contracts-reports
+          path: |
+            contracts/gas-report.txt
+            contracts/coverage/
+          if-no-files-found: warn
+
+  invariants:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - run: npm ci
+      - uses: foundry-rs/foundry-toolchain@v1.9.2
+        with:
+          version: v1.3.5
+      - name: Fuzz and invariant tests (CI profile)
+        run: FOUNDRY_PROFILE=ci forge test -vv
+      - name: Mutation check (every injected bug must be caught)
+        run: python3 scripts/mutation_check.py
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install slither-analyzer==0.11.3
+      - name: Slither (fails on any finding; accepted ones are annotated in the source with a justification)
+        run: slither . --compile-force-framework hardhat --filter-paths "node_modules|test-foundry" --fail-pedantic
 
   tools:
     runs-on: ubuntu-latest

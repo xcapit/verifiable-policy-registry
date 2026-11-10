@@ -11,3 +11,8 @@ dataset.csv
 *.rpz
 .env
 deployments/*.local.json
+contracts/out-forge/
+contracts/cache-forge/
+contracts/coverage/
+contracts/coverage.json
+contracts/gas-report.txt
