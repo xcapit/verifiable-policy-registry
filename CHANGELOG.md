@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- Bounded symbolic checks with Halmos 0.3.3 (`contracts/test-foundry/symbolic/`, `scripts/symbolic_check.py`, CI job `symbolic`).
+  - The acceptance rule of every state-changing function of the registry and the anchor, for all inputs within stated bounds: success exactly when INTERFACES I2 and I7 accept the call, and the stored result on success.
+  - Frame conditions under an arbitrary call: past versions, resolved appeals and written days are unchanged, and the governor holds no role.
+  - The leaf encoding, as a secondary check.
+  - Canaries that must fail, and 22 of the targeted mutants caught.
+  - Claim C57.
+
 ### Changed
 - White paper v0.7.
   - Related work on transparency logs (tamper-evident history trees, gossip, witness cosigning, Sigsum, the Go checksum database), and the case for a ledger rather than a witnessed log.

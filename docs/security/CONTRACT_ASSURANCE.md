@@ -9,6 +9,7 @@
 | Unit and integration tests (Hardhat) | 53 passing, including the resolver exercised through the published EAS contracts v1.4.0 | CI job `contracts` |
 | Static analysis (Slither 0.11.3, 100 detectors) | 0 findings; 5 accepted findings annotated in the source with their justification (§3) | CI job `static-analysis`, fails on any finding |
 | Invariant tests with a specification oracle (Foundry) | 11 invariants, 512 runs × 128 calls each in CI | CI job `invariants` |
+| Bounded symbolic checks (Halmos 0.3.3) | 16 checks pass for all inputs within stated bounds, one transaction from a fixed state, with no timeout and no cut path; 2 canaries fail as they must; 22 of 22 applicable mutants caught (§4.1) | CI job `symbolic`; mutant run local |
 | Property fuzz tests (Foundry) | 10 tests: 8 fuzzed properties (5 000 runs each in CI), the shared vector and event attribution | CI job `invariants` |
 | Targeted mutation check | 26 of 26 mutants caught under three fixed seeds, 15 of them proposed by a separate internal review (§5.1) | CI job `invariants` |
 | Mutation score over the whole test stack (slither-mutate) | 784 mutants: 715 killed (91.2 %); the 69 survivors are equivalent or unreachable, so every behaviour-changing mutant is killed (§5.2) | Measured locally, reproducible |
@@ -59,6 +60,43 @@ Anchor ([`AnchorInvariants`](../../contracts/test-foundry/AnchorInvariants.t.sol
 | `verifyRow` agrees with an independently computed leaf: a one-row release verifies exactly while its root is current and the day is not empty | `invariant_verifyRowMatchesModel` |
 
 Stateless properties in [`PropertyFuzz`](../../contracts/test-foundry/PropertyFuzz.t.sol): the shared cross-language vector (leaf and root, as in the Python and Hardhat tests); any row of any release of 1 to 40 rows verifies with its proof, and changing its count, unit, category or day breaks it; the length-prefixed leaf encoding is unambiguous; distinct (governor, name) pairs give distinct scope ids, and creating the same name from another address never touches the original scope; for each schema the resolver accepts an attestation exactly when the attester holds the schema's role, never another; a batch is accepted exactly when every attestation in it is; the resolver reads the scope id a decoder reads and refuses non-canonical string offsets and truncated heads.
+
+### 4.1 Bounded symbolic checks (Halmos)
+
+The fuzz campaigns above sample inputs. The checks in [`test-foundry/symbolic/`](../../contracts/test-foundry/symbolic/) are explored symbolically by Halmos 0.3.3, so they hold for **every** value of their parameters within the bounds below, not for the values a fuzzer happened to draw. Every address, hash, reason code, validity, day number and block timestamp is symbolic. Each UTC midnight, each window edge and the expiry instant are therefore covered, not sampled.
+
+What each check states, and how far it goes:
+
+- **One transaction from a fixed concrete state.** Each suite's `setUp` builds a small state: two or three scopes, a pending handover, an issuer, open, rejected and accepted appeals, and anchored and empty days. A check covers one call from that state. These are bounded results, not an induction over all reachable states; sequences of calls are covered by the invariant campaigns of §4 only.
+- **Acceptance rules.** The function is called with a low-level call, and its success is compared with a predicate written from [INTERFACES](../INTERFACES.md) I2 and I7. The predicate reads state through public getters and never calls the contract's own checks. A plain call would not do, because Halmos treats a reverting path as passing: a contract that wrongly refused a valid call would go unnoticed. On success, the stored result is checked field by field.
+- **Frame conditions.** One call with arbitrary calldata (any non-view function, any arguments) from an arbitrary sender. Afterwards, state the specification declares final must be unchanged.
+- **Bounds.**
+  - Strings have lengths 0, 256 and 257, the URI bound and one past it; scope names have lengths 0, 1, 128 and 129.
+  - Loops are unrolled up to 16 times, and the run is rejected if any path was cut by that bound.
+  - The solver runs without timeouts, so every branch is decided exactly, and a timeout counts as a failure, not a pass.
+  - Block time is assumed to satisfy `block.timestamp + 365 days < 2^64` for the registry and `block.timestamp / 1 days < 2^32` for the anchor; both bounds lie more than eleven million years ahead.
+- **Not vacuous.**
+  - Each suite has a canary: a copy of a check whose predicate moves one boundary by one unit (validity `<` instead of `<=` the scope's maximum; the back-fill window one day narrower). The canary must produce a counterexample, and in each case the counterexample lies exactly on the moved boundary.
+  - The mutants of §5.1 that fall within these suites are injected one at a time, and the named check must fail on each. All 22 are caught: A1 to A4, A6 to A11, and R1 to R12 (`symbolic_check.py --mutants`, measured locally, about 15 minutes). A5 (node hashing in `verifyRow`) and E1 to E3 (the resolver) are outside these suites. The first run let A9 survive (a correction that rewrites `committedAt`), because the correction check ran at the time of the original write; the check now runs at a symbolic later time.
+- **Storage reads.** The frame checks read stored versions and commitments from raw storage slots, because Halmos cannot decode a stored string after a write to a symbolic slot. `setUp` checks the assumed layout against the public getters, so a layout change makes the suite fail rather than pass vacuously.
+
+| Contract | Check | Statement |
+| --- | --- | --- |
+| Registry | `check_publishPolicy_acceptedExactlyWhenSpecified` | `publishPolicy` succeeds exactly when the caller governs an existing scope, the content hash is not 0, 0 < validity ≤ the scope's maximum, the URI is at most 256 bytes, the reason code is in 1..6, the code is 3 exactly when an appeal is resolved, and a resolved appeal is open and belongs to the scope. On success the new version holds exactly the arguments, `expiresAt = publishedAt + validity`, it is the current version and in force, the resolved appeal is accepted with the content hash, and no other open appeal changes. |
+| Registry | `check_rejectAppeal_acceptedExactlyWhenSpecified` | Rejection succeeds exactly for an open appeal, by the governor of the appeal's scope, with a non-zero reason; the appeal keeps its scope. |
+| Registry | `check_fileAppeal_acceptedExactlyWhenSpecified` | Filing succeeds exactly for an existing scope and a non-zero document whose latest round is absent or rejected, and opens round + 1 under `appealIdOf`. |
+| Registry | `check_setIssuer_acceptedExactlyWhenSpecified` | A role change succeeds exactly when the governor sets it for a non-zero address other than itself, and not a non-None role for the pending governor. |
+| Registry | `check_createScope_acceptedExactlyWhenSpecified` | Creation succeeds exactly for a name of 1 to 128 bytes, 0 < `maxValidity` ≤ 365 days, and an id the caller has not used; the caller governs the new, empty scope. |
+| Registry | `check_handover_acceptedExactlyWhenSpecified` | A proposal succeeds exactly from the governor for an address without a role; acceptance succeeds exactly from the pending governor, who then governs with no handover pending. |
+| Registry | `check_currentPolicy_inForceExactlyBeforeExpiry` | At every later time the current version is reported in force exactly while `block.timestamp < expiresAt`. |
+| Registry | `check_anyCall_keepsVersionsAndResolvedAppeals` | After any call, no stored word of a past version changes, rejected and accepted appeals keep their status and resolution, and an open appeal never returns to None. |
+| Registry | `check_anyCall_governorHoldsNoRole` | After any call (including `proposeGovernor`, `acceptGovernor` and `setIssuer` with any arguments), neither the governor nor the pending governor holds an issuer role. |
+| Anchor | `check_commitRoot_acceptedExactlyWhenSpecified` | `commitRoot` succeeds exactly when a publisher is appointed and is the caller, the UTC day has ended, the day is within the window or the window is unbounded, the day was never written, the root is not 0 and the URI is at most 256 bytes. On success the day holds the root, revision 0, not empty, committed at the block time. The zero address can never write, because an unappointed scope has a window of 0. |
+| Anchor | `check_markEmpty_acceptedExactlyWhenSpecified` | The same rule without a root; on success the day is empty. |
+| Anchor | `check_correctRoot_acceptedExactlyWhenSpecified` | A correction succeeds exactly from the scope's current governor in the registry, for a written day, with a different root, a non-zero reason and a URI of at most 256 bytes; the revision increases by one, the commit time is kept, and the day is empty exactly when the new root is 0. |
+| Anchor | `check_setPublisher_acceptedExactlyWhenSpecified` | Appointment succeeds exactly from the current governor, with a window of 0 exactly for a revocation. |
+| Anchor | `check_anyCall_writtenDaysChangeOnlyByGovernor` | After any call at any later time, a written day keeps its commit time, its revision never decreases, and its root or emptiness changes only if the caller is the governor. |
+| Anchor (secondary) | `check_leaf_distinctRowsHaveDistinctLeaves`, `check_leaf_isNeverAnInternalNode` | Distinct rows give distinct leaves (units and categories of 0 to 2 bytes), and no leaf equals an internal node (including the lengths at which a leaf preimage is 65 bytes, as a node preimage is). Both rest on Halmos's model of keccak256 as injective, so they show that the encodings are unambiguous as byte strings, not anything about keccak256. |
 
 ## 5. Mutation testing
 
@@ -143,7 +181,7 @@ Two functions depend on block time: `MetricsAnchor` derives the UTC day from it,
 ## 10. Not covered, and next steps
 
 - No third-party audit (milestone M3, VPR-024). This document is input to it, not a substitute.
-- No formal verification. Candidates for symbolic checking (Halmos or Certora) are the reason-code rule, the appeal state machine and the anchoring window, which are small and fully specified.
+- No unbounded formal verification. The symbolic checks of §4.1 hold for every input within stated bounds, for one transaction from a fixed concrete state; they are not an induction over all reachable states, and sequences are covered by fuzzing only. A proof of the invariants of §4 over all reachable states (Certora, or Halmos with symbolic storage) remains to be done, as does any symbolic check of `IssuerRoleResolver` and of `verifyRow`'s node hashing.
 - Event emission is tested in the unit tests, not in the invariant suites; indexers should rely on the events listed in [INTERFACES](../INTERFACES.md) and on reading state.
 - The leaf encoding is checked by the shared cross-language vector (Python, Hardhat and Foundry) and by an independent leaf model in the anchor invariants; internal nodes by a Solidity reference model in the property fuzz tests. There is no cross-language differential fuzzing yet.
 - `verifyRow` returns false for an empty day both because it checks the root and because a leaf hash is never zero; removing the explicit check is therefore an equivalent mutant that no test can catch.
@@ -159,5 +197,6 @@ REPORT_GAS=1 npx hardhat test                      # gas table
 npx hardhat coverage                               # coverage
 FOUNDRY_PROFILE=ci forge test                      # fuzz and invariant tests (Foundry 1.3.5)
 python3 scripts/mutation_check.py                  # targeted mutation check (temporary copy)
+python3 scripts/symbolic_check.py                  # Halmos 0.3.3 symbolic checks; add --mutants for the mutant run
 slither . --compile-force-framework hardhat --filter-paths "node_modules|test-foundry"   # Slither 0.11.3
 ```
