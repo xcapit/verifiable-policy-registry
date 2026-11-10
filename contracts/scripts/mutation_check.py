@@ -9,7 +9,7 @@ deliberately shallow campaign, under each of three fixed fuzzer seeds; the suite
   an editor or an interrupted run can never pick up a mutated source.
 - A mutant that does not compile is reported as an error, not counted as killed.
 
-The list mixes mutants written with the suites and mutants proposed by an independent review (marked "review").
+The list mixes mutants written with the suites and mutants proposed by a separate internal review of the suites (marked "review").
 It is a regression check, not a mutation score; the score over the whole test stack is measured separately with
 slither-mutate (docs/security/CONTRACT_ASSURANCE.md §5).
 

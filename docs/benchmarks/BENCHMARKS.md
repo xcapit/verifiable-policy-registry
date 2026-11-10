@@ -61,7 +61,7 @@ From the gas reporter over the unit tests in CI run [42795525989](https://github
 
 The `e2e` job, including `npm ci`, compilation and both stages, completes in a few minutes on the CI runner; the precise duration is in the job log of the run above. The demo writes about 15 KB of artefacts: release CSVs, zone, JSON inputs and the manifest.
 
-## 4. Not measured in v0.3
+## 4. Not measured
 
 - **Resolver latency impact.** No resolver runs in the demo (zone evaluation only). Measuring it is planned with the pinned resolver container (VPR-019) and at alpha onboarding.
 - **Network needs at schools.** These are measured during the alpha (Gate B).

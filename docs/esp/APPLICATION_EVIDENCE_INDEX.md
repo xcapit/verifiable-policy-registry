@@ -31,7 +31,7 @@
 | Deployed on a public network | **Not true at v0.5.0** | Planned in M2 (testnet) and Gate C (mainnet) |
 | Endorsement by the EF, UNICEF, Giga or DPGA | **None exists** | — |
 | Per-claim status for the whole project | Ledger | [CLAIMS_AND_EVIDENCE](../CLAIMS_AND_EVIDENCE.md) |
-| Guide for an independent reviewer | Prepared | [Reviewer guide](../review/V03_REVIEWER_GUIDE.md) |
+| Guide for an independent reviewer | Prepared | [Reviewer guide](../review/REVIEWER_GUIDE.md) |
 
 ## Fields requiring maintainer input
 

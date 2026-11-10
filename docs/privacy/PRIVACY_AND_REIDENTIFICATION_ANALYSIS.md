@@ -1,6 +1,6 @@
 # Privacy and re-identification analysis
 
-*CC BY 4.0 · v0.3 · Owner: Diana Truyol (impact and privacy evidence), with Fernando Boiero. This document is a technical analysis, not a legal opinion. Compliance with data-protection law depends on the country and is assessed in the DPIA with the deploying partner (ROADMAP M1).*
+*CC BY 4.0 · Owner: Diana Truyol (impact and privacy evidence), with Fernando Boiero. This document is a technical analysis, not a legal opinion. Compliance with data-protection law depends on the country and is assessed in the DPIA with the deploying partner (ROADMAP M1).*
 
 ## 1. Designed data inventory and retention
 

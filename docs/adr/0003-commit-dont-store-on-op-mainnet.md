@@ -19,4 +19,4 @@ Availability of documents depends on the publisher; mirrors (IPFS pinning, GitHu
 
 ## Alternatives considered
 
-A permissioned ledger run by the partners: cheaper, but the partners would be verifying themselves. Ethereum L1: more neutral but costs grow with every school.
+A permissioned ledger run by the partners: cheaper, but the partners would be verifying themselves. Ethereum L1: no sequencer and no L2 upgrade keys, but every anchor, policy version and attestation costs L1 gas, and attestations grow with the number of schools.
