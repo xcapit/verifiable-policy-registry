@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 430" width="960" height="430" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker></defs>
+<rect width="960" height="430" fill="#ffffff"/>
+<text x="40" y="32" font-size="17" font-weight="600" fill="#0f172a">One registry transaction, from submission to finality on an OP Stack chain</text>
+
+<!-- timeline -->
+<line x1="60" y1="92" x2="910" y2="92" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="912" y="112" font-size="11" fill="#475569" text-anchor="end">time</text>
+<g font-size="11" fill="#475569" text-anchor="middle">
+<circle cx="100" cy="92" r="6" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+<circle cx="320" cy="92" r="6" fill="#f59e0b"/>
+<circle cx="560" cy="92" r="6" fill="#2563eb"/>
+<circle cx="800" cy="92" r="6" fill="#059669"/>
+<text x="210" y="82">next L2 block (2 s)</text>
+<text x="440" y="82">batcher interval (deployment parameter)</text>
+<text x="680" y="82">L1 finality, about 2 epochs (~13 min)</text>
+</g>
+
+<!-- stage boxes -->
+<g font-size="12">
+<rect x="40" y="122" width="120" height="96" rx="8" fill="#f8fafc" stroke="#64748b"/>
+<text x="100" y="146" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">Submitted</text>
+<text x="100" y="168" fill="#475569" text-anchor="middle">signed by the</text>
+<text x="100" y="183" fill="#475569" text-anchor="middle">governor Safe,</text>
+<text x="100" y="198" fill="#475569" text-anchor="middle">sent to sequencer</text>
+
+<rect x="200" y="122" width="240" height="96" rx="8" fill="#fffbeb" stroke="#d97706"/>
+<text x="320" y="146" font-size="13" font-weight="600" fill="#92400e" text-anchor="middle">Unsafe (tag latest)</text>
+<text x="320" y="168" fill="#0f172a" text-anchor="middle">in an L2 block produced by the</text>
+<text x="320" y="183" fill="#0f172a" text-anchor="middle">sequencer; not yet derivable</text>
+<text x="320" y="198" fill="#0f172a" text-anchor="middle">from L1 data</text>
+
+<rect x="460" y="122" width="200" height="96" rx="8" fill="#eff6ff" stroke="#2563eb"/>
+<text x="560" y="146" font-size="13" font-weight="600" fill="#1d4ed8" text-anchor="middle">Safe</text>
+<text x="560" y="168" fill="#0f172a" text-anchor="middle">its batch is in an L1 block;</text>
+<text x="560" y="183" fill="#0f172a" text-anchor="middle">derivable from L1 data</text>
+<text x="560" y="198" fill="#0f172a" text-anchor="middle">that is not yet final</text>
+
+<rect x="680" y="122" width="240" height="96" rx="8" fill="#ecfdf5" stroke="#059669"/>
+<text x="800" y="146" font-size="13" font-weight="600" fill="#065f46" text-anchor="middle">Finalized</text>
+<text x="800" y="168" fill="#0f172a" text-anchor="middle">derivable from finalized L1</text>
+<text x="800" y="183" fill="#0f172a" text-anchor="middle">blocks; the tag at which</text>
+<text x="800" y="198" fill="#0f172a" text-anchor="middle">P1 to P7 are stated (§3.3)</text>
+</g>
+
+<!-- what can still revert it -->
+<text x="40" y="250" font-size="12" font-weight="600" fill="#475569">CAN STILL BE REVERTED BY</text>
+<g font-size="12" fill="#0f172a">
+<rect x="200" y="262" width="240" height="66" rx="6" fill="#ffffff" stroke="#d97706" stroke-dasharray="4 3"/>
+<text x="212" y="284">the sequencer, which can reorder</text>
+<text x="212" y="299">or drop unsafe blocks; reading here</text>
+<text x="212" y="314">trusts one operator</text>
+<rect x="460" y="262" width="200" height="66" rx="6" fill="#ffffff" stroke="#2563eb" stroke-dasharray="4 3"/>
+<text x="472" y="284">an L1 reorganisation,</text>
+<text x="472" y="299">which changes the L1 data</text>
+<text x="472" y="314">the block is derived from</text>
+<rect x="680" y="262" width="240" height="66" rx="6" fill="#ffffff" stroke="#059669" stroke-dasharray="4 3"/>
+<text x="692" y="284">only a failure of Ethereum finality</text>
+<text x="692" y="299">(at least 1/3 of stake slashable),</text>
+<text x="692" y="314">or a chain upgrade (A11, §6.2)</text>
+</g>
+
+<!-- verifier rule and liveness -->
+<rect x="40" y="346" width="580" height="66" rx="8" fill="#f8fafc" stroke="#64748b"/>
+<text x="54" y="368" font-size="12" font-weight="600" fill="#0f172a">Verifier rule</text>
+<text x="54" y="385" font-size="12" fill="#0f172a">Read registry and anchor state at the manifest's finality tag (finalized),</text>
+<text x="54" y="401" font-size="12" fill="#0f172a">from a node that derives L2 from L1 itself, not from one RPC endpoint.</text>
+<rect x="640" y="346" width="280" height="66" rx="8" fill="#f8fafc" stroke="#64748b"/>
+<text x="654" y="368" font-size="12" font-weight="600" fill="#0f172a">Liveness</text>
+<text x="654" y="385" font-size="12" fill="#0f172a">A censored transaction can be forced</text>
+<text x="654" y="401" font-size="12" fill="#0f172a">through L1; sequencing window ~12 h (A9).</text>
+</svg>

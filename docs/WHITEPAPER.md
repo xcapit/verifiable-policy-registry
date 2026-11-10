@@ -78,7 +78,7 @@ An open-source implementation of the contracts and the off-chain tooling accompa
 
 We assume a standard computational model for keccak-256 (collision and second-preimage resistance) and the unforgeability of ECDSA over secp256k1 and, for passkey-based signers, over P-256, which OP Stack chains verify with the precompile of RIP-7212 [39].
 
-*Ledger.* The contracts are proposed for an OP Stack rollup, whose L2 blocks pass through three states [37]: *unsafe* (produced by the sequencer but not derived from L1), *safe* (derivable entirely from L1 data) and *finalized* (derivable from finalized L1 blocks). By **ledger safety** we mean that the finalized L2 history is unique and is never reverted. For a verifier that runs a rollup node, it rests on Ethereum's finality and on the derivation rules, which that node applies itself; the fault-proof system matters to parties that act on output roots posted to L1, such as withdrawals, not to a verifier that derives L2 state. Safe blocks are derived from L1 data that is not yet final, so they can be reverted by an L1 reorganisation. By **ledger liveness** we mean that a transaction is eventually included: the sequencer can delay or censor it, but it can be forced through L1, and is included within the sequencing window, a deployment parameter that is typically 12 hours (§6.2, A9) [37]. Verifiers read state at a stated finality tag, recorded in the deployment manifest (INTERFACES I11). The properties of §3.3 are stated for `finalized`; at `safe` they hold unless L1 reorganises. Reading at `finalized` has a cost in latency: a new version, correction or attestation becomes visible only after its batch is posted to L1 and that L1 block is final, which takes at least the L1 finality delay of about two epochs (roughly 13 minutes). Renewals and corrections should be timed with that delay in mind. The VPR contracts are not upgradeable, but the rollup is. Its L1 system contracts and most of its L2 predeploys, including EAS and its schema registry, are proxies [40] that the chain's upgrade process can change. On a Stage 1 OP Stack chain, the role that upgrades the chain's L1 contracts requires the sign-off of its Security Council, which also holds the Guardian role; the Guardian can pause withdrawals and intervene in the dispute-game system [38]. We assume that these powers are not used against the system. This is an assumption about the chain's governance, not about the VPR contracts, and a verifier who rejects it should prefer a deployment on a chain whose model it accepts.
+*Ledger.* The contracts are proposed for an OP Stack rollup, whose L2 blocks pass through three states [37]: *unsafe* (produced by the sequencer but not derived from L1), *safe* (derivable entirely from L1 data) and *finalized* (derivable from finalized L1 blocks). By **ledger safety** we mean that the finalized L2 history is unique and is never reverted. For a verifier that runs a rollup node, it rests on Ethereum's finality and on the derivation rules, which that node applies itself; the fault-proof system matters to parties that act on output roots posted to L1, such as withdrawals, not to a verifier that derives L2 state. Safe blocks are derived from L1 data that is not yet final, so they can be reverted by an L1 reorganisation. By **ledger liveness** we mean that a transaction is eventually included: the sequencer can delay or censor it, but it can be forced through L1, and is included within the sequencing window, a deployment parameter that is typically 12 hours (§6.2, A9) [37]. Verifiers read state at a stated finality tag, recorded in the deployment manifest (INTERFACES I11; Figure 4). The properties of §3.3 are stated for `finalized`; at `safe` they hold unless L1 reorganises. Reading at `finalized` has a cost in latency: a new version, correction or attestation becomes visible only after its batch is posted to L1 and that L1 block is final, which takes at least the L1 finality delay of about two epochs (roughly 13 minutes). Renewals and corrections should be timed with that delay in mind. The VPR contracts are not upgradeable, but the rollup is. Its L1 system contracts and most of its L2 predeploys, including EAS and its schema registry, are proxies [40] that the chain's upgrade process can change. On a Stage 1 OP Stack chain, the role that upgrades the chain's L1 contracts requires the sign-off of its Security Council, which also holds the Guardian role; the Guardian can pause withdrawals and intervene in the dispute-game system [38]. We assume that these powers are not used against the system. This is an assumption about the chain's governance, not about the VPR contracts, and a verifier who rejects it should prefer a deployment on a chain whose model it accepts.
 
 *Governor.* We assume that no coalition of fewer than *m* of the *n* signers can produce an authorised transaction. The registry does not check this; it trusts the governor address. The assumption therefore holds only while the governor is a Safe with threshold *m* and that configuration is unchanged. A change of owners or threshold, and a handover of the scope to another address (`proposeGovernor`, `acceptGovernor`), which could be a single key, is itself a governor transaction, visible on-chain (§6.2, A2).
 
@@ -87,6 +87,10 @@ We do **not** assume that the operator is honest. We **do** assume that the inde
 <p align="center"><img src="figures/fig-trust.svg" alt="Trust assumptions by actor" width="100%"></p>
 
 *Figure 3. Trust by actor. The ledger is trusted at its finality tag and under the chain's governance, and the governor threshold under standard assumptions; the operator is not trusted at all; the reviewer and the auditor are trusted institutionally for specific checks; schools and the public need no trust and hold no keys.*
+
+<p align="center"><img src="figures/fig-finality.svg" alt="States of an OP Stack transaction from submission to finality, and what can still revert each" width="100%"></p>
+
+*Figure 4. What a verifier can rely on, by block state. An unsafe block can still be changed by the sequencer, a safe block by an L1 reorganisation, and a finalized block only by a failure of Ethereum finality or by a chain upgrade. The properties of §3.3 are stated at `finalized`, read from a node that derives L2 from L1 itself.*
 
 
 ### 3.3 Properties
@@ -108,7 +112,7 @@ Let a scope *s* have a sequence of policy versions ⟨*p*₁, …, *p*ₙ⟩. Ea
 - **P7 · Aggregate integrity with minimisation.** Once a day is anchored, every verifier rejects a release whose root differs from the anchored root, and the anchored root changes only through a governor correction that records a reason hash and increments a revision counter. Released rows are cells (*unit*, *day*, *category*, *count*) with *count* ≥ *k*.
   *Adversary:* the operator, as publisher. *Assumes:* collision resistance; ledger safety. *Enforced by:* `MetricsAnchor` for the anchored root and its corrections (`daysMatchModel`, `committedDaysWellFormed`); `vpr verify-root` for the root. The threshold is not enforced on-chain: a release with a count below *k* still has a valid root, and `vpr verify-root --k` detects it. P7 does **not** say that the release is the correct aggregation of what the resolver blocked. The step from event log to release is to be bound by the planned proof of §11 (milestone M4; designed, not implemented), and the step from resolver to log rests on the reviewer and the audit even then (§5.4).
 
-The distinction between P1–P5, which a ledger can enforce (for P5, the record but not its timeliness), and P6–P7, which a ledger can only record, is central to this work. We return to it in §6.1 and summarise it in Figure 13.
+The distinction between P1–P5, which a ledger can enforce (for P5, the record but not its timeliness), and P6–P7, which a ledger can only record, is central to this work. We return to it in §6.1 and summarise it in Figure 14.
 
 ### 3.4 Who monitors the record
 
@@ -140,7 +144,7 @@ The system addresses SDG target 4.a, safe and effective learning environments, a
 The target architecture has two planes. The **enforcement plane** would run in-country and consist of a pair of recursive resolvers with RPZ, DNSSEC validation and encrypted transport, a metrics exporter co-located with the resolvers, and a block page. None of those runtime components is implemented in this repository beyond tooling and a reference configuration fragment. The **accountability plane** has two implemented, unaudited contracts, `VerifiablePolicyRegistry` and `MetricsAnchor`, plus a third, `IssuerRoleResolver`, that enforces issuer roles for three Defined EAS schemas; the schemas are not yet registered. The dashboard and the public-network deployment are Planned. The design permits only attestations and aggregate commitments to reach the chain; this boundary has not been validated in a deployment.
 <p align="center"><img src="figures/fig1-architecture.svg" alt="Architecture with an enforcement plane and an accountability plane" width="100%"></p>
 
-*Figure 4. The enforcement plane (top) filters traffic in-country with a conventional resolver. The accountability plane (bottom) holds only commitments: policy versions, attestations and daily roots. The governor is the only party that can change a policy.*
+*Figure 5. The enforcement plane (top) filters traffic in-country with a conventional resolver. The accountability plane (bottom) holds only commitments: policy versions, attestations and daily roots. The governor is the only party that can change a policy.*
 
 
 Table 1 summarises the function of each part and its intended effect for students, together with the condition under which that effect holds.
@@ -161,21 +165,21 @@ Some lists cannot be published. The IWF list of URLs hosting CSAM is distributed
 
 <p align="center"><img src="figures/fig-commitments.svg" alt="From a policy to its four commitments" width="100%"></p>
 
-*Figure 5. Four keccak-256 commitments, each with one job. The content hash binds the public document, including the hashes of the category feeds; the restricted-list commitment proves declaration and change without disclosure; the zone hash links the compiled zone to a deployment attestation.*
+*Figure 6. Four keccak-256 commitments, each with one job. The content hash binds the public document, including the hashes of the category feeds; the restricted-list commitment proves declaration and change without disclosure; the zone hash links the compiled zone to a deployment attestation.*
 
 
 ### 4.3 Lifecycle and appeals
 
 <p align="center"><img src="figures/fig2-authorisation.svg" alt="Policy authorisation flow" width="100%"></p>
 
-*Figure 6. Authorisation flow. Without a threshold of signatures the policy in force does not change. Each appended version is public, is designed to be loaded by the resolver only after its document is checked against the on-chain hash (sync daemon planned, VPR-015), and ends in an independent attestation per school.*
+*Figure 7. Authorisation flow. Without a threshold of signatures the policy in force does not change. Each appended version is public, is designed to be loaded by the resolver only after its document is checked against the on-chain hash (sync daemon planned, VPR-015), and ends in an independent attestation per school.*
 
 The governor appends a version by calling `publishPolicy(scopeId, h, ρ, u, c, validity, a)`. The contract rejects an empty hash, any validity outside (0, Δ_max], a locator longer than 256 bytes and a reason code outside the published list (1 to 6). Reason code 3, *appeal accepted*, is required exactly when *a* is set. If *a* is non-zero, the contract requires that *a* refers to an open appeal in the same scope and marks it accepted in the same transaction. In other words, accepting an appeal is not a separate administrative act: it consists of publishing the policy that resolves it.
 
 Expiry is mandatory. When the latest version expires without renewal, `currentPolicy` reports it as not in force. What the resolver does in that state is a governance decision, recorded in the charter of the scope: either keep enforcing the last version, flagged as expired, or fall back to protective categories only (malware and phishing). We recommend the second option. It keeps the safety benefit of the filter without letting content restrictions persist past their authorisation.
 <p align="center"><img src="figures/fig3-timeline.svg" alt="Timeline of policy versions with renewal, appeal and expiry" width="100%"></p>
 
-*Figure 7. One scope over 180 days. Version 2 renews version 1 before it expires. Version 3 resolves an appeal and replaces version 2. When version 3 expires without renewal, no version is in force and the scope falls back to protective categories. Superseded versions remain public.*
+*Figure 8. One scope over 180 days. Version 2 renews version 1 before it expires. Version 3 resolves an appeal and replaces version 2. When version 3 expires without renewal, no version is in force and the scope falls back to protective categories. Superseded versions remain public.*
 
 
 An appeal is designed as a short document naming the domain, the requested change and its reason, together with a random nonce (format `vpr-appeal/3`), so that a document cannot be guessed and filed in advance by someone else. The implemented registry stores only its hash, `fileAppeal(scopeId, documentHash)`, so no caller can place free text on-chain through an appeal. The block-page relayer is Planned (VPR-017); it is intended to validate the document, reject personal data and file the hash so the appellant needs no wallet. Whether validated documents and reasoned decisions are public or access-controlled, and for how long, must be fixed in the Gate A DPIA. A rejection records a reason hash, and an acceptance records the content hash of the resolving policy version. A rejected document can be filed again in a new round, while a document with an open or accepted round cannot. The registry does not store who filed an appeal. That alone does not unlink appellants from appeals: a direct call to `fileAppeal` is a transaction whose sender is public. Unlinkability on-chain holds only for appeals filed through the planned relayer, which then knows the appellant and is bound by the DPIA's rules on what it keeps. The price of not storing the filer is that anyone can re-file a rejected document, whose hash is public, or file a document seen in transit first. In both cases the appeal exists and must be answered, so the harm is limited to added work for the governor.
@@ -193,7 +197,7 @@ Three EAS schemas, published under CC0, record claims about deployments. Each ha
 Under the proposed reporting rule, a school would count as protected only with a valid `VPR.IndependentTest.v1` for the version in force. The registry assigns each address at most one role per scope, and the governor never holds one: an address with a role cannot be proposed as governor, and the pending governor cannot be given a role. Each schema is registered with its own instance of `IssuerRoleResolver`, whose schema kind fixes both the required role and the layout of the encoded attestation. EAS calls the resolver at issuance, and the resolver accepts the attestation only if the attester holds that role in the registry for the scope named in the attestation. The resolver is implemented and tested; registration of the schemas on a public network is planned for M2 (VPR-012). The role is checked at issuance only. An attestation issued while its attester held the role remains valid after the role is withdrawn, so verifiers compare the attestation time with the public history of role assignments. Separation is enforced per address; one institution operating several addresses remains a governance matter. The Defined test schema contains a public summary of four booleans and a report hash. Report access, attestation validity and revocation procedures must be agreed at Gate A and implemented in M2.
 <p align="center"><img src="figures/fig4-issuers.svg" alt="Issuer separation across three attestation schemas" width="100%"></p>
 
-*Figure 8. Each schema has exactly one issuer role. The operator can state that a school is deployed, but only the independent reviewer can state that it is protected.*
+*Figure 9. Each schema has exactly one issuer role. The operator can state that a school is deployed, but only the independent reviewer can state that it is protected.*
 
 
 ### 4.5 How a school joins
@@ -206,7 +210,7 @@ Under the proposed reporting rule, a school would count as protected only with a
 
 <p align="center"><img src="figures/fig-onboarding.svg" alt="Five steps for a school to join" width="100%"></p>
 
-*Figure 9. Proposed onboarding of a school. Nothing is installed on devices. A school counts as protected only after the independent test, and only while that attestation is valid for the version in force.*
+*Figure 10. Proposed onboarding of a school. Nothing is installed on devices. A school counts as protected only after the independent test, and only while that attestation is valid for the version in force.*
 
 
 ---
@@ -217,7 +221,7 @@ Under the proposed reporting rule, a school would count as protected only with a
 
 <p align="center"><img src="figures/fig5-metrics.svg" alt="Metrics pipeline from resolver to on-chain root" width="100%"></p>
 
-*Figure 10. Identifying fields are discarded inside the resolver process. The exporter emits three fields per blocked query, the aggregator suppresses cells below k, and the release is committed to by a daily Merkle root that anyone can recompute.*
+*Figure 11. Identifying fields are discarded inside the resolver process. The exporter emits three fields per blocked query, the aggregator suppresses cells below k, and the release is committed to by a daily Merkle root that anyone can recompute.*
 
 The design principle is that privacy should be enforced by what is collected, not by deletion after collection. The reference resolver configuration disables query logging. The Planned exporter would emit a single tuple (*school_id*, *day*, *category*) for each blocked query; client addresses, device identifiers, queried names and finer timestamps would not cross that boundary. This has not been validated against a running resolver or exporter. The implemented aggregator accepts exactly those three fields and rejects inputs with additional columns.
 
@@ -227,7 +231,7 @@ The aggregator counts tuples per cell (*school*, *day*, *category*) and suppress
 
 <p align="center"><img src="figures/fig-suppression.svg" alt="Small-cell suppression example and its limits" width="100%"></p>
 
-*Figure 11. Suppression at *k* = 10 on synthetic data. Cells below *k* are removed before the root is computed, and their number is not published. The box states what suppression does not protect.*
+*Figure 12. Suppression at *k* = 10 on synthetic data. Cells below *k* are removed before the root is computed, and their number is not published. The box states what suppression does not protect.*
 
 
 This mechanism defends against the most direct risk in a school setting. A count of 1 or 2 in a sensitive category at a small school could, combined with local knowledge, point to an individual child. Its guarantees are nonetheless limited, and we state the limits explicitly.
@@ -247,7 +251,7 @@ Leaves and internal nodes are domain-separated with the tags 0x00 and 0x01 of RF
 
 <p align="center"><img src="figures/fig-anchor-lifecycle.svg" alt="Merkle encoding and anchored-day states" width="100%"></p>
 
-*Figure 12. Left: the format 2 encoding, with domain-separated leaves and nodes. Right: the states of one (scope, day). The publisher moves a day out of the unanchored state once; every later change is a governor correction that leaves a public trace.*
+*Figure 13. Left: the format 2 encoding, with domain-separated leaves and nodes. Right: the states of one (scope, day). The publisher moves a day out of the unanchored state once; every later change is a governor correction that leaves a public trace.*
 
 
 ### 5.4 What the commitment does not prove
@@ -272,7 +276,7 @@ A Merkle root anchored on-chain proves that a release has not been altered since
 
 <p align="center"><img src="figures/fig6-properties.svg" alt="Classification of properties P1 to P7 by what they rest on" width="100%"></p>
 
-*Figure 13. P1–P4 hold under standard cryptographic and ledger assumptions. P5 combines an on-chain record with an institutional commitment to respond. P6 rests on the independent reviewer, and P7 binds the published figures cryptographically but takes its inputs from the operator.*
+*Figure 14. P1–P4 hold under standard cryptographic and ledger assumptions. P5 combines an on-chain record with an institutional commitment to respond. P6 rests on the independent reviewer, and P7 binds the published figures cryptographically but takes its inputs from the operator.*
 
 ### 6.2 Adversaries
 
@@ -294,7 +298,7 @@ We consider the following adversaries.
 
 <p align="center"><img src="figures/fig-adversaries.svg" alt="Adversaries, mechanisms and outcomes" width="100%"></p>
 
-*Figure 14. Each adversary of §6.2 with its main mechanism and the kind of guarantee obtained. Only A1 and A5 are prevented outright; most threats are made visible, detected by another party or reduced within stated limits.*
+*Figure 15. Each adversary of §6.2 with its main mechanism and the kind of guarantee obtained. Only A1 and A5 are prevented outright; most threats are made visible, detected by another party or reduced within stated limits.*
 
 
 ### 6.3 Contract-level considerations
@@ -303,7 +307,7 @@ The contracts are deliberately small. `VerifiablePolicyRegistry` is append-only 
 
 <p align="center"><img src="figures/fig-state-machines.svg" alt="Appeal and governor handover state machines" width="100%"></p>
 
-*Figure 15. The two registry state machines. Appeals are keyed by document hash and can be resubmitted only after a rejection. A governor handover takes effect only when the proposed address accepts, and no address with an issuer role can become governor.*
+*Figure 16. The two registry state machines. Appeals are keyed by document hash and can be resubmitted only after a rejection. A governor handover takes effect only when the proposed address accepts, and no address with an issuer role can become governor.*
 
 
 ---
@@ -332,7 +336,7 @@ The proposed network is OP Mainnet, where EAS is deployed and transaction costs 
 
 <p align="center"><img src="figures/fig-deployment.svg" alt="Proposed deployment topology" width="100%"></p>
 
-*Figure 16. Proposed placement of each part. Nothing is deployed today: the contracts are implemented but unaudited, the schemas are not registered, and the in-country runtime components are planned for M2. Dashed boxes are planned.*
+*Figure 17. Proposed placement of each part. Nothing is deployed today: the contracts are implemented but unaudited, the schemas are not registered, and the in-country runtime components are planned for M2. Dashed boxes are planned.*
 
 
 ---
@@ -354,7 +358,7 @@ The pilot has two phases (see the roadmap [4]). Phase 1 lasts four months: one m
 
 <p align="center"><img src="figures/roadmap.svg" alt="Sixteen-week phase 1 roadmap with gates" width="100%"></p>
 
-*Figure 17. Phase 1: one month of design and sign-off followed by three months of work, with gates A, B and C at weeks 4, 10 and 16. Phase 2 is gated and funded separately.*
+*Figure 18. Phase 1: one month of design and sign-off followed by three months of work, with gates A, B and C at weeks 4, 10 and 16. Phase 2 is gated and funded separately.*
 
 
 ---
@@ -367,11 +371,11 @@ DNS filtering operates on domain names. IWF entries that are individual URLs on 
 
 ## 11. Closing the enforcement–accountability gap
 
-The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 18 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. Milestone M4 proposes to narrow the middle link with a zero-knowledge aggregation proof on testnet; the circuit audit and mainnet verifier are deferred to a separately agreed phase 2. No proof implementation exists in the proof of concept. Trusted execution and verifiable differential privacy remain further work.
+The weakest link in the design is the step between the resolver's behaviour and what is committed on-chain. Figure 19 decomposes it into three links. Without further mechanisms, only the last of them is cryptographic. Milestone M4 proposes to narrow the middle link with a zero-knowledge aggregation proof on testnet; the circuit audit and mainnet verifier are deferred to a separately agreed phase 2. No proof implementation exists in the proof of concept. Trusted execution and verifiable differential privacy remain further work.
 
 <p align="center"><img src="figures/fig7-gap.svg" alt="Enforcement-accountability gap link by link" width="100%"></p>
 
-*Figure 18. From resolver behaviour to on-chain root. The link from release to root is cryptographic. The link from log to release rests on the operator today and is to be closed by a zero-knowledge proof of aggregation, designed in §11.1 and planned for milestone M4. The link from behaviour to log rests on the reviewer and the auditor, and could be strengthened with remote attestation of a trusted execution environment (§11.3).*
+*Figure 19. From resolver behaviour to on-chain root. The link from release to root is cryptographic. The link from log to release rests on the operator today and is to be closed by a zero-knowledge proof of aggregation, designed in §11.1 and planned for milestone M4. The link from behaviour to log rests on the reviewer and the auditor, and could be strengthened with remote attestation of a trusted execution environment (§11.3).*
 
 ### 11.1 Statement
 
@@ -385,18 +389,18 @@ The public inputs are a deployment domain (chain id, verifier and anchor address
 
 <p align="center"><img src="figures/fig-zk-relation.svg" alt="Inputs of the designed aggregation relation" width="100%"></p>
 
-*Figure 19. The designed relation R. The operator supplies only the private witness; the policy-dependent inputs are read by the verifier from the registry. Nothing in this figure is implemented yet.*
+*Figure 20. The designed relation R. The operator supplies only the private witness; the policy-dependent inputs are read by the verifier from the registry. Nothing in this figure is implemented yet.*
 
 
 ### 11.2 What the proof guarantees, and implementation
 
-Given a valid proof, the published figures are exactly the suppressed aggregation of a log the operator committed to, and no event in that log falls outside the policy in force. The operator can no longer adjust the figures after the fact, or report blocks in categories the governor never approved. The proof does not establish that *L* is complete or that its events occurred. That property belongs to the first link of Figure 18 and still rests on the reviewer's measurements and on audit. A partial tie is available at low cost: the independent reviewer issues test queries from known schools on undisclosed days, records them as canary events, and after each release asks the operator for a proof that every canary is included in *L*. If the operator cannot tell canaries from real traffic, omission is detected with a probability that grows with the number of canaries. That condition is not automatic: the operator sees source addresses and queried names, so canaries must come from ordinary devices in the school network, query ordinary names and follow ordinary timing (VPR-038).
+Given a valid proof, the published figures are exactly the suppressed aggregation of a log the operator committed to, and no event in that log falls outside the policy in force. The operator can no longer adjust the figures after the fact, or report blocks in categories the governor never approved. The proof does not establish that *L* is complete or that its events occurred. That property belongs to the first link of Figure 19 and still rests on the reviewer's measurements and on audit. A partial tie is available at low cost: the independent reviewer issues test queries from known schools on undisclosed days, records them as canary events, and after each release asks the operator for a proof that every canary is included in *L*. If the operator cannot tell canaries from real traffic, omission is detected with a probability that grows with the number of canaries. That condition is not automatic: the operator sees source addresses and queried names, so canaries must come from ordinary devices in the school network, query ordinary names and follow ordinary timing (VPR-038).
 
 Two implementation routes are to be evaluated in milestone M1: a general-purpose zero-knowledge virtual machine running a reference implementation of R, or a dedicated circuit for counting, threshold comparison and membership. zkVM proofs are usually wrapped into a succinct proof such as Groth16 [25] or PLONK [26] for verification on the EVM. A dedicated circuit is cheaper to prove but must implement keccak-256, which is expensive in arithmetic circuits. One option is to commit to *L* with a SNARK-friendly hash such as Poseidon [27] and keep keccak-256 only for the public Merkle root. In the planned design, the anchoring contract accepts a daily root only together with a proof that verifies on-chain; the circuit and the verifier are audited in phase 2, before any mainnet use. If proving a full day exceeds the daily budget on commodity hardware, the fallback is one proof per school, aggregated off-chain.
 
 ### 11.3 Further work
 
-**Trusted execution.** If the resolver and exporter ran inside a trusted execution environment, such as Intel TDX, AMD SEV-SNP or AWS Nitro Enclaves, a remote attestation could bind *C*_L and the absence of logging to a measured, open-source binary loaded with the zone compiled from *h*ᵢ. This would strengthen the first link of Figure 18, moving part of P6 and P7 from institutional trust to hardware trust. Hardware trust has its own history of side-channel failures, and it concentrates trust in the hardware vendor.
+**Trusted execution.** If the resolver and exporter ran inside a trusted execution environment, such as Intel TDX, AMD SEV-SNP or AWS Nitro Enclaves, a remote attestation could bind *C*_L and the absence of logging to a measured, open-source binary loaded with the zone compiled from *h*ᵢ. This would strengthen the first link of Figure 19, moving part of P6 and P7 from institutional trust to hardware trust. Hardware trust has its own history of side-channel failures, and it concentrates trust in the hardware vendor.
 
 **Verifiable differential privacy.** Where releases must overlap, the noise added for differential privacy should be verifiably sampled, as in VerDP [35], either from public randomness committed in advance or within the same proof as R. The goal is that neither the operator nor the analyst can bias the noise.
 
