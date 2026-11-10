@@ -5,10 +5,13 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
+- Contract assurance (`docs/security/CONTRACT_ASSURANCE.md`): Slither in CI failing on any finding; Foundry invariant suites for the registry and the anchor and property fuzzing (Merkle proofs, leaf encoding, scope ids, resolver ABI head); a mutation check requiring eleven injected bugs to be caught; coverage (100 % lines, 99.34 % branches) and per-function gas reports in CI; OP Stack time and ordering semantics (VPR-040 Slither part, VPR-041, VPR-042).
+- Complete NatSpec on the three contracts (logic unchanged).
 - Integration test of `IssuerRoleResolver` through the real EAS contracts (EAS 1.9.0 artifacts, pinned devDependency): issuance only by the role holder, refusal across scopes and after a role is withdrawn, revocation by the attester, batches, malformed data and value (VPR-070).
 - `scripts/check-eas.js`: verifies a deployment manifest's EAS schema bindings (UID, schema string, resolver kind, registry and EAS wiring).
 
 ### Changed
+- Contracts are compiled with `evmVersion: cancun`, pinned identically in Hardhat and Foundry.
 - Deployment manifest: optional `contracts.eas` and `contracts.easSchemaRegistry`; `maxLagDays` follows the anchor semantics (1 to 2³²−1).
 
 ## [0.4.0] - 2026-11-09

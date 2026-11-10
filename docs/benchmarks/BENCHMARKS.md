@@ -1,6 +1,6 @@
 # Benchmarks
 
-*CC BY 4.0 · v0.3 · Every number below was measured on synthetic data, on the environment named next to it. None of them describe resolver latency, school-network performance or production costs.*
+*CC BY 4.0 · Every number below was measured on synthetic data, on the environment named next to it. None of them describe resolver latency, school-network performance or production costs.*
 
 ## How to reproduce
 
@@ -39,22 +39,23 @@ Synthetic release with 5 categories per unit, one day. The root time is the best
 
 ## 2. Gas on the Hardhat EVM
 
-From the evidence manifest of the same CI run (Hardhat 2.29.1, solc 0.8.24, optimizer 200 runs, chain id 31337):
+From the gas reporter over the unit tests in CI run [42795525989](https://github.com/xcapit/verifiable-policy-registry/actions/runs/42795525989) (Hardhat 2.29.1, solc 0.8.24, optimizer 200 runs, `evmVersion: cancun`). Averages over the calls in the test suite; the full table with minimum and maximum (short and 256-byte URIs) is in [contract assurance §8](../security/CONTRACT_ASSURANCE.md#8-gas). Figures before the pre-audit hardening (v0.3) are superseded.
 
-| Operation | Gas used |
+| Operation | Gas used (average) |
 | --- | --- |
-| `createScope` | 47 189 |
-| `setIssuer` (first role) | 49 177 |
-| `setPublisher` | 52 264 |
-| `publishPolicy` (first version, short URI) | 125 128 |
-| `fileAppeal` | 118 873 |
-| `rejectAppeal` | 55 852 |
-| `commitRoot` (first day, short URI) | 95 886 |
-| `verifyRow` (view; estimate for a 3-step proof) | 30 200 |
+| `createScope` | 73 097 |
+| `setIssuer` | 49 584 |
+| `setPublisher` | 64 548 |
+| `publishPolicy` | 152 795 |
+| `fileAppeal` | 114 724 |
+| `rejectAppeal` | 55 847 |
+| `commitRoot` | 116 835 |
+| `markEmpty` | 55 999 |
+| `correctRoot` | 61 686 |
 
-These are EVM execution gas figures. On OP Mainnet a transaction also pays an L1 data fee that depends on calldata size and L1 prices; it is not included. Converting to currency requires gas prices at the time of use, and is left to the [cost model](../giga/COST_MODEL_TEMPLATE.md).
+`verifyRow` is a view; the demo's evidence manifest reports an estimate for a three-step proof. These are EVM execution gas figures. On OP Mainnet a transaction also pays an L1 data fee that depends on calldata size and L1 prices; it is not included. Converting to currency requires gas prices at the time of use, and is left to the [cost model](../giga/COST_MODEL_TEMPLATE.md).
 
-**Per scope and day**, the recurring on-chain cost is one `commitRoot`. Appeals, policy versions and attestations are occasional.
+**Per scope and day**, the recurring on-chain cost is one `commitRoot` (or `markEmpty`). Appeals, policy versions and attestations are occasional.
 
 ## 3. Demonstrator duration and data volume
 
