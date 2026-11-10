@@ -17,6 +17,8 @@
       "properties": {
         "registry": { "$ref": "#/$defs/address" },
         "anchor": { "$ref": "#/$defs/address" },
+        "eas": { "$ref": "#/$defs/address", "description": "EAS contract the resolvers accept calls from" },
+        "easSchemaRegistry": { "$ref": "#/$defs/address" },
         "resolvers": {
           "type": "object",
           "additionalProperties": false,
@@ -55,7 +57,7 @@
             }
           },
           "publisher": { "$ref": "#/$defs/address" },
-          "maxLagDays": { "type": "integer", "minimum": 0 },
+          "maxLagDays": { "type": "integer", "minimum": 1, "maximum": 4294967295, "description": "Back-fill window in days; 4294967295 (NO_LAG_LIMIT) disables the bound" },
           "charterHash": { "$ref": "#/$defs/bytes32" }
         }
       }

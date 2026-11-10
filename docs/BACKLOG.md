@@ -105,7 +105,7 @@ Statement to prove for each daily release: the published table is the k-suppress
 | VPR-040 | Add `slither`/MIESC and `ruff` to CI | CI fails on high-severity findings and lint errors |
 | VPR-041 | Gas report for typical operations | Table in `docs/ARCHITECTURE.md` |
 | VPR-042 | Fuzz/invariant tests for the registry (Foundry or Echidna) | Invariants from VPR-001 hold under fuzzing |
-| VPR-070 | Integration test of `IssuerRoleResolver` against the real EAS contracts (`SchemaRegistry` + `EAS.attest`, as a devDependency or a fork test), and a deployment check that each schema's registered resolver has the matching `SchemaKind` | Test attests and is refused through EAS itself; deployment script fails on a mismatch |
+| VPR-070 | **Done.** Integration test of `IssuerRoleResolver` against the real EAS contracts (`SchemaRegistry` + `EAS.attest`, as a devDependency or a fork test), and a deployment check that each schema's registered resolver has the matching `SchemaKind` | Test attests and is refused through EAS itself; deployment script fails on a mismatch |
 | VPR-046 | End-to-end demo (`examples/e2e/run.sh`): policy, registry, RPZ, aggregation, anchored root and row verification on a local network | Runs from a clean checkout with one command; CI job green on every push |
 | VPR-043 | REUSE compliance: SPDX headers on every file, `REUSE.toml` for files without headers | `reuse lint` passes in CI |
 | VPR-044 | Docs site (MkDocs or similar) published from `docs/` | Site builds in CI and is linked from the README |
