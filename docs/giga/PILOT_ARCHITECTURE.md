@@ -1,6 +1,6 @@
 # Pilot architecture
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.4.0*
+*CC BY 4.0 · Proposal package for a school pilot · v0.5.0*
 
 This page describes what runs where during the pilot and how the system behaves when connectivity, power or a component fails. It is written for readers without blockchain background; the technical specification is in [../ARCHITECTURE.md](../ARCHITECTURE.md) and [../INTERFACES.md](../INTERFACES.md).
 
