@@ -12,31 +12,22 @@ interface IPolicyRegistry {
 
 /// @title Metrics Anchor
 /// @author Xcapit (dpg@xcapit.com)
-/// @notice Anchors one Merkle root per scope per day. Each root commits to a public dataset of aggregated
-///         counts with small cells suppressed (unit id, day, category, count). Anyone can download the dataset
-///         from `datasetUri`, recompute the root and compare it with the one anchored here, or verify a single
-///         row on-chain with `verifyRow`.
-/// @dev Dataset format 2 (docs/INTERFACES.md I6): leaves and internal nodes are domain-separated (0x00 / 0x01),
-///      the leaf is computed here from the row itself, and it binds the anchored day.
-///      Invariants (checked by the Foundry invariant suite in test-foundry/AnchorInvariants.t.sol):
-///      - The publisher of a scope is appointed, rotated or revoked only by that scope's current governor in the
-///        registry. A governor rotation does not revoke the publisher automatically; the new governor should.
-///      - A publisher writes a day once, only after the UTC day has ended, and no more than `maxLagDays` days
-///        after it (1 = yesterday only; NO_LAG_LIMIT disables the bound, for back-filling historical data).
-///        A day with nothing to publish is marked empty, so a gap is never ambiguous.
-///      - Only the governor can correct an anchored or empty day. Corrections are public, carry a reason hash and
-///        the new dataset URI, and increment a revision counter; the previous root remains in the events. An
-///        anchored root is never 0, so a root of 0 always means an empty day.
-///      - The leaf does not bind the scope id: roots are stored per scope, so a row is only ever verified against
-///        the root of the scope it is checked for.
-///      Time on OP Stack: the sequencer produces blocks, each timestamped the previous one plus the block time, and
-///      the derivation rules keep every block that carries transactions within [L1 origin, L1 origin + 1800 s]
-///      (`max_sequencer_drift` since Fjord). L2 time can therefore run up to about 30 minutes ahead of L1, and can
-///      lag after a sequencer outage. The day number follows wall-clock UTC to about +/-30 minutes in normal
-///      operation: a sequencer, alone or with the publisher, could let a day be anchored up to about 30 minutes
-///      before it ends in real time. The sequencer can also delay a transaction across a day boundary; a
-///      publisher should anchor well inside its back-fill window. See docs/security/CONTRACT_ASSURANCE.md section 9.
-///      The contract holds no funds, is not upgradeable, and makes one external call, a view to the registry.
+/// @notice Anchors one Merkle root per scope per day. Each root commits to a public release of aggregated
+///         counts (unit id, day, category, count) with small cells suppressed. Anyone can recompute the root
+///         from the release at `datasetUri`, or check a single row on-chain with `verifyRow`.
+/// @dev Encoding (dataset format 2, docs/INTERFACES.md I6). leaf = keccak256(0x00 || day || count || len(unit) ||
+///      unit || len(category) || category); node = keccak256(0x01 || min(a, b) || max(a, b)). The leaf is
+///      computed here from the row, so an internal node cannot pass as a row, and it binds the day. It does
+///      not bind the scope: roots are stored per scope and a row is checked only against its own scope's root.
+///      Roles. The scope's current governor in the registry appoints, rotates or revokes the publisher; a
+///      governor handover does not revoke it. The publisher writes each (scope, day) once, after the UTC day
+///      has ended and within `maxLagDays`, and marks a day with nothing to publish as empty. Only the governor
+///      corrects a written day, with a reason hash; each correction increments `revision`.
+///      Time. Day numbers follow UTC to about +/-30 minutes on OP Stack, so a day can be anchored up to about
+///      30 minutes before it ends in real time, and the sequencer can delay a write across a day boundary
+///      (docs/security/CONTRACT_ASSURANCE.md section 9).
+///      Invariants: test-foundry/AnchorInvariants.t.sol. Holds no funds, is not upgradeable, and makes one
+///      external call, a view to the registry.
 contract MetricsAnchor {
     /// @notice Maximum length, in bytes, of a dataset URI written on-chain.
     uint256 public constant MAX_URI_LENGTH = 256;

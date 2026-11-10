@@ -3,30 +3,20 @@ pragma solidity =0.8.24;
 
 /// @title Verifiable Policy Registry
 /// @author Xcapit (dpg@xcapit.com)
-/// @notice Public, versioned, time-limited and contestable registry of content-filtering policies.
-/// @dev Each scope is governed by a single governor address, which is expected to be a multisig contract
-///      (for example a Safe with an m-of-n threshold); the registry itself only checks the address. The
-///      registry stores commitments only: the full policy document lives off-chain at `uri` and is identified
-///      by `contentHash`. Legally restricted lists are represented only by `restrictedListHash`. Appeals are
-///      recorded as hashes of appeal documents validated off-chain.
-///      Scope ids are derived on-chain from the creating governor and a scope name
-///      (`scopeIdOf(governor, name)`), so a canonical name cannot be front-run by another address. Verifiers
-///      still pin the chain id, this contract's address and the expected governor from a deployment manifest.
-///      The id binds the creating governor: after a handover it no longer equals scopeIdOf(currentGovernor, name),
-///      and the new governor could create a second scope with the same name under a different id. Verifiers
-///      therefore pin the scope id itself, never recompute it from the current governor.
-///      Separation of roles is enforced per address: the governor never holds an issuer role, including after a
-///      handover. One institution controlling several addresses is a governance matter, not a contract check.
-///      Invariants (checked by the Foundry invariant suite in test-foundry/RegistryInvariants.t.sol): versions are
-///      append-only; every version expires within the scope's maximum validity (at most 365 days); reason codes are
-///      in 1..6 and code 3 is used exactly for versions that resolve an appeal; an appeal is accepted only by a
-///      version of its scope that names it, and final appeal states never change; the governor and the pending
-///      governor never hold an issuer role; only the governor (or, to accept, the pending governor) mutates state.
-///      Time: `currentPolicy` compares expiry with block.timestamp. On OP Stack, blocks that carry transactions are
-///      timestamped within [L1 origin, L1 origin + 1800 s], so expiry follows wall-clock time to about +/-30 minutes
-///      in normal operation, with a larger lag possible after a sequencer outage; the sequencer can also delay a
-///      renewal. See docs/security/CONTRACT_ASSURANCE.md section 9.
-///      The contract holds no funds, is not upgradeable and makes no external calls.
+/// @notice Public, versioned, time-limited and contestable registry of content-filtering policies. It stores
+///         commitments only: each version's document lives off-chain at `uri` and is bound by `contentHash`;
+///         legally restricted lists are bound by `restrictedListHash`; appeals are stored as document hashes.
+/// @dev Trust. Each scope has one governor address, expected to be a Safe with an m-of-n threshold. The
+///      registry checks the address, not the threshold.
+///      Scope ids. scopeId = keccak256(abi.encode(creator, name)), so no other address can claim a name first.
+///      The id keeps binding the creator after a handover, and the new governor can create a second scope with
+///      the same name under another id; verifiers therefore pin the id and never recompute it.
+///      Roles. Separation is per address: neither the governor nor the pending governor ever holds an issuer
+///      role. Several addresses of one institution are a governance matter, outside the contract's view.
+///      Time. Expiry is compared with block.timestamp, which on OP Stack follows UTC to about +/-30 minutes and
+///      can lag after a sequencer outage (docs/security/CONTRACT_ASSURANCE.md section 9).
+///      Specification: docs/INTERFACES.md I2. Invariants: test-foundry/RegistryInvariants.t.sol.
+///      Holds no funds, is not upgradeable and makes no external calls.
 contract VerifiablePolicyRegistry {
     /// @notice Upper bound on any scope's maximum validity, so that "every version expires" cannot be
     ///         emptied of meaning by an arbitrarily large value.
