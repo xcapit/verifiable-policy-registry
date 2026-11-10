@@ -32,6 +32,7 @@ cd ..
 pip install -e tools && (cd tools && python -m pytest -q)    # tools, toolkit, privacy and CLI tests
 E2E_OUT=out ./examples/e2e/run.sh                              # demonstrator; writes out/evidence-manifest.json
 python tools/bench/bench_merkle.py                             # release benchmark
+(cd contracts && BENCH_CHECK=1 npx hardhat run scripts/bench-workload.js)   # one-year workload gas, checked
 ```
 
 Prerequisites: Node.js 20 or later, Python 3.10 or later (Halmos 0.3.3 tested with 3.12), Foundry 1.3.5. No secrets, paid services or network access are needed beyond package installation. CI runs the same commands on every push; [CONTRACT_ASSURANCE.md](../security/CONTRACT_ASSURANCE.md) records the expected results.
