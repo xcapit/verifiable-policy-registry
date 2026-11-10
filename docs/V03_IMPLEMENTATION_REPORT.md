@@ -116,7 +116,7 @@ VPR-049, VPR-055, VPR-058, VPR-059, VPR-060, VPR-012, VPR-033 to VPR-038, and th
 New:
 - `docs/V03_BASELINE_AND_GAP_ANALYSIS.md`, `docs/CLAIMS_AND_EVIDENCE.md`, `docs/V03_IMPLEMENTATION_REPORT.md`
 - `docs/security/`, `docs/privacy/`, `docs/toolkit/`, `docs/benchmarks/`, `docs/review/`
-- `docs/giga/` (8 files), `docs/esp/` (5 files), `docs/DPG_EVIDENCE_MATRIX.md`
+- `docs/giga/` (8 files), `docs/esp/` (5 files; moved to `docs/funding/` after v0.4.0), `docs/DPG_EVIDENCE_MATRIX.md`
 - ADR-0009 and ADR-0010
 - `tools/vpr/toolkit.py`, `tools/bench/bench_merkle.py`
 - `tools/tests/test_toolkit.py`, `test_privacy.py`, `test_cli.py`

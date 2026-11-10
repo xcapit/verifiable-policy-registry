@@ -56,7 +56,7 @@ Operating options are described in [../SUSTAINABILITY.md](../SUSTAINABILITY.md):
 
 | Decision | Owner | When |
 | --- | --- | --- |
-| Who funds the alpha (resolver hosting, reviewer, support, weeks 5–16) | Unknown — input required; not covered by the proposed ESP scope | Before Gate A |
+| Who funds the alpha (resolver hosting, reviewer, support, weeks 5–16) | Unknown — input required; not covered by a tooling grant ([funding routes](../funding/FUNDING_ROUTES.md) §3) | Before Gate A |
 | Who operates after week 16 | Unknown — decision by confirmed partners | Before Gate C |
 | Who pays operating costs | Unknown — input required from confirmed partners | Before Gate C |
 | Whether to continue to phase 2 | Confirmed governing institutions, on the evaluation evidence | At Gate C |

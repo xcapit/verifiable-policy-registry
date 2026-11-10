@@ -1,14 +1,13 @@
-# Application evidence index
+# Funding evidence index
 
-*CC BY 4.0 · Entry point of the ESP evidence package. Each assertion an application might make is mapped to the file that supports it and to its status. The package is a preparation aid; it is not an application and implies no review or endorsement by the Ethereum Foundation.*
-
-> **Route status checked 2026-11-09:** the official ESP site lists no active Wishlist, RFP or open round. Office Hours remain available for non-financial guidance but are not a funding application. This package is therefore **Blocked** as an application until ESP publishes a relevant funding opportunity. Before any submission, match the scope to that opportunity and fill every field marked *TBD — maintainer input required*.
+*CC BY 4.0 · Entry point of the funding evidence package. Each assertion an application might make is mapped to the file that supports it and to its status. The package serves any funder of open Ethereum infrastructure; [FUNDING_ROUTES](FUNDING_ROUTES.md) lists the programmes considered and what each would fund. It is a preparation aid, not an application, and implies no review or endorsement by any funder.*
 
 ## Package contents
 
 | Document | Purpose |
 | --- | --- |
-| [PUBLIC_GOODS_CASE](PUBLIC_GOODS_CASE.md) | Problem, why Ethereum, outputs, CROPS alignment |
+| [FUNDING_ROUTES](FUNDING_ROUTES.md) | Funding programmes considered, their fit and status |
+| [PUBLIC_GOODS_CASE](PUBLIC_GOODS_CASE.md) | Problem, why Ethereum, outputs, alignment with funders' criteria |
 | [PROPOSED_SCOPE_AND_MILESTONES](PROPOSED_SCOPE_AND_MILESTONES.md) | Existing work versus proposed milestones, with acceptance methods |
 | [ECOSYSTEM_REUSE_AND_ADOPTION](ECOSYSTEM_REUSE_AND_ADOPTION.md) | Who can build on it and how adoption is measured |
 | [RISKS_AND_DEPENDENCIES](RISKS_AND_DEPENDENCIES.md) | Delivery risks, external dependencies, L2 assumptions |
@@ -29,7 +28,7 @@
 | Performance figures | See report | [Benchmarks](../benchmarks/BENCHMARKS.md) (local and CI environments only; no production claims) |
 | Contracts are audited | **Not true at v0.4.0** | Audit planned in M3 ([roadmap](../ROADMAP.md)) |
 | Deployed on a public network | **Not true at v0.4.0** | Planned in M2 (testnet) and Gate C (mainnet) |
-| Endorsement by the EF, UNICEF, Giga or DPGA | **None exists** | — |
+| Endorsement by any funder, UNICEF, Giga or the DPGA | **None exists** | — |
 | Per-claim status for the whole project | Ledger | [CLAIMS_AND_EVIDENCE](../CLAIMS_AND_EVIDENCE.md) |
 | Guide for an independent reviewer | Prepared | [Reviewer guide](../review/V03_REVIEWER_GUIDE.md) |
 
@@ -38,6 +37,4 @@
 - Budget in USD per milestone, including the external audit: **TBD — maintainer input required**.
 - Time allocation per team member: **TBD — maintainer input required**.
 - Adoption targets: **TBD — maintainer input required**.
-- Application route: **Blocked — no active Wishlist, RFP or open round on 2026-11-09; choose only after a relevant opportunity is published**.
-
-The route is not merely an administrative field: eligibility and requested scope depend on the published Wishlist, RFP or round. No document in this directory should be submitted as a general or unsolicited funding application.
+- Application route: chosen per programme in [FUNDING_ROUTES](FUNDING_ROUTES.md). Eligibility and scope depend on each programme's published call, so no document in this directory should be submitted as a general or unsolicited application.

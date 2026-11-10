@@ -1,8 +1,6 @@
 # Public-goods case
 
-*CC BY 4.0 · Part of the ESP evidence package ([index](APPLICATION_EVIDENCE_INDEX.md)). This package describes the project for an Ethereum Foundation Ecosystem Support Program (ESP) application. It is not an application, it does not claim eligibility, and it implies no ESP review or endorsement.*
-
-> **Current route boundary (checked 2026-11-09):** ESP lists no active Wishlist, RFP or open round. Office Hours provide non-financial guidance and are not a funding application. This case must be matched to a future published funding opportunity before it can support a submission.
+*CC BY 4.0 · Part of the funding evidence package ([index](EVIDENCE_INDEX.md)). It describes the project as open Ethereum infrastructure for any public-goods funder. It is not an application and implies no review or endorsement by any funder; programme-specific notes are in [FUNDING_ROUTES](FUNDING_ROUTES.md).*
 
 ## 1. Problem
 
@@ -44,15 +42,16 @@ All outputs are open and reusable without permission: contracts and verifier und
 
 The second reference use case, which is not about schools, is in [`examples/public-service/`](../../examples/public-service). It is a synthetic public-service reliability dataset verified by the same generic verifier, and it shows that the toolkit does not depend on school-specific logic.
 
-## 4. Alignment with CROPS
+## 4. Alignment with funders' criteria
 
-The ESP describes its priorities in terms of censorship resistance, open source, privacy and security (CROPS). The project relates to them as follows. This is a description of intent and evidence, not a claim that the ESP shares this reading:
+Funders of Ethereum public goods state their priorities in similar terms. The Ethereum Foundation's ESP, for instance, asks for alignment with censorship resistance, open source, privacy and security (CROPS). The project relates to them as follows; this is a description of intent and evidence, not a claim that any funder shares this reading.
 
-- **Censorship resistance.** The tension is real: VPR provides accountability for institutional blocking, not censorship resistance in the CROPS sense, and the ESP may judge it out of scope. The design does not make filtering impossible to abuse. The implemented registry makes policy commitments, reasons, appeal status and contractual expiry public. Threshold signing, resolver behaviour after expiry and external recourse depend on the proposed deployment model ([white paper](../WHITEPAPER.md) §6.2, adversary A2).
-- **Open source.** All code, schemas and documents are public under OSI-approved or Creative Commons licences.
-- **Privacy.** The design permits only `(unit_id, day, category)` events to leave the resolver process, and the implemented aggregator rejects extra input fields and publishes only thresholded aggregates. The resolver and exporter are not implemented or audited, so the end-to-end property remains Designed ([privacy analysis](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md)).
+- **Censorship resistance.** Network filtering already exists in schools and public networks, usually as an opaque service. VPR does not add filtering; it constrains filtering that is already there. Every blocking policy becomes public with its reasons, needs a threshold of independent signers, expires by default and can be contested on-chain, and the project refuses ISP-wide or national blocking ([ADR-0006](../adr/0006-scope-school-networks-only.md)). The limit is stated plainly: VPR makes institutional blocking accountable, it does not make it impossible. Threshold signing, resolver behaviour after expiry and external recourse depend on the deployment model ([white paper](../WHITEPAPER.md) §6.2, adversary A2).
+- **Open source.** All code, schemas and documents are public: contracts and verifier under Apache-2.0, other code under AGPL-3.0-only, schemas and datasets under CC0-1.0, documentation under CC BY 4.0.
+- **Privacy.** The design permits only `(unit_id, day, category)` events to leave the resolver process, and the implemented aggregator rejects extra input fields and publishes only thresholded aggregates. The resolver and exporter are not implemented or audited, so the end-to-end property remains designed, not demonstrated ([privacy analysis](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md)).
 - **Security.** The contracts are kept minimal, an external audit is planned before mainnet, and negative tests cover tampering ([claims and evidence](../CLAIMS_AND_EVIDENCE.md)).
+- **Portability.** The contracts are standard Solidity and use EAS, so they run on any EVM network where EAS is deployed. OP Mainnet is the reference target ([ADR-0003](../adr/0003-commit-dont-store-on-op-mainnet.md)); a second network is planned to exercise platform independence ([DPG evidence matrix](../DPG_EVIDENCE_MATRIX.md), indicator 4).
 
 ## 5. What is not proposed
 
-No token, no proprietary component and no single-customer deliverable. A grant would fund only the open outputs. Xcapit may offer paid operation of a deployment outside any grant ([sustainability](../SUSTAINABILITY.md), operator option 4); this would be disclosed, and the operator would remain separated from testing and governance (ADR-0005). The connected-school alpha is a validation environment; its operation, hosting and reviewer costs are outside the scope proposed to the ESP and need separate funding, which is not yet identified.
+No token, no proprietary component and no single-customer deliverable. A grant would fund only the open outputs. Xcapit may offer paid operation of a deployment outside any grant ([sustainability](../SUSTAINABILITY.md), operator option 4); this would be disclosed, and the operator would remain separated from testing and governance (ADR-0005). The connected-school alpha is a validation environment; its operation, hosting and reviewer costs are outside the scope of a tooling grant and need separate funding ([FUNDING_ROUTES](FUNDING_ROUTES.md) §3).

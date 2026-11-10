@@ -44,7 +44,7 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 | --- | --- |
 | evaluating the approach (funders, partners, reviewers) | [White paper](docs/WHITEPAPER.md) · [Claims and evidence](docs/CLAIMS_AND_EVIDENCE.md) · [Reviewer guide](docs/review/V03_REVIEWER_GUIDE.md) · [Do no harm](docs/DO_NO_HARM.md) · [DPG evidence matrix](docs/DPG_EVIDENCE_MATRIX.md) |
 | assessing a pilot (Giga, ministries, providers) | [Pilot readiness](docs/giga/PILOT_READINESS.md) · [Operating model](docs/giga/OPERATING_MODEL.md) · [Cost model](docs/giga/COST_MODEL_TEMPLATE.md) · [Sustainability](docs/SUSTAINABILITY.md) |
-| assessing ecosystem value (Ethereum builders, ESP) | [Public-goods case](docs/esp/PUBLIC_GOODS_CASE.md) · [Toolkit guide](docs/toolkit/INTEGRATION_GUIDE.md) · [Second use case](examples/public-service/README.md) |
+| assessing ecosystem value (Ethereum builders and funders) | [Public-goods case](docs/funding/PUBLIC_GOODS_CASE.md) · [Funding routes](docs/funding/FUNDING_ROUTES.md) · [Toolkit guide](docs/toolkit/INTEGRATION_GUIDE.md) · [Second use case](examples/public-service/README.md) |
 | building a component | [Architecture](docs/ARCHITECTURE.md) · [Interfaces](docs/INTERFACES.md) · [Decision records](docs/adr) · [Backlog](docs/BACKLOG.md) |
 | operating or governing a deployment | [Policy governance](docs/GOVERNANCE.md) · [Privacy statement (RFC 8932)](docs/PRIVACY_STATEMENT.md) · [Roadmap](docs/ROADMAP.md) |
 | contributing | [Contributing](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Project governance](GOVERNANCE.md) |
@@ -117,7 +117,7 @@ The pilot targets school networks, but the components are generic and released f
 | `vpr` tools | Implemented | Canonical hashing of policy documents, RPZ compilation, aggregation with small-cell suppression and Merkle proofs |
 | ZK aggregation verifier and `vpr verify-proof` | Planned (M4, testnet; mainnet in phase 2) | On-chain check that a published table is the correct suppressed aggregation of a committed private log |
 
-The design applies to any bounded network with an accountable governor: libraries, public Wi-Fi, health centres or NGO networks. It is not meant for ISP-wide or national blocking ([ADR-0006](docs/adr/0006-scope-school-networks-only.md)).
+The contracts are standard Solidity and use EAS, so they run on any EVM network where EAS is deployed; OP Mainnet is the reference target. The design applies to any bounded network with an accountable governor: libraries, public Wi-Fi, health centres or NGO networks. It is not meant for ISP-wide or national blocking ([ADR-0006](docs/adr/0006-scope-school-networks-only.md)).
 
 ## Design principles
 

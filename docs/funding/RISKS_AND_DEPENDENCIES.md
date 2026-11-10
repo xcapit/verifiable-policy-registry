@@ -1,6 +1,6 @@
 # Risks and dependencies
 
-*CC BY 4.0 · Part of the ESP evidence package ([index](APPLICATION_EVIDENCE_INDEX.md)). The full threat model is in [THREAT_MODEL](../security/THREAT_MODEL.md); this page covers delivery risks for the proposed scope.*
+*CC BY 4.0 · Part of the funding evidence package ([index](EVIDENCE_INDEX.md)). The full threat model is in [THREAT_MODEL](../security/THREAT_MODEL.md); this page covers delivery risks for the proposed scope.*
 
 ## 1. Delivery risks
 
@@ -23,7 +23,7 @@
 | External auditor | Gate C | Not engaged | Mainnet deployment waits |
 | Outside cryptographic reviewer | M1 ZK specification | Not engaged | M4 proceeds at higher risk; recorded as unreviewed |
 | Pilot partners (Giga, ministry, provider) | Validation alpha only | No commitment exists | The reusable outputs remain deliverable on a synthetic deployment (roadmap Gate A) |
-| Relevant ESP funding opportunity | Any ESP application | No active Wishlist, RFP or open round as checked on 2026-11-09 | Seek non-financial project feedback through Office Hours; adapt this package only when a relevant opportunity is published |
+| Matching funding programme | Any grant application | Several programmes considered; none with an open call that matches the full scope as checked on 2026-11-10 ([FUNDING_ROUTES](FUNDING_ROUTES.md)) | Split the scope across programmes (tooling, audit, pilot operations); seek non-financial feedback (ESP Office Hours) |
 
 ## 3. L2-specific assumptions
 

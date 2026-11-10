@@ -1,6 +1,6 @@
 # Proposed scope and milestones
 
-*CC BY 4.0 · Part of the ESP evidence package ([index](APPLICATION_EVIDENCE_INDEX.md)). Proposed work only: nothing here is funded, approved or scheduled with any funder. As checked on 2026-11-09, ESP has no active Wishlist, RFP or open round; this scope is not submit-ready and must be adapted to a future published opportunity.*
+*CC BY 4.0 · Part of the funding evidence package ([index](EVIDENCE_INDEX.md)). Proposed work only: nothing here is funded, approved or scheduled with any funder. The scope is not submit-ready: it is adapted to each programme's published call ([FUNDING_ROUTES](FUNDING_ROUTES.md)).*
 
 ## 1. Existing work, not part of a future request
 
@@ -42,4 +42,4 @@ Current maintainers are listed in [MAINTAINERS.md](../../MAINTAINERS.md). Time a
 
 ## 5. Reporting
 
-If funded under a compatible opportunity, each milestone would close with a tagged release, a CHANGELOG entry, acceptance evidence linked from [APPLICATION_EVIDENCE_INDEX](APPLICATION_EVIDENCE_INDEX.md), and an update of the [claims ledger](../CLAIMS_AND_EVIDENCE.md).
+If funded under a compatible opportunity, each milestone would close with a tagged release, a CHANGELOG entry, acceptance evidence linked from [APPLICATION_EVIDENCE_INDEX](EVIDENCE_INDEX.md), and an update of the [claims ledger](../CLAIMS_AND_EVIDENCE.md).

@@ -1,6 +1,6 @@
 # Ecosystem reuse and adoption
 
-*CC BY 4.0 · Part of the ESP evidence package ([index](APPLICATION_EVIDENCE_INDEX.md)).*
+*CC BY 4.0 · Part of the funding evidence package ([index](EVIDENCE_INDEX.md)).*
 
 ## 1. Who could build on this
 

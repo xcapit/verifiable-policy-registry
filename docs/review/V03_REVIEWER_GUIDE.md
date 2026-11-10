@@ -11,7 +11,7 @@
   - schemas: `schemas/`;
   - demonstrator: `examples/e2e/`, `contracts/scripts/e2e.js`;
   - specifications and claims: `docs/security/`, `docs/privacy/`, `docs/CLAIMS_AND_EVIDENCE.md`, `docs/INTERFACES.md`;
-  - plans: `docs/ROADMAP.md`, `docs/giga/`, `docs/esp/`, `docs/DPG_EVIDENCE_MATRIX.md`.
+  - plans: `docs/ROADMAP.md`, `docs/giga/`, `docs/funding/`, `docs/DPG_EVIDENCE_MATRIX.md`.
 - **Out of scope**, because it does not exist yet:
   - a running resolver;
   - the sync daemon, exporter, relayer and dashboard;
@@ -45,7 +45,7 @@ Prerequisites: Node.js 20 or later, Python 3.10 or later. No secrets, no paid se
 | Measurements | [benchmarks/BENCHMARKS.md](../benchmarks/BENCHMARKS.md) |
 | Plan and gates | [ROADMAP.md](../ROADMAP.md) |
 | Pilot proposal | [giga/PILOT_READINESS.md](../giga/PILOT_READINESS.md) |
-| Ecosystem case | [esp/APPLICATION_EVIDENCE_INDEX.md](../esp/APPLICATION_EVIDENCE_INDEX.md) |
+| Ecosystem case | [funding/EVIDENCE_INDEX.md](../funding/EVIDENCE_INDEX.md) |
 | DPG self-assessment | [DPG_EVIDENCE_MATRIX.md](../DPG_EVIDENCE_MATRIX.md) |
 
 ## 4. Known limitations and unresolved items

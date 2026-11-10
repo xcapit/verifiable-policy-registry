@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- Funding package moved from `docs/esp/` to `docs/funding/` and made funder-neutral: generic public-goods case, new [FUNDING_ROUTES](docs/funding/FUNDING_ROUTES.md) with the programmes considered, their fit and dated status (ESP, Optimism, Arbitrum Audit Program, Base, Celo, TheDAO Security Fund, Gitcoin and Octant, ZKsync). The censorship-resistance argument now leads with how VPR constrains filtering that already exists. README states EVM portability.
 - Licensing ([ADR-0011](docs/adr/0011-licence-split-and-dataset-licence.md)): contracts and the planned zero-knowledge verifier move to Apache-2.0; the rest of the code stays AGPL-3.0-only; published datasets are CC0-1.0 (closes VPR-059). NOTICE, CONTRIBUTING, CITATION.cff, publiccode.yml and the DPG evidence matrix updated.
 
 ### Added
