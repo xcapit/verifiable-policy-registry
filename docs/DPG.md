@@ -25,6 +25,7 @@ All mandatory dependencies are open source or open standards, and each has a fun
 | Safe multisig | Open source (LGPL-3.0) | Any contract wallet or multisig that can call the registry: the governor is a plain address |
 | Unbound | Open source (BSD) | PowerDNS Recursor, Knot Resolver or BIND: the zone is standard RPZ |
 | Hardhat, Python, pycryptodome, PyYAML | Open source | Foundry; any keccak256 implementation |
+| EAS contracts (`@ethereum-attestation-service/eas-contracts`, MIT; test-only, deployed from published artifacts) | Open source | Any EAS deployment, or a fork test against a public network |
 
 No software component requires a proprietary service, a paid API or a specific cloud provider. Deployments may need licensed data, such as threat feeds or a restricted list obtained under its provider's terms; those are inputs, not software dependencies.
 

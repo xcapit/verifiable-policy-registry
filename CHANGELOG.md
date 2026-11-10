@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- Integration test of `IssuerRoleResolver` through the real EAS contracts (EAS 1.9.0 artifacts, pinned devDependency): issuance only by the role holder, refusal across scopes and after a role is withdrawn, revocation by the attester, batches, malformed data and value (VPR-070).
+- `scripts/check-eas.js`: verifies a deployment manifest's EAS schema bindings (UID, schema string, resolver kind, registry and EAS wiring).
+
+### Changed
+- Deployment manifest: optional `contracts.eas` and `contracts.easSchemaRegistry`; `maxLagDays` follows the anchor semantics (1 to 2³²−1).
+
 ## [0.4.0] - 2026-11-09
 
 Pre-audit hardening of the contracts, with a further internal review, and white paper v0.6. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment. Pre-audit hardening (closes VPR-060, VPR-065 to VPR-069; the resolver part of VPR-012; the format of VPR-049). **Breaking changes** to the contracts and tools.
