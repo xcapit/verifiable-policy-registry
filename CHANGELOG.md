@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-11
+
+Evidence for an expert review of the blockchain side. The release adds bounded symbolic checks of every state-changing function, a one-year workload benchmark with the OP Mainnet L1 data fee, and white paper v0.7 with a formal trust model, properties stated against named adversaries, and a finality figure. Contract logic is unchanged since v0.4.0; only NatSpec comments changed. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment.
+
 ### Added
 - Bounded symbolic checks with Halmos 0.3.3 (`contracts/test-foundry/symbolic/`, `scripts/symbolic_check.py`, CI job `symbolic`).
   - The acceptance rule of every state-changing function of the registry and the anchor, for all inputs within stated bounds: success exactly when INTERFACES I2 and I7 accept the call, and the stored result on success.
@@ -33,6 +37,9 @@ All notable changes to this project are documented here. The format follows [Kee
 - Documentation: the v0.3 planning reports (baseline and gap analysis, implementation report) are removed; they described how the release was prepared, not the system, and remain in the v0.3.0 to v0.5.0 tags. The reviewer guide (`docs/review/REVIEWER_GUIDE.md`) covers the current toolchain and scope.
 - Stale statements corrected: anchor corrections in the cryptographic evidence and threat model (T12), the architecture sequence and on-chain data table, the opcode target in the public-goods case, ADR-0003's L1 cost argument, interface and version headers. ADR-0007 is renamed to match its corrected wording (small-cell suppression, not k-anonymity).
 - The 15 mutants that did not come from the suites' authors are attributed to a separate internal review; no external review has taken place (claim C45).
+- INTERFACES I2 and I7 state every rule the symbolic checks test: the validity bound, the resolved-appeal conditions, appeal rounds, `setIssuer` on the governor, the in-force rule, scopes without a publisher, and `correctRoot` keeping `committedAt`.
+- Contract NatSpec: the contract-level notes on trust, scope ids, roles and time are rewritten more precisely (comments only; compiled code unchanged).
+- Authorship: `CITATION.cff` lists a single author with ORCID, and the white paper's author line links it.
 
 ## [0.5.0] - 2026-11-10
 
@@ -160,7 +167,8 @@ First public release: a proof of concept and the documentation needed for extern
 - Code of conduct, security policy, project governance, maintainers, support, contribution guide with DCO, issue and pull request templates.
 - Licence texts (AGPL-3.0-only, CC0-1.0, CC-BY-4.0), NOTICE, CITATION.cff and publiccode.yml.
 
-[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.2.0...v0.3.0
