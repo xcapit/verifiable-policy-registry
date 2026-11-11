@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: contracts/package-lock.json
       - run: npm ci
       - run: npx hardhat test
+      - name: One-year workload gas matches docs/benchmarks/workload-gas.json
+        run: BENCH_CHECK=1 npx hardhat run scripts/bench-workload.js
       - name: Gas report (per function)
         run: REPORT_GAS=1 GAS_REPORT_FILE=gas-report.txt npx hardhat test > /dev/null && cat gas-report.txt
       - name: Coverage (gate - statements, lines and functions 100 %, branches at least 98 %)

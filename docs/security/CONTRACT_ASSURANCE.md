@@ -166,7 +166,7 @@ Measured by `hardhat-gas-reporter` over the unit tests in CI run [42795525989](h
 | `correctRoot` | 39 609 | 84 305 | 61 686 |
 | Deployment: registry / anchor / resolver | | | 1 679 541 / 1 148 815 / 687 077 |
 
-These are L2 execution gas figures. On OP Stack chains a transaction also pays an L1 data fee: since the Fjord upgrade it is computed from a FastLZ-based estimate of the compressed size of the full signed transaction, priced with the L1 base fee and the blob base fee; chains on the Isthmus upgrade may add an operator fee. Neither is included. The recurring cost per scope and day is one `commitRoot` (or `markEmpty`).
+These are L2 execution gas figures. On OP Stack chains a transaction also pays an L1 data fee: since the Fjord upgrade it is computed from a FastLZ-based estimate of the compressed size of the full signed transaction, priced with the L1 base fee and the blob base fee; chains on the Isthmus upgrade may add an operator fee. Neither is included in this table. The recurring cost per scope and day is one `commitRoot` (or `markEmpty`). The table averages the unit tests' calls, whose URIs are mostly short. The one-year workload in [BENCHMARKS §2.1](../benchmarks/BENCHMARKS.md#21-one-year-of-one-scope-with-the-l1-data-fee) uses 66-byte `ipfs://` URIs, which take three storage slots more, and reports the L1 data fee read from OP Mainnet's oracle: for example, `commitRoot` costs 166 651 gas there, against the 116 835 average here.
 
 ## 9. Time and ordering on OP Stack
 

@@ -11,6 +11,11 @@ All notable changes to this project are documented here. The format follows [Kee
   - The leaf encoding, as a secondary check.
   - Canaries that must fail, and 22 of the targeted mutants caught.
   - Claim C57.
+- One-year workload benchmark for one scope (`contracts/scripts/bench-workload.js`, `docs/benchmarks/workload-gas.json`).
+  - Execution gas per operation (min, median, max) with realistic hashes, URIs and transaction encoding; CI checks it exactly.
+  - L1 data fee and L2 base fee from OP Mainnet's `GasPriceOracle` (`scripts/bench-l1fee.js`, read-only), calibrated against receipts and taken as the median of seven daily snapshots.
+  - Finding: attestations per school and per version are 93 % of the execution gas, and the L1 data fee is most of each transaction's cost.
+  - BENCHMARKS §2.1, contract assurance §8, cost model and claim C48 updated.
 
 ### Changed
 - White paper v0.7.

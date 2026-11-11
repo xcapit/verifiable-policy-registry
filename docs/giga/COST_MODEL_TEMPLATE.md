@@ -17,10 +17,10 @@ A template for computing the cost of running the system per school. **No figure 
 | C | Test cycle length | months | Unknown — input required (reviewer and governing institutions, M1) |
 | D_month | Days in the billing month | days/month | Calendar input for the period being costed |
 | A | Public attestations per school per test cycle | attestations | Unknown — input required (reviewer, M1) |
-| g_att | Gas per attestation | gas | Unknown — measured on the test network (operator, M2) |
-| g_root | Gas per daily root anchoring | gas | Unknown — measured on the test network (operator, M2) |
-| g_pol | Gas per policy version | gas | Unknown — measured on the test network (operator, M2) |
-| p_gas | Gas price × currency per unit of gas on the chosen network | currency/gas | Unknown — at the time of operation |
+| g_att | Gas per attestation | gas | Measured on the Hardhat EVM: 455 277 per independent test, about 286 000 per school in a deployment batch (BENCHMARKS §2.1); to be confirmed on the test network (operator, M2) |
+| g_root | Gas per daily root anchoring | gas | Measured on the Hardhat EVM: 166 651 (`commitRoot`), 56 106 (`markEmpty`) (BENCHMARKS §2.1); to be confirmed on the test network (operator, M2) |
+| g_pol | Gas per policy version | gas | Measured on the Hardhat EVM: 196 449 median, without the Safe's overhead (BENCHMARKS §2.1); to be confirmed on the test network (operator, M2) |
+| p_gas | Gas price × currency per unit of gas on the chosen network | currency/gas | Unknown — at the time of operation. On OP Stack the L1 data fee dominates and is priced separately (BENCHMARKS §2.1 gives L1 gas per operation) |
 | V | Policy versions per month per scope | versions/month | Unknown — derived from the Gate A validity bound and actual change rate |
 | P_h | Prover machine cost per hour (from M4) | currency/hour | Unknown — benchmarks (VPR-036, M4) |
 | P_t | Proving hours per scope per day (from M4) | hours/day | Unknown — benchmarks (VPR-036, M4) |
