@@ -5,7 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
-- ADR-0011 (proposed, for the M1 review): bind policy and appeal documents to their deployment (chain id and registry) without changing scope ids, and add a per-scope notice period before a version takes effect, with an emergency path bounded to 7 days in any 30. Linked from the white paper §6.2, threat model T47 and backlog VPR-071.
+- ADR-0011 (proposed, for the M1 review): bind policy and appeal documents to their deployment (chain id, registry and scope id) without changing scope ids, and add a per-scope, capped notice period before a policy version takes effect, with an emergency path bounded to 7 days in any 30 (durations to be set at the review). Linked from the white paper §6.2, threat model T47 and backlog VPR-071.
 
 ## [0.6.0] - 2026-11-11
 
