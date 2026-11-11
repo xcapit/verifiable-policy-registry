@@ -27,8 +27,8 @@
 | Cryptographic encodings and the ZK relation are specified | Designed (ZK not implemented) | [ZK and cryptographic evidence](../security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md) |
 | Threats and privacy risks are analysed with residual risks | Designed | [Threat model](../security/THREAT_MODEL.md), [privacy analysis](../privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md) |
 | Performance figures | See report | [Benchmarks](../benchmarks/BENCHMARKS.md) (local and CI environments only; no production claims) |
-| Contracts are audited | **Not true at v0.6.0** | Audit planned in M3 ([roadmap](../ROADMAP.md)) |
-| Deployed on a public network | **Not true at v0.6.0** | Planned in M2 (testnet) and Gate C (mainnet) |
+| Contracts are audited | **Not true at v0.7.0** | Audit planned in M3 ([roadmap](../ROADMAP.md)) |
+| Deployed on a public network | **Not true at v0.7.0** | Planned in M2 (testnet) and Gate C (mainnet) |
 | Endorsement by the EF, UNICEF, Giga or DPGA | **None exists** | — |
 | Per-claim status for the whole project | Ledger | [CLAIMS_AND_EVIDENCE](../CLAIMS_AND_EVIDENCE.md) |
 | Guide for an independent reviewer | Prepared | [Reviewer guide](../review/REVIEWER_GUIDE.md) |
