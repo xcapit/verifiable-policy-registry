@@ -35,7 +35,7 @@ def _out(a, obj: dict, text: str) -> None:
 
 def cmd_policy_hash(a):
     p = policy.load(a.policy)
-    obj = {"scope": p.scope, "version": p.doc["version"], "contentHash": p.content_hash()}
+    obj = {"scope": p.scope, "version": p.doc["version"], "contentHash": p.content_hash(), "rulesDigest": p.rules_digest()}
     if a.governor:
         obj["governor"] = a.governor
         obj["scopeId"] = p.scope_id(a.governor)
@@ -173,7 +173,7 @@ def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="vpr", description="Verifiable Policy Registry tools (toolkit API v1)")
     sub = ap.add_subparsers(required=True)
 
-    s = sub.add_parser("policy-hash", help="validate a policy and print its content hash (and scope id, given the governor)")
+    s = sub.add_parser("policy-hash", help="validate a policy and print its content hash and rules digest (and scope id, given the governor)")
     s.add_argument("policy")
     s.add_argument("--governor", help="governor address; the on-chain scope id is keccak256(abi.encode(governor, scope))")
     s.add_argument("--json", action="store_true")

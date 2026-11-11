@@ -33,6 +33,8 @@ REASON_CODES = {
 
 REQUIRED_KEYS = {"scope", "version", "profile", "categories", "local_blocks", "exceptions"}
 OPTIONAL_KEYS = {"valid_days", "reason_code", "threat_feeds", "restricted_list_hash", "feed_hashes"}
+# Keys that a scheduled renewal may change without changing what is blocked (ADR-0012).
+RENEWAL_KEYS = frozenset({"version", "reason_code", "valid_days"})
 PROFILES = {"primary", "secondary", "teachers"}
 SCOPE_RE = re.compile(r"[a-z0-9-]+:[A-Z]{2}:[a-z0-9-]+")  # used with fullmatch
 CATEGORY_RE = re.compile(r"[a-z0-9_-]{1,64}")  # used with fullmatch
@@ -56,6 +58,17 @@ class Policy:
 
     def content_hash(self) -> str:
         return to_hex(keccak256(self.canonical_json()))
+
+    def rules_digest(self) -> str:
+        """keccak256 of the canonical document without RENEWAL_KEYS (ADR-0012).
+
+        Two versions with the same rules digest block and allow exactly the same things, so an independent test
+        of one remains evidence for the other. A rules digest is never the content hash of a valid policy,
+        because it hashes a document without the required `version` key.
+        """
+        rules = {k: v for k, v in self.doc.items() if k not in RENEWAL_KEYS}
+        canonical = json.dumps(rules, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        return to_hex(keccak256(canonical))
 
     def scope_id(self, governor: str) -> str:
         """bytes32 scope id used on-chain: keccak256(abi.encode(governor, scope)) (VerifiablePolicyRegistry.scopeIdOf)."""
