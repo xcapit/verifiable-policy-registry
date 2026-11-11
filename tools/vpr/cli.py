@@ -8,6 +8,8 @@
     vpr prove-row        dataset.csv --index 0
     vpr verify-row       proof.json
     vpr restricted-hash  restricted.txt
+    vpr check-carryover  tested-v3.yaml in-force-v5.yaml --tested-hash 0x<h3> --in-force-hash 0x<h5>
+    vpr check-renewal    v4.yaml v5.yaml --reason-code 2
 
 Exit codes: 0 success; 1 verification failed (mismatching root or proof); 2 invalid input or usage,
 including any unexpected error. verify-row without --root only checks self-consistency (anchored=false).
@@ -163,6 +165,47 @@ def cmd_check_onchain(a):
     return EXIT_OK if ok else EXIT_MISMATCH
 
 
+def _anchor(pairs: dict) -> tuple[dict, bool]:
+    """Compare documents with on-chain content hashes. pairs: name -> (Policy, hash or None)."""
+    out = {}
+    for name, (p, h) in pairs.items():
+        expected = _root(h) if h is not None else None
+        out[name] = {"document": p.content_hash(), "onchain": expected, "match": expected is None or p.content_hash() == expected}
+    return out, all(v["onchain"] is not None for v in out.values())
+
+
+def _report(r: dict, ok: bool, anchored: bool, verdict: str) -> str:
+    lines = [f"{k:<22} {'ok' if v else 'MISMATCH'}" for k, v in r["checks"].items()]
+    state = lambda v: "unchecked" if v["onchain"] is None else ("ok" if v["match"] else "MISMATCH")  # noqa: E731
+    lines += [f"contentHash {k:<10} {state(v)}  {v['document']}" for k, v in r["contentHash"].items()]
+    lines += [f"note: {x}" for x in r["limits"]]
+    if not anchored:
+        lines.append("note: not checked against on-chain content hashes; pass them to bind the documents to the registry")
+    return "\n".join(lines + [verdict if ok else "MISMATCH"])
+
+
+def cmd_check_carryover(a):
+    """ADR-0012: does an independent test of one version remain evidence for the version in force?"""
+    tested, in_force = policy.load(a.tested), policy.load(a.in_force)
+    r = policy.carry_over(tested, in_force)
+    r["contentHash"], r["anchored"] = _anchor({"tested": (tested, a.tested_hash), "inForce": (in_force, a.in_force_hash)})
+    ok = r["carriesOver"] and all(v["match"] for v in r["contentHash"].values())
+    r["match"] = ok
+    _out(a, r, _report(r, ok, r["anchored"], "CARRIES OVER"))
+    return EXIT_OK if ok else EXIT_MISMATCH
+
+
+def cmd_check_renewal(a):
+    """GOVERNANCE reason code 2: a scheduled renewal keeps the rules digest of the version it renews."""
+    previous, renewal = policy.load(a.previous), policy.load(a.renewal)
+    r = policy.check_renewal(previous, renewal, a.reason_code)
+    r["contentHash"], r["anchored"] = _anchor({"previous": (previous, a.previous_hash), "renewal": (renewal, a.renewal_hash)})
+    ok = r["match"] and all(v["match"] for v in r["contentHash"].values())
+    r["match"] = ok
+    _out(a, r, _report(r, ok, r["anchored"], "OK" if r["renewalRuleApplies"] else "OK (not a renewal: reason code is not 2)"))
+    return EXIT_OK if ok else EXIT_MISMATCH
+
+
 def cmd_appeal_hash(a):
     doc = json.loads(Path(a.document).read_text(encoding="utf-8"))
     print(toolkit.appeal_document_hash(doc))
@@ -220,6 +263,23 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--reason-code", type=int)
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_check_onchain)
+
+    s = sub.add_parser("check-carryover", help="check whether an independent test of one policy version remains evidence for the version in force (ADR-0012); does not check the attestation's validUntil or revocation")
+    s.add_argument("tested", help="policy document of the version named in the test's policyVersion")
+    s.add_argument("in_force", help="policy document of the version in force")
+    s.add_argument("--tested-hash", help="on-chain content hash of the tested version")
+    s.add_argument("--in-force-hash", help="on-chain content hash of the version in force")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_check_carryover)
+
+    s = sub.add_parser("check-renewal", help="check that a version with reason code 2 keeps the rules digest of the version it renews (GOVERNANCE, ADR-0012)")
+    s.add_argument("previous", help="policy document of the version being renewed")
+    s.add_argument("renewal", help="policy document of the next version")
+    s.add_argument("--reason-code", type=int, help="on-chain reason code of the next version; required if its document has none")
+    s.add_argument("--previous-hash", help="on-chain content hash of the version being renewed")
+    s.add_argument("--renewal-hash", help="on-chain content hash of the next version")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_check_renewal)
 
     s = sub.add_parser("appeal-hash", help="validate an appeal document (vpr-appeal/3) and print the hash to file")
     s.add_argument("document")

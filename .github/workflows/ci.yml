@@ -34,7 +34,7 @@ jobs:
           "
       - name: Upload gas and coverage reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: contracts-reports
           path: |
@@ -162,7 +162,7 @@ jobs:
         run: python tools/bench/bench_merkle.py | tee e2e-out/bench-merkle.json
       - name: Upload demo evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: demo-evidence
           path: e2e-out/

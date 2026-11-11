@@ -69,7 +69,7 @@ See the week-by-week plan in [ROADMAP.md](ROADMAP.md#m1--design-and-sign-off--we
 | ID | Task | Acceptance criteria |
 | --- | --- | --- |
 | VPR-020 | Daily job: aggregate, publish CSV/JSON, `commitRoot` | Idempotent; a day can be recomputed by anyone with `vpr verify-root` |
-| VPR-021 | Public dashboard (static site) reading registry, EAS and anchor | Shows policy in force + history with reasons, schools with valid attestations, daily metrics with verification button |
+| VPR-021 | Public dashboard (static site) reading registry, EAS and anchor | Shows policy in force + history with reasons, schools with valid attestations (counting carried-over tests only where `vpr check-carryover` passes, and flagging any reason-code-2 version that fails `vpr check-renewal`, ADR-0012), daily metrics with verification button |
 | VPR-022 | NIST SP 800-81r3 compliance matrix `docs/compliance/nist-800-81r3.md` | Each applicable recommendation mapped to config or control, with evidence |
 | VPR-023 | UK Safer Internet Centre self-certification checklist | Completed and published in `docs/compliance/` |
 | VPR-024 | Static analysis (MIESC, Slither) and external audit of the registry, anchor and resolver configuration, with fixes and a re-check | Public audit report; no open high-severity finding after re-check |
