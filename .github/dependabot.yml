@@ -4,6 +4,15 @@ updates:
     directory: /contracts
     schedule: { interval: weekly }
     open-pull-requests-limit: 5
+    ignore:
+      # The compiler is pinned to 0.8.24 in hardhat.config.js, foundry.toml and here (OFFLINE_SOLC);
+      # it changes only by a deliberate decision across all three, never by a dependency bump.
+      - dependency-name: solc
+      # Hardhat 3 is a major migration (BACKLOG VPR-072), deferred until after the M3 audit.
+      - dependency-name: hardhat
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@nomicfoundation/*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: pip
     directory: /tools
     schedule: { interval: weekly }

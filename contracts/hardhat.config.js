@@ -5,14 +5,21 @@ const { TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD } = require("hardhat/builtin-tasks/
 
 // Offline mode: set OFFLINE_SOLC=1 to compile with the solc-js package from npm instead of
 // downloading the native compiler (useful in CI sandboxes without access to binaries.soliditylang.org).
+// The solc package is pinned to exactly this version in package.json. The check below refuses any
+// other build, so that an offline compile can never run a different compiler under the 0.8.24 label.
+const SOLC_LONG_VERSION = "0.8.24+commit.e11b9ed9";
 if (process.env.OFFLINE_SOLC === "1") {
   subtask(TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD, async (args, hre, runSuper) => {
     if (args.solcVersion === "0.8.24") {
+      const actual = require("solc").version();
+      if (!actual.startsWith(SOLC_LONG_VERSION + ".")) {
+        throw new Error(`OFFLINE_SOLC: node_modules/solc is ${actual}, expected ${SOLC_LONG_VERSION}; run npm ci`);
+      }
       return {
         compilerPath: path.join(__dirname, "node_modules", "solc", "soljson.js"),
         isSolcJs: true,
         version: args.solcVersion,
-        longVersion: "0.8.24+commit.e11b9ed9",
+        longVersion: SOLC_LONG_VERSION,
       };
     }
     return runSuper();

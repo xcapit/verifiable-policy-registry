@@ -11,7 +11,11 @@ All notable changes to this project are documented here. The format follows [Kee
 - ADR-0011 (proposed, for the M1 review): bind policy and appeal documents to their deployment (chain id, registry and scope id) without changing scope ids, and add a per-scope, capped notice period before a policy version takes effect, with an emergency path bounded to 7 days in any 30 (durations to be set at the review). Linked from the white paper §6.2, threat model T47 and backlog VPR-071.
 
 ### Changed
+- The solc-js package (used only by `OFFLINE_SOLC=1`) is pinned to exactly 0.8.24, and dependabot ignores it and major versions of Hardhat and its plugins (Hardhat 3 migration deferred to after the M3 audit, backlog VPR-072). GitHub Actions `checkout`, `setup-node` and `setup-python` are updated to v7.
 - NOTICE: the suggested CC BY attribution names the author listed in `CITATION.cff`; the copyright statement is unchanged.
+
+### Fixed
+- `OFFLINE_SOLC=1` compiled with solc-js 0.8.26, which the lockfile had resolved from `^0.8.24`, while labelling the build 0.8.24. The package is now pinned to 0.8.24 and the Hardhat config refuses any other solc-js version. Builds with the native compiler (the default, and CI) were not affected.
 
 ## [0.6.0] - 2026-11-11
 
