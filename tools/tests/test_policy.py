@@ -136,3 +136,14 @@ def test_rules_digest_ignores_renewal_fields_only():
 def test_rules_digest_is_not_a_content_hash():
     p = policy.load(EXAMPLE)
     assert p.rules_digest() != p.content_hash()
+
+
+def test_rules_digest_distinguishes_an_omitted_key_from_an_empty_one():
+    # deliberate and fail-closed: `threat_feeds: []` and no `threat_feeds` are different documents,
+    # so a renewal must keep the key as it was to carry tests over
+    p = policy.load(EXAMPLE)
+    a = copy.deepcopy(p.doc)
+    a["threat_feeds"] = []
+    b = copy.deepcopy(a)
+    del b["threat_feeds"]
+    assert policy.validate(a).rules_digest() != policy.validate(b).rules_digest()
