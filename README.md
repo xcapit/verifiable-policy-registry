@@ -145,6 +145,8 @@ The design applies to any bounded network with an accountable governor: librarie
 
 GitHub handles and areas of responsibility are in [MAINTAINERS.md](MAINTAINERS.md). Contact: dpg@xcapit.com.
 
+**How this repository is developed.** The maintainer directs the work and decides what is merged. Parts of the code, tests and documentation were drafted with an AI assistant (Anthropic's Claude), working under that direction; changes are merged only with the maintainer's approval. Nothing here asks to be trusted because of who or what wrote it. Each claim is tied to a test, a CI job or a document in the [claims ledger](docs/CLAIMS_AND_EVIDENCE.md), and the contracts are not yet audited.
+
 ## Who is behind it
 
 The project is developed by [Xcapit](https://xcapit.com) (CryptoLab S.A.S., Córdoba, Argentina), an ISO/IEC 27001-certified software company that has built Digital Public Goods with UNICEF.

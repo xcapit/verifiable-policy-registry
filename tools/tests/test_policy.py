@@ -112,3 +112,27 @@ def test_schema_rules_are_enforced_at_runtime(key, value):
     doc[key] = value
     with pytest.raises(policy.PolicyError):
         policy.validate(doc)
+
+
+def test_rules_digest_ignores_renewal_fields_only():
+    # ADR-0012: a renewal changes version, reason code and validity, not what is blocked.
+    p = policy.load(EXAMPLE)
+    renewed = copy.deepcopy(p.doc)
+    renewed["version"] = p.doc["version"] + 1
+    renewed["reason_code"] = 2
+    renewed["valid_days"] = 30
+    r = policy.validate(renewed)
+    assert r.content_hash() != p.content_hash()
+    assert r.rules_digest() == p.rules_digest()
+
+    changed = copy.deepcopy(renewed)
+    changed["local_blocks"].append({"domain": "new-block.example", "reason": "test"})
+    assert policy.validate(changed).rules_digest() != p.rules_digest()
+
+    for key in ("categories", "exceptions", "feed_hashes", "restricted_list_hash", "scope", "profile"):
+        assert key not in policy.RENEWAL_KEYS
+
+
+def test_rules_digest_is_not_a_content_hash():
+    p = policy.load(EXAMPLE)
+    assert p.rules_digest() != p.content_hash()

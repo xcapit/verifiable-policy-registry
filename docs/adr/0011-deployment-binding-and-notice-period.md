@@ -61,6 +61,13 @@ All durations below (72 hours, 30 days, 7 days) are placeholders to be set at th
 - **Verifiers do more work.** The resolver's sync daemon (VPR-015) and the dashboard must read `effectiveAt` and pending versions, and tools must check `deployment` and `version`.
 - **New contracts.** The notice period would need new contracts and an audit scope that includes them; the deployment binding needs new document formats and tool checks only. ADR-0010 already requires a redeployment at M4. Taking this record before the M3 audit would add a second redeployment, which the M1 review should weigh against deferring both changes to a single new deployment.
 
+## Maintainer's recommendation for the M1 review
+
+Recorded 2026-11-11. The status stays Proposed until the M1 review with the pilot partners.
+
+- **Durations.** Keep the proposed values as the starting point: `minNotice` 72 hours by default, `MAX_NOTICE` 30 days, emergency validity of at most 7 days, and at least 30 days between emergencies. They match the existing 7-day emergency validity in GOVERNANCE and leave a working week to object. The pilot's charter may raise `minNotice` but should not lower it.
+- **Sequencing.** Implement both decisions before the M3 audit, so that the audited contracts are the ones that would be deployed. Bring forward the registry part of ADR-0010 (the `catRoot` and `unitRoot` fields, VPR-058) into the same new registry, so that one redeployment carries both changes and M4 adds only the verifier contract. The cost is a larger M2–M3 scope. The benefit is that the M3 audit covers the registry that M4 relies on, and no deployment is audited only to be replaced.
+
 ## Alternatives considered
 
 - **Scope id over the chain id and registry address** (`keccak256(abi.encode(block.chainid, address(this), creator, name))`, an EIP-712-style domain). It binds on-chain, but the id changes on every redeployment, which breaks the recovery path of §6.3 and every pinned manifest. Rejected. A document-level binding gives verifiers the same information without that cost.

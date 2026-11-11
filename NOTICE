@@ -14,7 +14,8 @@ This repository contains material under three licences:
   Documentation (docs/ and the Markdown files at the repository root)
     Creative Commons Attribution 4.0 International (CC-BY-4.0)
     See LICENSES/CC-BY-4.0.txt
-    Suggested attribution: "Verifiable Policy Registry, Xcapit and contributors, CC BY 4.0"
+    Suggested attribution: "Verifiable Policy Registry, Fernando Boiero, Xcapit, CC BY 4.0"
+    (the author as listed in CITATION.cff; copyright as stated above)
 
 CODE_OF_CONDUCT.md is adapted from the Contributor Covenant v2.1 (CC BY 4.0),
 https://www.contributor-covenant.org/version/2/1/code_of_conduct.html

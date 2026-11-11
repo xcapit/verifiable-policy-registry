@@ -5,7 +5,13 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
+- ADR-0012 (accepted): an independent test remains valid across versions with the same rules digest. The rules digest is the keccak-256 of the canonical document without `version`, `reason_code` and `valid_days`. `vpr policy-hash` prints it; INTERFACES I1 and I8, GOVERNANCE (reason code 2), the white paper and BENCHMARKS are updated. In the benchmark workload, this cuts reviewer attestations from 1 000 to 400 a year.
+- ADR-0011: the maintainer's recommendation for the M1 review. Keep the proposed durations, and implement the notice period together with the registry part of ADR-0010 in one redeployment before the M3 audit.
+- README: how the repository is developed, including the use of an AI assistant under the maintainer's direction.
 - ADR-0011 (proposed, for the M1 review): bind policy and appeal documents to their deployment (chain id, registry and scope id) without changing scope ids, and add a per-scope, capped notice period before a policy version takes effect, with an emergency path bounded to 7 days in any 30 (durations to be set at the review). Linked from the white paper §6.2, threat model T47 and backlog VPR-071.
+
+### Changed
+- NOTICE: the suggested CC BY attribution names the author listed in `CITATION.cff`; the copyright statement is unchanged.
 
 ## [0.6.0] - 2026-11-11
 
