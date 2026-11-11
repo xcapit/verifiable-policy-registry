@@ -75,6 +75,67 @@ class Policy:
         return scope_id(governor, self.scope)
 
 
+def _digest_limits(p: Policy) -> list[str]:
+    """What an equal rules digest does not commit to, for this document."""
+    if p.doc["categories"] and not p.doc.get("feed_hashes"):
+        return ["no feed_hashes: equal digests fix the category names, not the contents of their feeds"]
+    return []
+
+
+def carry_over(tested: Policy, in_force: Policy) -> dict:
+    """Whether an independent test of `tested` remains evidence for `in_force` (ADR-0012, INTERFACES I8).
+
+    It holds when both documents are of the same scope, `tested` is not later than `in_force`, and their rules
+    digests are equal. This checks the documents only: the attestation's own validUntil and revocation, and the
+    documents' on-chain content hashes, are separate checks.
+    """
+    checks = {
+        "sameScope": tested.scope == in_force.scope,
+        "testedNotLater": tested.doc["version"] <= in_force.doc["version"],
+        "sameRulesDigest": tested.rules_digest() == in_force.rules_digest(),
+    }
+    return {
+        "scope": in_force.scope,
+        "testedVersion": tested.doc["version"],
+        "inForceVersion": in_force.doc["version"],
+        "rulesDigest": {"tested": tested.rules_digest(), "inForce": in_force.rules_digest()},
+        "checks": checks,
+        "carriesOver": all(checks.values()),
+        "limits": _digest_limits(in_force),
+    }
+
+
+def check_renewal(previous: Policy, renewal: Policy, reason_code: int | None = None) -> dict:
+    """Check the GOVERNANCE rule for reason code 2: a scheduled renewal keeps the rules digest of the version it renews.
+
+    `reason_code` is the on-chain reason code of `renewal`, if known. If the document also carries one, they must
+    agree. With neither, the rule cannot be applied, and this raises PolicyError (fail closed).
+    """
+    doc_code = renewal.doc.get("reason_code")
+    if doc_code is None and reason_code is None:
+        raise PolicyError("the renewal's reason code is unknown: pass the on-chain value with --reason-code")
+    code = reason_code if reason_code is not None else doc_code
+    checks = {
+        "reasonCodeConsistent": doc_code is None or reason_code is None or doc_code == reason_code,
+        "sameScope": previous.scope == renewal.scope,
+        "nextVersion": renewal.doc["version"] == previous.doc["version"] + 1,
+    }
+    applies = code == 2
+    if applies:
+        checks["sameRulesDigest"] = previous.rules_digest() == renewal.rules_digest()
+    return {
+        "scope": renewal.scope,
+        "previousVersion": previous.doc["version"],
+        "version": renewal.doc["version"],
+        "reasonCode": code,
+        "renewalRuleApplies": applies,
+        "rulesDigest": {"previous": previous.rules_digest(), "renewal": renewal.rules_digest()},
+        "checks": checks,
+        "match": all(checks.values()),
+        "limits": _digest_limits(renewal) if applies else [],
+    }
+
+
 def _check_domain(d: str, where: str) -> str:
     if not isinstance(d, str):
         raise PolicyError(f"domain in {where} must be a string")

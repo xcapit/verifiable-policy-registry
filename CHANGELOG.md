@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
+- `vpr check-carryover` and `vpr check-renewal` (ADR-0012). The first checks whether an independent test of one version remains evidence for the version in force. The second checks that a version with reason code 2 keeps the rules digest of the version it renews, which catches a rule change labelled as a renewal. Both can bind the documents to on-chain content hashes and report `anchored: false` otherwise. Both note when the documents have no `feed_hashes`, because then equal digests do not fix feed contents. Tested in `tools/tests/test_cli.py`.
 - ADR-0012 (accepted): an independent test remains valid across versions with the same rules digest. The rules digest is the keccak-256 of the canonical document without `version`, `reason_code` and `valid_days`. `vpr policy-hash` prints it; INTERFACES I1 and I8, GOVERNANCE (reason code 2), the white paper and BENCHMARKS are updated. In the benchmark workload, this cuts reviewer attestations from 1 000 to 400 a year.
 - ADR-0011: the maintainer's recommendation for the M1 review. Keep the proposed durations, and implement the notice period together with the registry part of ADR-0010 in one redeployment before the M3 audit.
 - README: how the repository is developed, including the use of an AI assistant under the maintainer's direction.

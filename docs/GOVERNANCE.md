@@ -21,7 +21,7 @@ Used in `publishPolicy(..., reasonCode, ...)` and in policy documents.
 | Code | Meaning |
 | --- | --- |
 | 1 | `initial_policy`: first version for a scope |
-| 2 | `scheduled_renewal`: re-signing before expiry, no change to what is blocked; the rules digest must not change, which anyone can check with `vpr policy-hash` (ADR-0012) |
+| 2 | `scheduled_renewal`: re-signing before expiry, no change to what is blocked; the rules digest must not change, which anyone can check with `vpr check-renewal` (ADR-0012) |
 | 3 | `appeal_accepted`: resolves an appeal (set `resolvesAppeal`) |
 | 4 | `new_threat`: new malware/phishing category or feed |
 | 5 | `legal_requirement`: change required by law (must cite it in the document) |

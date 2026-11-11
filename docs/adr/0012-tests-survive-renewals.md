@@ -1,6 +1,6 @@
 # ADR-0012: An independent test remains valid across renewals that do not change the rules
 
-- Status: Accepted (rule and tool support implemented; dashboard check planned)
+- Status: Accepted (rule and tool checks implemented: `vpr policy-hash`, `vpr check-carryover`, `vpr check-renewal`; dashboard check planned, VPR-021)
 - Date: 2026-11-11
 
 ## Context
@@ -22,6 +22,7 @@ The reason code cannot carry the decision by itself. The registry stores reason 
 
 - **Fewer re-tests.** Reviewer attestations scale with the number of rule changes, not with the number of versions. In the benchmark workload that is 400 instead of 1 000 a year.
 - **No extra trust.** The protection claim still rests on a test of the same rules that are in force. Only the label of the version changes. A verifier, or the planned dashboard, must fetch both documents and compare digests; that is one more off-chain check, of the same kind as the content-hash check.
+- **Feed contents.** Equal digests fix the feed contents only when the documents declare `feed_hashes`. Without them, two versions with the same digest name the same categories, but their feeds may differ. `vpr check-carryover` and `vpr check-renewal` report this case.
 - **Detection, not prevention.** A governor that changes the rules in a version labelled as a renewal is not stopped. It is detected, and the schools tested under the old rules stop counting as protected.
 
 ## Alternatives considered
