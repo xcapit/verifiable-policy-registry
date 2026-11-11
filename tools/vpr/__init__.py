@@ -5,4 +5,4 @@
 - merkle: sorted-pair keccak256 Merkle trees (compatible with MetricsAnchor.verifyLeaf)
 """
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"

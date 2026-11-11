@@ -1,6 +1,6 @@
 # Measurement and evaluation
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.6.0*
+*CC BY 4.0 · Proposal package for a school pilot · v0.7.0*
 
 How the pilot is evaluated, and what is deliberately not measured.
 

@@ -1,6 +1,6 @@
 # Pilot readiness
 
-*CC BY 4.0 · Proposal package for a school pilot · v0.6.0*
+*CC BY 4.0 · Proposal package for a school pilot · v0.7.0*
 
 > **Status of this package.** This is a proposal prepared by the project team. No commitment, letter of interest, endorsement, approval or deployment exists from Giga, UNICEF, ITU, any ministry, any connectivity provider or any school. Every decision that requires a partner is listed in [OPEN_QUESTIONS_FOR_GIGA.md](OPEN_QUESTIONS_FOR_GIGA.md) and remains open until that partner confirms it in writing.
 

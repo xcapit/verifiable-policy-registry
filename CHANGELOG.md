@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-11
+
+Tool checks for test carry-over (ADR-0012), a proposed design for deployment binding and a notice period (ADR-0011), and a cleaner toolchain. The release is a minor version because it adds commands to the `vpr` CLI; existing commands, formats and the contracts are unchanged. Contract source is unchanged since v0.6.0, and contract logic since v0.4.0. The white paper stays at version 0.7, with small edits for ADR-0011 and ADR-0012; its version number is independent of the release number. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment.
+
 ### Added
 - `vpr check-carryover` and `vpr check-renewal` (ADR-0012). The first checks whether an independent test of one version remains evidence for the version in force. The second checks that a version with reason code 2 keeps the rules digest of the version it renews, which catches a rule change labelled as a renewal. Both can bind the documents to on-chain content hashes and report `anchored: false` otherwise. Both note when the documents have no `feed_hashes`, because then equal digests do not fix feed contents. Tested in `tools/tests/test_cli.py`.
 - ADR-0012 (accepted): an independent test remains valid across versions with the same rules digest. The rules digest is the keccak-256 of the canonical document without `version`, `reason_code` and `valid_days`. `vpr policy-hash` prints it; INTERFACES I1 and I8, GOVERNANCE (reason code 2), the white paper and BENCHMARKS are updated. In the benchmark workload, this cuts reviewer attestations from 1 000 to 400 a year.
@@ -181,7 +185,8 @@ First public release: a proof of concept and the documentation needed for extern
 - Code of conduct, security policy, project governance, maintainers, support, contribution guide with DCO, issue and pull request templates.
 - Licence texts (AGPL-3.0-only, CC0-1.0, CC-BY-4.0), NOTICE, CITATION.cff and publiccode.yml.
 
-[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.3.0...v0.4.0
