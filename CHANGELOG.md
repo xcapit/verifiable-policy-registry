@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- ADR-0011 (proposed, for the M1 review): bind policy and appeal documents to their deployment (chain id and registry) without changing scope ids, and add a per-scope notice period before a version takes effect, with an emergency path bounded to 7 days in any 30. Linked from the white paper §6.2, threat model T47 and backlog VPR-071.
+
 ## [0.6.0] - 2026-11-11
 
 Evidence for an expert review of the blockchain side. The release adds bounded symbolic checks of every state-changing function, a one-year workload benchmark with the OP Mainnet L1 data fee, and white paper v0.7 with a formal trust model, properties stated against named adversaries, and a finality figure. Contract logic is unchanged since v0.4.0; only NatSpec comments changed. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment.
