@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- ADR-0015 (proposed, for the M1 review) covers appeal timeliness and spam. Appeals whose document is not provided within 3 days are unsubstantiated and count against no one. Substantiated appeals still open after the charter's response time are overdue and published per scope. Batch rejection is added to the next registry. An on-chain renewal gate is deferred until filings can be rate limited without identifying the filer. GOVERNANCE rule 3, threat model T23 and T25, the white paper (P5) and the claims ledger (C60, not enforced) are updated, and backlog VPR-076 to VPR-078 are added.
+
 ### Changed
 - ADR-0013 supersedes ADR-0006. VPR is a protocol for filtering policies in bounded networks or in software and services the user chooses (wallets, dApp front ends, protective resolvers), and schools are its first deployment. The exclusion of ISP-wide and national blocking is kept. The README, the white paper (§3.5, §11.3), the roadmap (a new section on the protocol beyond schools) and the claims ledger (C59) are updated. Backlog VPR-073 to VPR-075 plan a TypeScript client verification library, a reference wallet integration and a policy format for non-domain subjects. Phase 1 milestones and shares are unchanged.
 
