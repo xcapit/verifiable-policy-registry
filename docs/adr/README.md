@@ -21,4 +21,5 @@ Template: [0000-template.md](0000-template.md).
 | [0011](0011-deployment-binding-and-notice-period.md) | Bind documents to their deployment, and add a notice period before a version takes effect | Proposed |
 | [0012](0012-tests-survive-renewals.md) | An independent test remains valid across renewals that do not change the rules | Accepted |
 | [0013](0013-protocol-for-bounded-or-chosen-filtering.md) | A protocol for filtering in bounded networks or chosen by the user; schools are the first deployment | Accepted |
+| [0014](0014-immutable-contracts-and-governor-verification.md) | Immutable contracts, and a governor verified as a Safe off-chain | Accepted (handover delay proposed) |
 | [0015](0015-appeal-timeliness-and-spam.md) | Make unanswered appeals visible, and bound appeal spam | Proposed |

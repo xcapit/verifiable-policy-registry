@@ -6,7 +6,7 @@
 
 | Evidence | Result | Where it runs |
 | --- | --- | --- |
-| Unit and integration tests (Hardhat) | 53 passing, including the resolver exercised through the published EAS contracts v1.4.0 | CI job `contracts` |
+| Unit and integration tests (Hardhat) | 70 passing, including the resolver exercised through the published EAS contracts v1.4.0 and the governor check against a Safe 1.4.1 deployed from the published artifacts | CI job `contracts` |
 | Static analysis (Slither 0.11.3, 100 detectors) | 0 findings; 5 accepted findings annotated in the source with their justification (§3) | CI job `static-analysis`, fails on any finding |
 | Invariant tests with a specification oracle (Foundry) | 11 invariants, 512 runs × 128 calls each in CI | CI job `invariants` |
 | Bounded symbolic checks (Halmos 0.3.3) | 16 checks pass for all inputs within stated bounds, one transaction from a fixed state, with no timeout and no cut path; 2 canaries fail as they must; 22 of 22 applicable mutants caught (§4.1) | CI job `symbolic`; mutant run local |
