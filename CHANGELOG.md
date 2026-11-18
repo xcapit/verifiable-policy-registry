@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- `scripts/check-governor.js` (library `scripts/lib/governor-check.js`): checks, read-only, that each scope's on-chain governor is the manifest's governor and is a Safe with the declared threshold. It checks the SafeProxy code hash and singleton against declared values, rejects EOAs and EIP-7702 delegated EOAs, requires Safe 1.3.0 or later, and fails on any enabled module that the manifest does not declare. It reports the guard, the fallback handler and a pending handover. Exit codes 0, 1 and 2. Tested in `test/GovernorCheck.test.js` against Safe 1.4.1, deployed from the artifacts of the pinned npm package `@safe-global/safe-contracts` 1.4.1, whose code hashes equal those of the canonical deployments.
+- Deployment manifest: optional `governorSafe` (`singletons`, `proxyCodeHashes`) and per-scope `governorModules`. Existing manifests remain valid.
+
 ## [0.7.0] - 2026-11-11
 
 Tool checks for test carry-over (ADR-0012), a proposed design for deployment binding and a notice period (ADR-0011), and a cleaner toolchain. The release is a minor version because it adds commands to the `vpr` CLI; existing commands, formats and the contracts are unchanged. Contract source is unchanged since v0.6.0, and contract logic since v0.4.0. The white paper stays at version 0.7, with small edits for ADR-0011 and ADR-0012; its version number is independent of the release number. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment.
