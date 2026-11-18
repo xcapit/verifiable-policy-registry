@@ -88,6 +88,16 @@ Phase 2 is proposed only if Gates A–C are met, and it is funded and agreed sep
 - DPG registration, if not already obtained;
 - operator handover according to the agreed post-pilot model ([SUSTAINABILITY](SUSTAINABILITY.md)).
 
+## The protocol beyond schools
+
+Schools are the first deployment, not the limit of the design ([ADR-0013](adr/0013-protocol-for-bounded-or-chosen-filtering.md)). The phase 1 outputs are protocol-level: the registry, anchor, schemas, toolkit and specifications serve any adopter with its own scopes and governor. An integration track for developers is planned alongside, outside the phase 1 shares unless it is agreed otherwise:
+
+- a TypeScript verification library for wallets, browser extensions and dApp front ends, which evaluates a name on the device ([VPR-073](BACKLOG.md#future-work));
+- a reference wallet integration that warns about a domain listed in a published, appealable policy ([VPR-074](BACKLOG.md#future-work));
+- a policy format for subjects other than domain names, such as contract addresses, decided by its own ADR ([VPR-075](BACKLOG.md#future-work)).
+
+The exclusion of ISP-wide and national blocking applies to every adopter.
+
 ## Schedule risks
 
 - **Partner decisions.** Country, provider and signers are outside the team's control. Gate A defines what proceeds without them.
