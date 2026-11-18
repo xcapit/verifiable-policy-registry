@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 - `scripts/check-governor.js` (library `scripts/lib/governor-check.js`): checks, read-only, that each scope's on-chain governor is the manifest's governor and is a Safe with the declared threshold. It checks the SafeProxy code hash and singleton against declared values, rejects EOAs and EIP-7702 delegated EOAs, requires Safe 1.3.0 or later, and fails on any enabled module that the manifest does not declare. It reports the guard, the fallback handler and a pending handover. Exit codes 0, 1 and 2. Tested in `test/GovernorCheck.test.js` against Safe 1.4.1, deployed from the artifacts of the pinned npm package `@safe-global/safe-contracts` 1.4.1, whose code hashes equal those of the canonical deployments.
+- ADR-0014 records that the contracts stay immutable, with no proxy and no upgrade key above the scopes' governors. It explains why the governor is verified as a Safe off-chain rather than by an on-chain code check, which would give false assurance under EIP-7702. It proposes a delay before a governor handover takes effect, for the M1 review (VPR-079). Threat model T47 and claim C61 are updated.
 - Deployment manifest: optional `governorSafe` (`singletons`, `proxyCodeHashes`) and per-scope `governorModules`. Existing manifests remain valid.
 
 ## [0.7.0] - 2026-11-11
