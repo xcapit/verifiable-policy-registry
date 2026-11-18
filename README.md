@@ -46,7 +46,7 @@ What the ledger cannot prove is that a resolver behaves as declared at runtime. 
 | assessing a pilot (Giga, ministries, providers) | [Pilot readiness](docs/giga/PILOT_READINESS.md) · [Operating model](docs/giga/OPERATING_MODEL.md) · [Cost model](docs/giga/COST_MODEL_TEMPLATE.md) · [Sustainability](docs/SUSTAINABILITY.md) |
 | assessing ecosystem value (Ethereum builders, ESP) | [Public-goods case](docs/esp/PUBLIC_GOODS_CASE.md) · [Toolkit guide](docs/toolkit/INTEGRATION_GUIDE.md) · [Second use case](examples/public-service/README.md) |
 | building a component | [Architecture](docs/ARCHITECTURE.md) · [Interfaces](docs/INTERFACES.md) · [Decision records](docs/adr) · [Backlog](docs/BACKLOG.md) |
-| operating or governing a deployment | [Policy governance](docs/GOVERNANCE.md) · [Privacy statement (RFC 8932)](docs/PRIVACY_STATEMENT.md) · [Roadmap](docs/ROADMAP.md) |
+| operating or governing a deployment | [Policy governance](docs/GOVERNANCE.md) · [Bypass and complementary controls](docs/BYPASS.md) · [Privacy statement (RFC 8932)](docs/PRIVACY_STATEMENT.md) · [Roadmap](docs/ROADMAP.md) |
 | contributing | [Contributing](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Project governance](GOVERNANCE.md) |
 | reviewing security and privacy | [Security policy](SECURITY.md) · [Threat model](docs/security/THREAT_MODEL.md) · [Contract assurance](docs/security/CONTRACT_ASSURANCE.md) · [Cryptographic evidence](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md) · [Privacy analysis](docs/privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md) |
 
