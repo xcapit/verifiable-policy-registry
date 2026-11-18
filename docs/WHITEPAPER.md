@@ -129,7 +129,7 @@ Two limits follow. Detection is not automatic: until the dashboard exists, a cha
 
 ### 3.5 Non-goals
 
-The system does not attempt to prove on-chain that a resolver behaves correctly at runtime. It does not target filtering at the scale of an internet service provider or a nation: the design assumes a bounded network with an accountable governor, and the project explicitly declines features for broader blocking (ADR-0006 [4]). It does not filter at URL level. It does not replace education, device management or supervision; it complements them.
+The system does not attempt to prove on-chain that a resolver behaves correctly at runtime. It does not target filtering at the scale of an internet service provider or a nation: the design assumes a bounded network with an accountable governor, or software or a service that the user chooses and can stop using, and the project explicitly declines features for broader blocking (ADR-0013 [4]). It does not filter at URL level. It does not replace education, device management or supervision; it complements them.
 
 ### 3.6 Relevance to the Sustainable Development Goals
 
@@ -401,6 +401,8 @@ Two implementation routes are to be evaluated in milestone M1: a general-purpose
 ### 11.3 Further work
 
 **Trusted execution.** If the resolver and exporter ran inside a trusted execution environment, such as Intel TDX, AMD SEV-SNP or AWS Nitro Enclaves, a remote attestation could bind *C*_L and the absence of logging to a measured, open-source binary loaded with the zone compiled from *h*ᵢ. This would strengthen the first link of Figure 19, moving part of P6 and P7 from institutional trust to hardware trust. Hardware trust has its own history of side-channel failures, and it concentrates trust in the hardware vendor.
+
+**Other adopters of the protocol.** The registry, schemas and verification rules are not specific to schools (ADR-0013 [4]). Wallets, dApp front ends and user-chosen resolvers apply blocklists that are today maintained by a single party without a public record. Each could publish its list as a scope with its own governor, so that users and other developers can check what is blocked, since when, why and until when, and contest it. Two pieces are missing: a client verification library that evaluates a name on the device without sending it to a server, and a policy format for subjects other than domain names, such as contract addresses. Enforcement evidence also differs: in client software it is the open-source client, not a reviewer's network test, and whether clients need an attestation of their own is open.
 
 **Verifiable differential privacy.** Where releases must overlap, the noise added for differential privacy should be verifiably sampled, as in VerDP [35], either from public randomness committed in advance or within the same proof as R. The goal is that neither the operator nor the analyst can bias the noise.
 
