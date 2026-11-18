@@ -31,7 +31,7 @@ Used in `publishPolicy(..., reasonCode, ...)` and in policy documents.
 
 1. Every local block and exception in a policy document states its reason.
 2. Maximum validity per scope: 90 days in the pilot. Renewal is a signed act.
-3. Appeals are answered within 5 working days (pilot target).
+3. Appeals are answered within 5 working days (pilot target; 7 calendar days for the overdue rule, because block time is calendar time). Under the proposed reporting rules ([ADR-0015](adr/0015-appeal-timeliness-and-spam.md)), an appeal whose document is not available to verifiers within 3 days of filing is *unsubstantiated* and may be rejected with the standard reason "document not provided". A substantiated appeal still open after the response time is *overdue*. Overdue appeals are published per scope.
 4. Restricted lists are referenced only by hash; their use is stated in the document.
 5. The charter of each scope defines the fallback when a policy expires without renewal (recommended: protective-only categories: malware and phishing).
 6. Key management: hardware wallets or passkey-based smart accounts for institutional signers; documented recovery; signer rotation via Safe and the two-step handover (`proposeGovernor`, then `acceptGovernor` by the new governor).
@@ -42,7 +42,7 @@ Every scope has a charter, signed by all governor signers before its first polic
 
 - maximum validity, and the fallback when a version expires without renewal;
 - **categories that may never be blocked as such**: education, health (including sexual and reproductive health information for the appropriate age), human rights, journalism, political information, and information for LGBTQ+ young people. Individual domains inside these areas can still be blocked only with a stated reason that the reviewer checks;
-- the response time for appeals, and the external recourse path (below);
+- the response time for appeals, in calendar days, and the external recourse path (below);
 - the release policy for metrics (threshold, minimum cohort, category tiers, delay), taken from the DPIA ([privacy analysis](privacy/PRIVACY_AND_REIDENTIFICATION_ANALYSIS.md));
 - the identities of the issuers for each attestation role, recorded on-chain with `setIssuer`.
 

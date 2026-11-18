@@ -20,3 +20,4 @@ Template: [0000-template.md](0000-template.md).
 | [0010](0010-category-and-unit-sets-on-chain.md) | Category and unit sets committed on-chain for the ZK relation | Proposed |
 | [0011](0011-deployment-binding-and-notice-period.md) | Bind documents to their deployment, and add a notice period before a version takes effect | Proposed |
 | [0012](0012-tests-survive-renewals.md) | An independent test remains valid across renewals that do not change the rules | Accepted |
+| [0015](0015-appeal-timeliness-and-spam.md) | Make unanswered appeals visible, and bound appeal spam | Proposed |
