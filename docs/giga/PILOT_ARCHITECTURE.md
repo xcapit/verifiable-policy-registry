@@ -59,5 +59,5 @@ No degraded mode silently removes child protection or the ability to appeal. Eac
 ## Explicit boundaries
 
 - Filtering is by domain name. Entries that are individual pages on otherwise legitimate sites need a different control (for example at the provider) and are outside this pilot.
-- VPNs and devices configured to ignore network DNS can bypass the filter. This is reported, not hidden: the reviewer's attestation records whether bypasses were resisted.
+- VPNs and devices configured to ignore network DNS can bypass the filter. This is reported, not hidden: the reviewer's attestation records whether bypasses were resisted. Case by case, with the complementary controls a school may need: [BYPASS.md](../BYPASS.md).
 - Further detail on threats: [../security/THREAT_MODEL.md](../security/THREAT_MODEL.md).
