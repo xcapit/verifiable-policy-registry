@@ -2,13 +2,13 @@
 
 [![CI](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/xcapit/verifiable-policy-registry/actions/workflows/ci.yml) [![License: AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-blue.svg)](LICENSE) [![DPG readiness](https://img.shields.io/badge/DPG-in%20preparation-orange.svg)](docs/DPG.md) [![White paper](https://img.shields.io/badge/white%20paper-v0.7-informational.svg)](docs/WHITEPAPER.md)
 
-**Accountable content filtering for school connectivity, designed to minimise and never publish data about children.**
+**An open protocol for accountable, verifiable filtering policies. Its first deployment is school connectivity, where it is designed to minimise data about children and never publish it.**
 
 Connecting a school to the internet means protecting its children from malware, phishing and harmful content, and that protection is often delivered by network-level filtering. The same mechanism can also be used for internet censorship. A filter is accountable only when people outside the operator can verify what it blocks, who decided it and for how long, and what data the infrastructure retains. Conventional deployments do not necessarily make those properties publicly verifiable.
 
 The Verifiable Policy Registry (VPR) is designed to separate the **enforcement** of filtering from its **accountability**. In a deployment, a standard protective DNS resolver would enforce the policy in-country, while an Ethereum layer-2 network would hold only commitments. Policy documents would be published in full except for legally restricted lists, which would be committed to by hash, and a threshold governor would authorise each version. Versions expire by default and can be contested. A reviewer independent of the operator would attest deployment tests. Impact releases use small-cell suppression and a daily Merkle root that anyone can recompute. The implemented contracts write no end-user personal data or caller-supplied free text on-chain: appeals are represented by hashes of documents handled off-chain.
 
-The project team proposes a first deployment in schools connected by **UNICEF Giga** in Latin America: a controlled alpha in two to five schools, then, if its gates are met, a cohort of 20 to 50 ([roadmap](docs/ROADMAP.md), [pilot proposal](docs/giga/PILOT_READINESS.md)). No pilot, funding or endorsement has been agreed with Giga, UNICEF, the Ethereum Foundation or any other party. The design applies to any bounded network with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks.
+The project team proposes a first deployment in schools connected by **UNICEF Giga** in Latin America: a controlled alpha in two to five schools, then, if its gates are met, a cohort of 20 to 50 ([roadmap](docs/ROADMAP.md), [pilot proposal](docs/giga/PILOT_READINESS.md)). No pilot, funding or endorsement has been agreed with Giga, UNICEF, the Ethereum Foundation or any other party. The protocol is not specific to schools ([ADR-0013](docs/adr/0013-protocol-for-bounded-or-chosen-filtering.md)). It serves other bounded networks with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks, and software or services that users choose for themselves, such as wallets, dApp front ends and protective resolvers, whose blocklists can be published, versioned, expiring and contestable in the same registry.
 
 > **Status: v0.7.0 (research prototype, pre-release).** Every claim is tracked in the [claims and evidence ledger](docs/CLAIMS_AND_EVIDENCE.md).
 >
@@ -107,7 +107,7 @@ vpr verify-root dataset.csv 0x<root>                 # anyone can recompute a pu
 
 ## What other builders can reuse
 
-The pilot targets school networks, but the components are generic and released for reuse:
+The first deployment targets school networks, but the components are generic and released for reuse by any builder whose product applies a blocklist ([ADR-0013](docs/adr/0013-protocol-for-bounded-or-chosen-filtering.md)):
 
 | Component | Status | What it gives you |
 | --- | --- | --- |
@@ -116,8 +116,10 @@ The pilot targets school networks, but the components are generic and released f
 | `MetricsAnchor` | Implemented, not audited | Write-once daily Merkle roots per scope, publisher appointed by the governor, and on-chain verification of a single row with domain-separated hashing |
 | `vpr` tools | Implemented | Canonical hashing of policy documents, RPZ compilation, aggregation with small-cell suppression and Merkle proofs |
 | ZK aggregation verifier and `vpr verify-proof` | Planned (M4, testnet; mainnet in phase 2) | On-chain check that a published table is the correct suppressed aggregation of a committed private log |
+| Client verification library (TypeScript) | Planned ([VPR-073](docs/BACKLOG.md#future-work)) | For wallets, extensions and dApp front ends: read the policy in force, check the document against its on-chain hash, its expiry and rules digest, and evaluate a name locally, without sending queried names to a server |
+| Reference wallet integration | Planned ([VPR-074](docs/BACKLOG.md#future-work)) | A worked example of a wallet warning about a domain listed in a published, appealable policy |
 
-The design applies to any bounded network with an accountable governor: libraries, public Wi-Fi, health centres or NGO networks. It is not meant for ISP-wide or national blocking ([ADR-0006](docs/adr/0006-scope-school-networks-only.md)).
+The protocol applies to bounded networks with an accountable governor (libraries, public Wi-Fi, health centres or NGO networks) and to software or services the user chooses and can stop using (wallets, browser extensions, dApp front ends, protective resolvers the user configures). Each adopter governs its own scopes with its own Safe. It is not meant for ISP-wide or national blocking ([ADR-0013](docs/adr/0013-protocol-for-bounded-or-chosen-filtering.md)).
 
 ## Design principles
 
@@ -126,7 +128,7 @@ The design applies to any bounded network with an accountable governor: librarie
 3. **Privacy by collection, not by deletion.** The metrics pipeline only ever receives `(school_id, day, category)`. IP addresses, device identifiers and queried names never leave the resolver process.
 4. **Accountability over prevention.** No single party can change a policy. A majority can, but every change is public, has a stated reason, is temporary and can be contested.
 5. **Restricted lists stay restricted.** Lists that cannot legally be published, such as the IWF list, are represented only by a hash commitment.
-6. **Narrow scope.** Bounded networks with an accountable governor. The project does not support ISP-wide or national blocking.
+6. **Bounded or chosen.** Bounded networks with an accountable governor, or software and services the user chooses. The project does not support ISP-wide or national blocking.
 
 ## Standards
 

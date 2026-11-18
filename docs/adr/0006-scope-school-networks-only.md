@@ -1,6 +1,6 @@
 # ADR-0006: Scope limited to bounded networks such as schools
 
-- Status: Accepted
+- Status: Superseded by [ADR-0013](0013-protocol-for-bounded-or-chosen-filtering.md), which keeps the exclusion of ISP-wide and national blocking
 - Date: 2026-11-09
 
 ## Context

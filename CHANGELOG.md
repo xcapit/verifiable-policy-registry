@@ -5,9 +5,13 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
+- ADR-0015 (proposed, for the M1 review) covers appeal timeliness and spam. Appeals whose document is not provided within 3 days are unsubstantiated and count against no one. Substantiated appeals still open after the charter's response time are overdue and published per scope. Batch rejection is added to the next registry. An on-chain renewal gate is deferred until filings can be rate limited without identifying the filer. GOVERNANCE rule 3, threat model T23 and T25, the white paper (P5) and the claims ledger (C60, not enforced) are updated, and backlog VPR-076 to VPR-078 are added.
 - `scripts/check-governor.js` (library `scripts/lib/governor-check.js`): checks, read-only, that each scope's on-chain governor is the manifest's governor and is a Safe with the declared threshold. It checks the SafeProxy code hash and singleton against declared values, rejects EOAs and EIP-7702 delegated EOAs, requires Safe 1.3.0 or later, and fails on any enabled module that the manifest does not declare. It reports the guard, the fallback handler and a pending handover. Exit codes 0, 1 and 2. Tested in `test/GovernorCheck.test.js` against Safe 1.4.1, deployed from the artifacts of the pinned npm package `@safe-global/safe-contracts` 1.4.1, whose code hashes equal those of the canonical deployments.
 - ADR-0014 records that the contracts stay immutable, with no proxy and no upgrade key above the scopes' governors. It explains why the governor is verified as a Safe off-chain rather than by an on-chain code check, which would give false assurance under EIP-7702. It proposes a delay before a governor handover takes effect, for the M1 review (VPR-079). Threat model T47 and claim C61 are updated.
 - Deployment manifest: optional `governorSafe` (`singletons`, `proxyCodeHashes`) and per-scope `governorModules`. Existing manifests remain valid.
+
+### Changed
+- ADR-0013 supersedes ADR-0006. VPR is a protocol for filtering policies in bounded networks or in software and services the user chooses (wallets, dApp front ends, protective resolvers), and schools are its first deployment. The exclusion of ISP-wide and national blocking is kept. The README, the white paper (§3.5, §11.3), the roadmap (a new section on the protocol beyond schools) and the claims ledger (C59) are updated. Backlog VPR-073 to VPR-075 plan a TypeScript client verification library, a reference wallet integration and a policy format for non-domain subjects. Phase 1 milestones and shares are unchanged.
 
 ## [0.7.0] - 2026-11-11
 
