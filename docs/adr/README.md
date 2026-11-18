@@ -13,10 +13,11 @@ Template: [0000-template.md](0000-template.md).
 | [0003](0003-commit-dont-store-on-op-mainnet.md) | Commit, do not store: hashes on OP Mainnet with EAS | Accepted |
 | [0004](0004-multisig-governor-expiry-appeals.md) | Multisig governor per scope, mandatory expiry, on-chain appeals | Accepted |
 | [0005](0005-issuer-separation.md) | Separate issuers: the operator never certifies itself | Accepted |
-| [0006](0006-scope-school-networks-only.md) | Scope limited to bounded networks such as schools | Accepted |
+| [0006](0006-scope-school-networks-only.md) | Scope limited to bounded networks such as schools | Superseded by 0013 |
 | [0007](0007-suppressed-metrics-merkle.md) | Threshold-suppressed metrics (k = 10) with a daily Merkle root | Accepted |
 | [0008](0008-restricted-lists-hash-only.md) | Restricted lists by hash commitment only | Accepted |
 | [0009](0009-generic-verification-toolkit.md) | A use-case-independent verification toolkit | Accepted |
 | [0010](0010-category-and-unit-sets-on-chain.md) | Category and unit sets committed on-chain for the ZK relation | Proposed |
 | [0011](0011-deployment-binding-and-notice-period.md) | Bind documents to their deployment, and add a notice period before a version takes effect | Proposed |
 | [0012](0012-tests-survive-renewals.md) | An independent test remains valid across renewals that do not change the rules | Accepted |
+| [0013](0013-protocol-for-bounded-or-chosen-filtering.md) | A protocol for filtering in bounded networks or chosen by the user; schools are the first deployment | Accepted |

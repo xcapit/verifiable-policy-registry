@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+- ADR-0013 supersedes ADR-0006. VPR is a protocol for filtering policies in bounded networks or in software and services the user chooses (wallets, dApp front ends, protective resolvers), and schools are its first deployment. The exclusion of ISP-wide and national blocking is kept. The README, the white paper (§3.5, §11.3), the roadmap (a new section on the protocol beyond schools) and the claims ledger (C59) are updated. Backlog VPR-073 to VPR-075 plan a TypeScript client verification library, a reference wallet integration and a policy format for non-domain subjects. Phase 1 milestones and shares are unchanged.
+
 ## [0.7.0] - 2026-11-11
 
 Tool checks for test carry-over (ADR-0012), a proposed design for deployment binding and a notice period (ADR-0011), and a cleaner toolchain. The release is a minor version because it adds commands to the `vpr` CLI; existing commands, formats and the contracts are unchanged. Contract source is unchanged since v0.6.0, and contract logic since v0.4.0. The white paper stays at version 0.7, with small edits for ADR-0011 and ADR-0012; its version number is independent of the release number. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment.
