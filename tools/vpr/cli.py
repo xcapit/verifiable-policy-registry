@@ -10,6 +10,7 @@
     vpr restricted-hash  restricted.txt
     vpr check-carryover  tested-v3.yaml in-force-v5.yaml --tested-hash 0x<h3> --in-force-hash 0x<h5>
     vpr check-renewal    v4.yaml v5.yaml --reason-code 2
+    vpr check-beacon     policy.yaml --txt "$(dig +short TXT _vpr-policy.block.example.org)" --version 7
 
 Exit codes: 0 success; 1 verification failed (mismatching root or proof); 2 invalid input or usage,
 including any unexpected error. verify-row without --root only checks self-consistency (anchored=false).
@@ -52,7 +53,7 @@ def cmd_compile_rpz(a):
         for f in Path(a.feeds_dir).glob("*.txt"):
             feeds[f.stem] = policy.load_feed(f)
     restricted = policy.load_feed(a.restricted) if a.restricted else None
-    zone = policy.compile_rpz(p, feeds, restricted, a.block_page, allow_missing_feeds=a.allow_missing_feeds)
+    zone = policy.compile_rpz(p, feeds, restricted, a.block_page, allow_missing_feeds=a.allow_missing_feeds, beacon=a.beacon)
     if a.out:
         # the zone contains restricted entries in clear: it is an operator-confidential file
         out = Path(a.out)
@@ -206,6 +207,24 @@ def cmd_check_renewal(a):
     return EXIT_OK if ok else EXIT_MISMATCH
 
 
+def cmd_check_beacon(a):
+    """ADR-0016: does the resolver report the policy it should be enforcing? A missing answer suggests a bypass."""
+    p = policy.load(a.policy)
+    if a.zone is not None:
+        lines = [l.partition(";")[0] for l in Path(a.zone).read_text(encoding="utf-8").splitlines()]
+        found = [l for l in lines if l.split() and l.split()[0].startswith(policy.BEACON_LABEL + ".") and len(l.split()) > 1 and l.split()[1].upper() == "TXT"]
+        if len(found) > 1:
+            raise ValueError("the zone has more than one policy beacon")
+        text = found[0].split(None, 2)[2] if found else ""
+    else:
+        text = sys.stdin.read() if a.txt == "-" else a.txt
+    content_hash = _root(a.content_hash) if a.content_hash is not None else None
+    r = policy.check_beacon(policy.parse_beacon(text), p, a.version, content_hash)
+    lines = [f"{k:<20} {'ok' if v else 'MISMATCH'}" for k, v in r["checks"].items()]
+    _out(a, r, "\n".join(lines + [f"note: {r['note']}", "MATCH" if r["match"] else "MISMATCH"]))
+    return EXIT_OK if r["match"] else EXIT_MISMATCH
+
+
 def cmd_appeal_hash(a):
     doc = json.loads(Path(a.document).read_text(encoding="utf-8"))
     print(toolkit.appeal_document_hash(doc))
@@ -229,7 +248,18 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--block-page", help="hostname of the block/appeal page")
     s.add_argument("--out")
     s.add_argument("--allow-missing-feeds", action="store_true", help="compile even if a category has no feed (testing only)")
+    s.add_argument("--beacon", help="domain the operator controls; the zone answers TXT _vpr-policy.<domain> with the policy it was compiled from (ADR-0016)")
     s.set_defaults(func=cmd_compile_rpz)
+
+    s = sub.add_parser("check-beacon", help="compare a policy beacon answer (ADR-0016) with the policy document and, optionally, the version in force on-chain")
+    s.add_argument("policy", help="policy document the resolver should be enforcing")
+    src = s.add_mutually_exclusive_group(required=True)
+    src.add_argument("--txt", help="the TXT answer, e.g. the output of: dig +short TXT _vpr-policy.<domain>; '-' reads stdin; empty means no answer")
+    src.add_argument("--zone", help="a compiled zone file to read the beacon from")
+    s.add_argument("--version", type=int, help="version number in force on-chain")
+    s.add_argument("--content-hash", help="content hash of the version in force on-chain")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_check_beacon)
 
     s = sub.add_parser("evaluate", help="evaluate domains against a compiled zone (zone evaluation, not DNS resolution)")
     s.add_argument("zone")

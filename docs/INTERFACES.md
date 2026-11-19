@@ -113,6 +113,7 @@ Produced by `vpr compile-rpz`. Standard Response Policy Zone usable by Unbound o
 - Exceptions: `<domain> CNAME rpz-passthru.` and `*.<domain> CNAME rpz-passthru.`
 - Blocks: `<domain> CNAME <block-page>.` (or `CNAME .` for NXDOMAIN), plus the wildcard. A comment states the source (`category:<name>` or `local`). Restricted entries carry no comment.
 - SOA serial: the policy version, so the same policy and feeds always produce the same zone (and the same `zoneHash`).
+- Policy beacon (optional, `--beacon <domain>`, [ADR-0016](adr/0016-policy-beacon-in-the-zone.md)): one local-data record, `_vpr-policy.<domain> TXT "v=vpr1" "scope=<scope>" "version=<n>" "content=0x<contentHash>" "rules=0x<rulesDigest>"`, which any client on the network can query. It is self-reported by the operator and carries no zone hash. Zones compiled without `--beacon` are unchanged.
 
 ## I5 · Block events (resolver exporter → aggregator)
 
@@ -191,7 +192,7 @@ Installed with `pip install -e tools/`. Exit codes: `0` success, `1` verificatio
 | Command | Input | Output |
 | --- | --- | --- |
 | `vpr policy-hash <policy> [--governor ADDR] [--json]` | Policy document (I1) | `scope`, `version`, `contentHash`, `rulesDigest`; with `--governor`, the on-chain `scopeId` |
-| `vpr compile-rpz <policy> [--feeds-dir DIR] [--restricted FILE] [--block-page HOST] [--out FILE]` | Policy, feeds (`<category>.txt`, one domain per line, `#` comments), optional restricted list | RPZ zone (I4). Fails closed: a category without a feed, or a restricted list whose hash differs from the policy's, is an error |
+| `vpr compile-rpz <policy> [--feeds-dir DIR] [--restricted FILE] [--block-page HOST] [--beacon DOMAIN] [--out FILE]` | Policy, feeds (`<category>.txt`, one domain per line, `#` comments), optional restricted list | RPZ zone (I4). Fails closed: a category without a feed, or a restricted list whose hash differs from the policy's, is an error |
 | `vpr aggregate <events.csv> [--day YYYY-MM-DD] [--k N] [--out-csv FILE]` | Block events (I5); `--day` is required when they span several days | JSON summary on stdout, dataset CSV (I6) |
 | `vpr evaluate <zone> <domain>… [--json]` | Compiled zone (I4) and domains | Action per domain (`passthru`, `redirect`, `nxdomain`, `allow`) and matching rule; a zone evaluation, not DNS resolution |
 | `vpr prove-row <release.csv> --index N` | Release (I6) | JSON with the row, day number, leaf, proof and root |
@@ -201,6 +202,7 @@ Installed with `pip install -e tools/`. Exit codes: `0` success, `1` verificatio
 | `vpr check-onchain <policy> [--content-hash H] [--version N] [--validity S] [--reason-code C]` | Policy and on-chain values | `ok`/`MISMATCH` per field; exit 1 on any mismatch |
 | `vpr check-carryover <tested> <in-force> [--tested-hash H] [--in-force-hash H] [--json]` | Policy documents of the tested version and of the version in force; optionally their on-chain content hashes | Whether a test of the first remains evidence for the second (I8, ADR-0012): same scope, tested version not later, same rules digest. Exit 1 if not, or on a content-hash mismatch. `anchored: false` without both hashes. Notes when the documents have no `feed_hashes`. Does not check the attestation's `validUntil` or revocation |
 | `vpr check-renewal <previous> <renewal> [--reason-code C] [--previous-hash H] [--renewal-hash H] [--json]` | Policy documents of two consecutive versions; the on-chain reason code if the document has none | For reason code 2, that the rules digest is unchanged (GOVERNANCE). Also checks the next version number, the scope, and that the document's reason code agrees with `--reason-code`. Exit 1 on a mismatch; exit 2 if the reason code is unknown |
+| `vpr check-beacon <policy> (--txt ANSWER \| --zone FILE) [--version N] [--content-hash H] [--json]` | Policy document that should be in force; the beacon answer (for example `dig +short TXT _vpr-policy.<domain>`, `-` for stdin) or a compiled zone; optionally the on-chain version and content hash | Per-field `ok`/`MISMATCH` (ADR-0016). Exit 1 on a mismatch or when no beacon answers, which suggests the client is not using the resolver. Exit 2 on a malformed beacon. Detects a stale or wrong zone, not a deliberate misreport |
 | `vpr appeal-hash <document.json>` | Appeal document (I9) | Its hash for `fileAppeal`, after validation |
 | `vpr restricted-hash <list>` | Restricted list, one domain per line | Its commitment (I1); the list itself is never published |
 | `vpr verify-root <dataset.csv> <root> [--k K] [--json]` | Dataset (I6) and expected root | `MATCH` (exit 0) or `MISMATCH` (exit 1) |

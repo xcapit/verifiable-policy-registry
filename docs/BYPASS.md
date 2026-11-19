@@ -24,6 +24,16 @@ A school or ministry that needs more than DNS filtering has to add other control
 | Hard-coded IP addresses | No | No DNS lookup is made | Not applicable | DNS filtering acts on names only |
 | A page on an otherwise legitimate domain | No | DNS sees the domain, not the URL | Not applicable | Needs a URL-level control ([white paper §10](WHITEPAPER.md#10-limitations)) |
 
+## Checking from a device
+
+A zone compiled with a policy beacon ([ADR-0016](adr/0016-policy-beacon-in-the-zone.md)) answers a TXT query that names the policy it enforces:
+
+```bash
+dig +short TXT _vpr-policy.<block-page-host>
+```
+
+No answer means the device is probably not using the filtering resolver: another DNS, encrypted DNS or a VPN. `vpr check-beacon` compares an answer with the policy in force. The beacon is reported by the operator, so a matching answer is not proof that the policy is enforced. The reviewer's tests check that.
+
 ## Complementary controls a school may need
 
 These controls are conventional, and VPR neither provides nor attests them.
