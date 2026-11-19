@@ -23,3 +23,4 @@ Template: [0000-template.md](0000-template.md).
 | [0013](0013-protocol-for-bounded-or-chosen-filtering.md) | A protocol for filtering in bounded networks or chosen by the user; schools are the first deployment | Accepted |
 | [0014](0014-immutable-contracts-and-governor-verification.md) | Immutable contracts, and a governor verified as a Safe off-chain | Accepted (handover delay proposed) |
 | [0015](0015-appeal-timeliness-and-spam.md) | Make unanswered appeals visible, and bound appeal spam | Proposed |
+| [0016](0016-policy-beacon-in-the-zone.md) | A policy beacon in the zone, queryable from inside the network | Accepted (signed beacon and canaries proposed) |

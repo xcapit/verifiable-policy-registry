@@ -180,3 +180,68 @@ def test_carryover_bad_hash_exits_2(tmp_path, capsys):
     v1, _ = version(tmp_path, 1, reason=1)
     code, _, err = run(capsys, "check-carryover", str(v1), str(v1), "--tested-hash", "0x12")
     assert code == 2 and err.startswith("error:")
+
+
+# ADR-0016: policy beacon in the zone, and check-beacon.
+FEEDS = ROOT / "examples" / "feeds"
+BEACON = "block.example.org"
+
+
+def beacon_zone(tmp_path, capsys, doc_path=EXAMPLE):
+    zone = tmp_path / "beacon.rpz"
+    code, _, _ = run(capsys, "compile-rpz", str(doc_path), "--feeds-dir", str(FEEDS), "--block-page", BEACON, "--beacon", BEACON, "--out", str(zone))
+    assert code == 0
+    return zone
+
+
+def test_beacon_passes_against_its_policy(tmp_path, capsys):
+    zone = beacon_zone(tmp_path, capsys)
+    code, out, _ = run(capsys, "check-beacon", str(EXAMPLE), "--zone", str(zone), "--version", "1", "--json")
+    r = json.loads(out)
+    assert code == 0 and r["match"] and r["beacon"]["scope"] == "giga:XX:primary"
+
+
+def test_beacon_from_dig_output(tmp_path, capsys):
+    from vpr import policy
+
+    record = policy.beacon_record(policy.load(EXAMPLE), BEACON)
+    dig = record.split(None, 2)[2]  # what dig +short prints: the quoted strings
+    code, out, _ = run(capsys, "check-beacon", str(EXAMPLE), "--txt", dig, "--json")
+    assert code == 0 and json.loads(out)["match"]
+
+
+def test_stale_zone_is_detected(tmp_path, capsys):
+    # the resolver still serves version 1 while version 2 is in force
+    zone = beacon_zone(tmp_path, capsys)
+    v2, h2 = version(tmp_path, 2)
+    code, out, _ = run(capsys, "check-beacon", str(v2), "--zone", str(zone), "--version", "2", "--content-hash", h2, "--json")
+    r = json.loads(out)
+    assert code == 1 and r["checks"]["version"] is False and r["checks"]["onchainVersion"] is False and r["checks"]["contentHash"] is False
+
+
+def test_wrong_scope_is_detected(tmp_path, capsys):
+    zone = beacon_zone(tmp_path, capsys)
+    other, _ = version(tmp_path, 1, reason=1, valid_days=90, change=lambda d: d.update(scope="giga:XX:secondary", profile="secondary"))
+    code, out, _ = run(capsys, "check-beacon", str(other), "--zone", str(zone), "--json")
+    assert code == 1 and json.loads(out)["checks"]["scope"] is False
+
+
+def test_missing_beacon_suggests_a_bypass(capsys):
+    code, out, _ = run(capsys, "check-beacon", str(EXAMPLE), "--txt", "", "--json")
+    r = json.loads(out)
+    assert code == 1 and r["present"] is False and "bypass" in r["note"]
+
+
+@pytest.mark.parametrize(
+    "txt",
+    [
+        '"v=vpr2" "scope=giga:XX:primary" "version=1" "content=0x' + "0" * 64 + '" "rules=0x' + "0" * 64 + '"',
+        '"v=vpr1" "scope=giga:XX:primary" "version=1"',
+        '"v=vpr1" "v=vpr1" "scope=giga:XX:primary" "version=1" "content=0x' + "0" * 64 + '" "rules=0x' + "0" * 64 + '"',
+        '"v=vpr1" "scope=giga:XX:primary" "version=01" "content=0x' + "0" * 64 + '" "rules=0x' + "0" * 64 + '"',
+        '"v=vpr1" "scope=giga:XX:primary" "version=1" "content=0xZZ" "rules=0x' + "0" * 64 + '"',
+    ],
+)
+def test_malformed_beacon_exits_2(txt, capsys):
+    code, _, err = run(capsys, "check-beacon", str(EXAMPLE), "--txt", txt)
+    assert code == 2 and err.startswith("error:")

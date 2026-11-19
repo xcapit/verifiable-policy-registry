@@ -252,6 +252,7 @@ def compile_rpz(
     block_page: str | None = None,
     serial: int | None = None,
     allow_missing_feeds: bool = False,
+    beacon: str | None = None,
 ) -> str:
     """Compile a policy into an RPZ zone (RFC-draft Response Policy Zones), usable by Unbound or PowerDNS.
 
@@ -259,6 +260,10 @@ def compile_rpz(
     - `exceptions` are emitted as PASSTHRU rules, which take precedence.
     - If `block_page` is given, blocked names are redirected there (so users see a notice and can appeal);
       otherwise they get NXDOMAIN.
+    - If `beacon` is given (a domain the operator controls), the zone answers TXT queries for
+      `_vpr-policy.<beacon>` with the scope, version, content hash and rules digest it was compiled from
+      (`beacon_record`, ADR-0016). It is a self-report: it detects a stale or wrong zone and a client that does
+      not use the resolver, not an operator who misreports on purpose.
     - Fails closed: a category without a feed, or a restricted list whose hash differs from the one declared in
       the policy, is an error rather than a silently weaker zone.
     """
@@ -268,6 +273,8 @@ def compile_rpz(
         raise PolicyError(f"no feed, or an empty feed, for categories {missing}: refusing to compile a zone without promised protection")
     if block_page is not None:
         block_page = _check_domain(block_page, "block_page")
+    if beacon is not None:
+        beacon = _check_domain(beacon, "beacon")
     declared_feeds = policy.doc.get("feed_hashes")
     if declared_feeds:
         for cat in policy.doc["categories"]:
@@ -316,6 +323,8 @@ def compile_rpz(
         "",
         "; exceptions (PASSTHRU)",
     ]
+    if beacon is not None:
+        lines += ["; policy beacon (ADR-0016): self-reported by the operator", beacon_record(policy, beacon), ""]
     for d in exceptions:
         lines += [f"{d} CNAME rpz-passthru.", f"*.{d} CNAME rpz-passthru."]
     lines += ["", "; blocks"]
@@ -323,6 +332,87 @@ def compile_rpz(
         source = "" if blocked[d] == "restricted" else f" ; {blocked[d]}"
         lines += [f"{d} CNAME {target}{source}", f"*.{d} CNAME {target}"]
     return "\n".join(lines) + "\n"
+
+
+BEACON_LABEL = "_vpr-policy"
+BEACON_FORMAT = "vpr1"
+_BEACON_KEYS = ("v", "scope", "version", "content", "rules")
+
+
+def beacon_name(domain: str) -> str:
+    """Owner name of the policy beacon for a domain the operator controls (ADR-0016)."""
+    return f"{BEACON_LABEL}.{_check_domain(domain, 'beacon')}"
+
+
+def beacon_record(policy: Policy, domain: str) -> str:
+    """RPZ local-data TXT record that reports which policy the zone was compiled from (ADR-0016).
+
+    Each field is its own character-string, well under 255 bytes. The zone hash is not included: it would have
+    to be computed over a zone that contains it. The deployment attestation carries the zone hash instead.
+    """
+    fields = {
+        "v": BEACON_FORMAT,
+        "scope": policy.scope,
+        "version": str(policy.doc["version"]),
+        "content": policy.content_hash(),
+        "rules": policy.rules_digest(),
+    }
+    return f"{beacon_name(domain)} TXT " + " ".join(f'"{k}={fields[k]}"' for k in _BEACON_KEYS)
+
+
+_TXT_STRING = re.compile(r'"([^"\\]*)"')
+
+
+def parse_beacon(text: str) -> dict | None:
+    """Parse a beacon answer: the quoted character-strings of a TXT record, as printed by `dig +short TXT` or
+    found in the zone. Returns None if the text holds no character-string (no beacon answered).
+
+    Raises PolicyError for a malformed beacon: an unknown format, a missing, repeated or unexpected field, or a
+    value outside its syntax.
+    """
+    strings = _TXT_STRING.findall(text or "")
+    if not strings:
+        return None
+    fields = {}
+    for s in strings:
+        key, sep, value = s.partition("=")
+        if not sep or key not in _BEACON_KEYS or key in fields:
+            raise PolicyError("malformed beacon: unexpected, repeated or unnamed field")
+        fields[key] = value
+    if set(fields) != set(_BEACON_KEYS):
+        raise PolicyError(f"malformed beacon: missing fields {sorted(set(_BEACON_KEYS) - set(fields))}")
+    if fields["v"] != BEACON_FORMAT:
+        raise PolicyError(f"unknown beacon format {fields['v']!r}")
+    if not SCOPE_RE.fullmatch(fields["scope"]) or not re.fullmatch(r"[1-9][0-9]*", fields["version"]):
+        raise PolicyError("malformed beacon: scope or version")
+    for k in ("content", "rules"):
+        if not re.fullmatch(r"0x[0-9a-f]{64}", fields[k]):
+            raise PolicyError(f"malformed beacon: {k} must be a 0x-prefixed 32-byte hex string")
+    fields["version"] = int(fields["version"])
+    return fields
+
+
+def check_beacon(beacon: dict | None, policy: Policy, onchain_version: int | None = None,
+                 onchain_content_hash: str | None = None) -> dict:
+    """Compare a beacon answer with the policy document it should report, and optionally with the version in
+    force on-chain (ADR-0016). A missing beacon fails: the client is likely not using the filtering resolver.
+    """
+    if beacon is None:
+        return {"present": False, "checks": {"beaconPresent": False}, "match": False,
+                "note": "no beacon answered: this client is probably not using the filtering resolver (bypass), or the zone has no beacon"}
+    checks = {
+        "beaconPresent": True,
+        "scope": beacon["scope"] == policy.scope,
+        "version": beacon["version"] == policy.doc["version"],
+        "contentHash": beacon["content"] == policy.content_hash(),
+        "rulesDigest": beacon["rules"] == policy.rules_digest(),
+    }
+    if onchain_version is not None:
+        checks["onchainVersion"] = beacon["version"] == onchain_version
+    if onchain_content_hash is not None:
+        checks["onchainContentHash"] = beacon["content"] == onchain_content_hash.lower()
+    return {"present": True, "beacon": beacon, "checks": checks, "match": all(checks.values()),
+            "note": "self-reported by the operator: it detects a stale or wrong zone, not a deliberate misreport; behaviour is checked by the reviewer's tests"}
 
 
 def list_hash(domains: list[str]) -> str:
@@ -360,7 +450,8 @@ def evaluate_zone(zone: str, domain: str) -> dict:
     so the artefact that a resolver would load is what gets tested. It does not query any resolver.
 
     It fails closed on input it does not understand: any record other than the zone header ($TTL, SOA, NS
-    at the apex) and CNAME triggers raises PolicyError instead of being ignored.
+    at the apex), CNAME triggers and a well-formed policy beacon (ADR-0016) raises PolicyError instead of
+    being ignored.
     """
     name = _check_domain(domain, "query")
     exact: dict[str, tuple[str, str]] = {}
@@ -376,6 +467,8 @@ def evaluate_zone(zone: str, domain: str) -> dict:
             rest = rest[1:]  # TTL
         if rest and rest[0].upper() == "IN":
             rest = rest[1:]
+        if rest and rest[0].upper() == "TXT" and owner.startswith(BEACON_LABEL + ".") and parse_beacon(" ".join(rest[1:])):
+            continue  # the policy beacon (ADR-0016) is local data, not a blocking or passthru rule
         if len(rest) != 2 or rest[0].upper() != "CNAME":
             raise PolicyError(f"unsupported record at line {n} of the zone")
         target = rest[1].lower()

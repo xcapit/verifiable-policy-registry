@@ -147,3 +147,29 @@ def test_rules_digest_distinguishes_an_omitted_key_from_an_empty_one():
     b = copy.deepcopy(a)
     del b["threat_feeds"]
     assert policy.validate(a).rules_digest() != policy.validate(b).rules_digest()
+
+
+def test_beacon_is_opt_in_and_does_not_change_evaluation():
+    p = policy.load(EXAMPLE)
+    plain = policy.compile_rpz(p, _feeds(), block_page="block.example.org", serial=1)
+    with_beacon = policy.compile_rpz(p, _feeds(), block_page="block.example.org", serial=1, beacon="block.example.org")
+    assert "_vpr-policy" not in plain and policy.zone_hash(plain) != policy.zone_hash(with_beacon)
+    assert '_vpr-policy.block.example.org TXT "v=vpr1"' in with_beacon
+    for d in ("wikipedia.org", "bad-malware.example", "casino-example.example", "unlisted.example"):
+        assert policy.evaluate_zone(with_beacon, d) == policy.evaluate_zone(plain, d)
+
+
+def test_beacon_fields_fit_and_reject_bad_domains():
+    p = policy.load(EXAMPLE)
+    record = policy.beacon_record(p, "block.example.org")
+    assert all(len(s) < 255 for s in record.split('"')[1::2])
+    assert policy.parse_beacon(record)["content"] == p.content_hash()
+    with pytest.raises(policy.PolicyError):
+        policy.compile_rpz(p, _feeds(), serial=1, beacon="block.example.org\nevil.example CNAME rpz-passthru.")
+
+
+def test_evaluate_rejects_other_txt_records():
+    p = policy.load(EXAMPLE)
+    zone = policy.compile_rpz(p, _feeds(), serial=1) + 'other.example TXT "hello"\n'
+    with pytest.raises(policy.PolicyError):
+        policy.evaluate_zone(zone, "wikipedia.org")
