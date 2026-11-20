@@ -10,7 +10,7 @@ The Verifiable Policy Registry (VPR) is designed to separate the **enforcement**
 
 The project team proposes a first deployment in schools connected by **UNICEF Giga** in Latin America: a controlled alpha in two to five schools, then, if its gates are met, a cohort of 20 to 50 ([roadmap](docs/ROADMAP.md), [pilot proposal](docs/giga/PILOT_READINESS.md)). No pilot, funding or endorsement has been agreed with Giga, UNICEF, the Ethereum Foundation or any other party. The protocol is not specific to schools ([ADR-0013](docs/adr/0013-protocol-for-bounded-or-chosen-filtering.md)). It serves other bounded networks with an accountable governor, such as libraries, municipal Wi-Fi or NGO networks, and software or services that users choose for themselves, such as wallets, dApp front ends and protective resolvers, whose blocklists can be published, versioned, expiring and contestable in the same registry.
 
-> **Status: v0.7.0 (research prototype, pre-release).** Every claim is tracked in the [claims and evidence ledger](docs/CLAIMS_AND_EVIDENCE.md).
+> **Status: v0.8.0 (research prototype, pre-release).** Every claim is tracked in the [claims and evidence ledger](docs/CLAIMS_AND_EVIDENCE.md).
 >
 > | | |
 > | --- | --- |

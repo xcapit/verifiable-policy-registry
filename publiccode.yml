@@ -1,8 +1,8 @@
 publiccodeYmlVersion: "0.4"
 name: Verifiable Policy Registry
 url: "https://github.com/xcapit/verifiable-policy-registry"
-softwareVersion: "0.7.0"
-releaseDate: "2026-11-11"
+softwareVersion: "0.8.0"
+releaseDate: "2026-11-19"
 platforms: [web, linux]
 categories: [data-collection, it-security]
 developmentStatus: development

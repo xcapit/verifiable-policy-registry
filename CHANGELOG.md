@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-19
+
+Answers to a technical review of governance, appeals and bypass, and a policy beacon in the zone (ADR-0016). The release is a minor version because it adds commands to the `vpr` CLI (`check-beacon`, `compile-rpz --beacon`), a contracts script (`check-governor.js`) and optional manifest fields; existing commands, formats and zones compiled without `--beacon` are unchanged. Contract source is unchanged since v0.6.0, and contract logic since v0.4.0. ADR-0015 and the signed beacon are proposals for the M1 review, not implemented. The white paper stays at version 0.7, with edits for ADR-0013 and ADR-0015; its version number is independent of the release number. Research prototype: contracts not audited, schemas not registered on a public network, ZK proof of aggregation designed but not implemented, no public deployment.
+
 ### Added
 - Policy beacon (ADR-0016). `vpr compile-rpz --beacon <domain>` adds a TXT record `_vpr-policy.<domain>` with the scope, version, content hash and rules digest the zone was compiled from. `vpr check-beacon` compares a beacon answer, for example from `dig`, or a zone with the policy in force and optionally with the on-chain version and content hash. It detects a stale or wrong zone. A missing answer suggests that the client is not using the filtering resolver. The beacon is self-reported by the operator and is opt-in; `evaluate_zone` accepts it and nothing else beyond CNAME triggers. Checked by hand against Unbound 1.25.0. A signed beacon is proposed (VPR-080). INTERFACES I4 and I10, BYPASS.md, threat model T02 and claim C62 are updated.
 - ADR-0015 (proposed, for the M1 review) covers appeal timeliness and spam. Appeals whose document is not provided within 3 days are unsubstantiated and count against no one. Substantiated appeals still open after the charter's response time are overdue and published per scope. Batch rejection is added to the next registry. An on-chain renewal gate is deferred until filings can be rate limited without identifying the filer. GOVERNANCE rule 3, threat model T23 and T25, the white paper (P5) and the claims ledger (C60, not enforced) are updated, and backlog VPR-076 to VPR-078 are added.
@@ -196,7 +200,8 @@ First public release: a proof of concept and the documentation needed for extern
 - Code of conduct, security policy, project governance, maintainers, support, contribution guide with DCO, issue and pull request templates.
 - Licence texts (AGPL-3.0-only, CC0-1.0, CC-BY-4.0), NOTICE, CITATION.cff and publiccode.yml.
 
-[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/xcapit/verifiable-policy-registry/compare/v0.4.0...v0.5.0
