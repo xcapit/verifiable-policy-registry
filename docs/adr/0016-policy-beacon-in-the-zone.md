@@ -37,7 +37,7 @@ Any client on the network can query it: `dig +short TXT _vpr-policy.<domain>`.
 
 **What a missing beacon means.** If a school's zone has a beacon and a device gets no answer, the device is probably not using the filtering resolver. Any party can run that check without special access: the school, the dashboard, the reviewer kit, or a connectivity probe such as Giga Meter.
 
-**Tested against a resolver.** The record was served by Unbound 1.25.0 from a zone compiled by `vpr compile-rpz --beacon`, and `vpr check-beacon` on the `dig` answer matched. The run was manual and local. Running it in CI needs the pinned resolver container (VPR-055).
+**Tested against a resolver.** The resolver check (`examples/resolver/run.sh`, CI job `resolver`) serves a zone compiled with `--beacon` from a pinned Unbound 1.26.2 container. `vpr check-beacon` matches the `dig` answer against the version and content hash in force, and reports a mismatch when another version is in force. With a zone compiled without `--beacon`, no beacon answers and `vpr check-beacon` reports it. Every other answer matches `vpr evaluate`, so the beacon changes no blocking decision on a real resolver either.
 
 ## Consequences
 

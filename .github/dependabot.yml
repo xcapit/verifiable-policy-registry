@@ -16,6 +16,10 @@ updates:
   - package-ecosystem: pip
     directory: /tools
     schedule: { interval: weekly }
+  # Base image digest of the resolver check; the Unbound version and checksum are bumped by hand.
+  - package-ecosystem: docker
+    directory: /deploy/unbound/test
+    schedule: { interval: monthly }
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: monthly }

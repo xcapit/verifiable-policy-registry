@@ -121,7 +121,7 @@ The `e2e` job, including `npm ci`, compilation and both stages, completes in a f
 
 ## 4. Not measured
 
-- **Resolver latency impact.** No resolver runs in the demo (zone evaluation only). Measuring it is planned with the pinned resolver container (VPR-019) and at alpha onboarding.
+- **Resolver latency impact.** Not measured. The pinned resolver container (`examples/resolver`) checks answers and logging, not latency, and its upstream is a local zone, so its timings say nothing about a school network. Measuring it is planned with the hardened resolver profile (VPR-019) and at alpha onboarding.
 - **Network needs at schools.** These are measured during the alpha (Gate B).
 - **Safe overhead.** The cost of `execTransaction` and of *m* signatures for governor transactions (§2.1) is not measured.
 - **Conformance attestations, revocations and `verifyRow` calls** are not in the workload; `verifyRow` is a view and costs nothing unless it is called from a contract.

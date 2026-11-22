@@ -64,7 +64,7 @@ function writeManifest(passed) {
     onchainStages: stages,
     gasUsed: gas,
     notImplemented: [
-      { stage: "dns-resolution", note: "No resolver runs in the demo; the compiled zone is evaluated (vpr evaluate). A pinned resolver container is planned (VPR-055)." },
+      { stage: "dns-resolution", note: "No resolver runs in this demo; the compiled zone is evaluated (vpr evaluate). A pinned Unbound container serving the same policy is checked separately: examples/resolver/run.sh, CI job resolver (VPR-055)." },
       { stage: "zk-proof", note: "Zero-knowledge proof of aggregation is Designed, not implemented. Specification: docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md; milestone M4 (docs/ROADMAP.md)." },
     ],
     limitations: [

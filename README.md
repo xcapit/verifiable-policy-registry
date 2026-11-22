@@ -15,8 +15,8 @@ The project team proposes a first deployment in schools connected by **UNICEF Gi
 > | | |
 > | --- | --- |
 > | **Implemented** (code + passing tests) | Policy registry with expiry, appeals by hash and on-chain issuer roles; metrics anchor with on-chain row verification; policy hashing, fail-closed zone compilation and zone evaluation; aggregation with small-cell suppression; generic verification toolkit and CLI |
-> | **Demonstrated** (CI, synthetic data, local chain) | Policy → zone → releases for two use cases → anchored roots → accepted and rejected proofs → appeal → expiry, with a machine-readable evidence manifest ([demo](examples/e2e/run.sh), [benchmarks](docs/benchmarks/BENCHMARKS.md)) |
-> | **Designed, not implemented** | Zero-knowledge proof of aggregation, hiding event-log commitment, canary checks ([specification](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md)); resolver container; deployment manifest |
+> | **Demonstrated** (CI, synthetic data, local chain) | Policy → zone → releases for two use cases → anchored roots → accepted and rejected proofs → appeal → expiry, with a machine-readable evidence manifest ([demo](examples/e2e/run.sh), [benchmarks](docs/benchmarks/BENCHMARKS.md)); a pinned Unbound resolver serving the compiled zones, queried with `dig` ([resolver check](examples/resolver/run.sh)) |
+> | **Designed, not implemented** | Zero-knowledge proof of aggregation, hiding event-log commitment, canary checks ([specification](docs/security/ZK_AND_CRYPTOGRAPHIC_EVIDENCE.md)); deployment manifest |
 > | **Audit and review** | None. Not audited, not formally verified, no independent review yet ([reviewer guide](docs/review/REVIEWER_GUIDE.md)) |
 > | **Deployment and pilot** | Local test chains only. No public deployment, no school, no partner commitment |
 
@@ -79,6 +79,14 @@ E2E_OUT=out ./examples/e2e/run.sh       # evidence in out/evidence-manifest.json
 ```
 
 The same script runs in CI on every push, and the evidence is uploaded as the artifact `demo-evidence`. Its source is in [`examples/e2e/`](examples/e2e) and [`contracts/scripts/e2e.js`](contracts/scripts/e2e.js).
+
+The demo evaluates the compiled zone with `vpr evaluate`; it runs no resolver. A separate check serves zones compiled from the same policy with a pinned Unbound container and queries it with `dig`. It checks that every answer matches `vpr evaluate`, that the policy beacon (ADR-0016) is served and matched by `vpr check-beacon`, and that the resolver logs none of the queried names. Two canaries, a zone without its block rules and a resolver that logs queries, must make it fail. It needs Docker, and nothing leaves the container: the upstream is a local test zone.
+
+```bash
+RESOLVER_OUT=out-resolver ./examples/resolver/run.sh   # evidence in out-resolver/resolver-evidence.json
+```
+
+CI runs it as the job `resolver` and uploads the artifact `resolver-evidence`.
 
 ## Quick start
 

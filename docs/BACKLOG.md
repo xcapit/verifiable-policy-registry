@@ -14,7 +14,7 @@ Dependency-aware checklist for v0.3. Items marked **Done in v0.3** were delivere
 | VPR-052 | Privacy and re-identification analysis, data inventory, privacy regression tests | VPR-050 | **Done in v0.3**; release-policy parameters need pilot data (DPIA, M1) |
 | VPR-053 | Generic verification toolkit, second use case, CLI JSON and exit codes (ADR-0009) | — | **Done in v0.3** |
 | VPR-054 | Demonstrator with zone evaluation, expiry, appeal rejection, negative cases and evidence manifest | VPR-053 | **Done in v0.3** |
-| VPR-055 | Pinned resolver container in the demonstrator (real DNS queries, no query logging asserted) | VPR-019 | Planned (M2) |
+| VPR-055 | Pinned resolver container in the demonstrator (real DNS queries, no query logging asserted) | — | **Done** after v0.8.0: `examples/resolver/run.sh`, CI job `resolver` (Unbound 1.26.2 built from the checksummed release on a digest-pinned base; answers checked against `vpr evaluate`, beacon, log, two canaries). The hardening of VPR-019 is still open |
 | VPR-056 | Giga pilot-readiness package; ESP package; DPG evidence matrix | VPR-050 | **Done in v0.3** (proposal documents; inputs marked) |
 | VPR-057 | Reviewer guide | VPR-050–056 | **Done in v0.3** |
 | VPR-058 | Registry fields `catRoot` and `unitRoot` (ADR-0010) and ZK verifier anchoring | VPR-033 | Designed; Planned (M4) |

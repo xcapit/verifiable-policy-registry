@@ -27,7 +27,7 @@ This package describes how the Verifiable Policy Registry (VPR) could be piloted
 | Policy registry and daily-summary anchor (contracts) | Implemented, not audited | `contracts/`, CI job `contracts` |
 | Policy validation, filter-zone compilation, aggregation tools | Implemented | `tools/`, CI job `tools` |
 | End-to-end flow on a local test network with synthetic data | Demonstrated | `examples/e2e/run.sh`, CI job `e2e` |
-| Checking test domains against the compiled filter zone | Implemented in v0.3 as a zone evaluation, not DNS resolution | `vpr evaluate` |
+| Checking test domains against the compiled filter zone | Implemented as a zone evaluation (`vpr evaluate`), and tested in CI against a real resolver (pinned Unbound 1.26.2, synthetic upstream) | `vpr evaluate`, `examples/resolver/run.sh`, CI job `resolver` |
 | Production DNS resolver for schools | Designed (reference configuration only) | `deploy/unbound/rpz.conf`, roadmap M2 |
 | Block page and appeal relayer, Spanish and Portuguese | Planned (VPR-017) | [../BACKLOG.md](../BACKLOG.md) |
 | Independent reviewer test kit | Planned (VPR-018) | [../BACKLOG.md](../BACKLOG.md) |

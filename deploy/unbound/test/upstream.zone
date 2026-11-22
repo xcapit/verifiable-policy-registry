@@ -1,0 +1,21 @@
+; Synthetic "internet" for the resolver check (VPR-055): what the names would resolve to without a
+; policy. Addresses are from the documentation ranges (RFC 5737). A name whose answer is one of the
+; 198.51.100.0/24 addresses below must never reach a client while the policy blocks it.
+$ORIGIN .
+$TTL 300
+.                          SOA  ns.test. hostmaster.test. 1 3600 600 86400 300
+.                          NS   ns.test.
+; block page
+block.example.org.         A    192.0.2.80
+; exceptions and allowed names
+wikipedia.org.             A    192.0.2.10
+en.wikipedia.org.          A    192.0.2.11
+khanacademy.org.           A    192.0.2.12
+unlisted.example.          A    192.0.2.20
+; names listed by the example policy (category feeds and local blocks)
+adult-site.example.        A    198.51.100.1
+bad-malware.example.       A    198.51.100.2
+www.bad-malware.example.   A    198.51.100.3
+c2-server.example.         A    198.51.100.4
+casino-example.example.    A    198.51.100.5
+fake-bank-login.example.   A    198.51.100.6
