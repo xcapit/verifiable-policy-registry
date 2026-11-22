@@ -168,6 +168,25 @@ jobs:
           path: e2e-out/
           if-no-files-found: warn
 
+  resolver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -e tools
+      - name: Resolver check (pinned Unbound, real DNS queries, no query logging; every canary must be caught)
+        run: RESOLVER_OUT=resolver-out ./examples/resolver/run.sh
+      - name: Upload resolver evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: resolver-evidence
+          path: resolver-out/
+          if-no-files-found: warn
+
   links:
     runs-on: ubuntu-latest
     steps:
